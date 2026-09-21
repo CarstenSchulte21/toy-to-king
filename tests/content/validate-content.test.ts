@@ -39,7 +39,7 @@ describe("validateContent", () => {
 
   it("meldet fehlende Pflichtfelder mit lesbarer Stelle", () => {
     const r = run(room(`  - id: tonne\n    rect: [10, 10, 30, 30]\n    untersuchen: "x"\n`));
-    expect(r.errors[0]).toContain('Hotspot "tonne", Feld "label"');
+    expect(r.errors).toEqual(['content/rooms/hof.yaml, Hotspot "tonne", Feld "label": Pflichtfeld fehlt.']);
   });
 
   it("meldet Tippfehler in Feldnamen", () => {
@@ -67,6 +67,15 @@ describe("validateContent", () => {
       ),
     );
     expect(r.errors.join("\n")).toContain("nicht gemischt");
+  });
+
+  it("meldet bei vertipptem Pflichtfeld nur den Tippfehler", () => {
+    const r = run(
+      room(`  - id: tonne\n    lable: Tonne\n    rect: [10, 10, 30, 30]\n    untersuchen: "x"\n`),
+    );
+    expect(r.errors).toEqual([
+      'content/rooms/hof.yaml, Hotspot "tonne": Unbekanntes Feld "lable". Meintest du "label"?',
+    ]);
   });
 
   it("verlangt mindestens ein Verb", () => {

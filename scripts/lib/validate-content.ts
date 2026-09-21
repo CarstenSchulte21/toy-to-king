@@ -146,8 +146,11 @@ function pushIssues(file: string, data: unknown, issues: z.core.$ZodIssue[], err
   );
   for (const issue of issues) {
     if (issue.code === "custom" && typoPaths.has(issue.path.join("."))) continue;
+    const missing = issue.code === "invalid_type" && /undefined/.test(issue.message);
+    // Fehlt ein Feld, das daneben falsch geschrieben steht, reicht der Tippfehler-Hinweis.
+    if (missing && typoPaths.has(issue.path.slice(0, -1).join("."))) continue;
     for (const i of resolveUnion(issue)) {
-      let message = i.message;
+      let message = missing ? "Pflichtfeld fehlt." : i.message;
       if (issue.code === "unrecognized_keys") {
         message = issue.keys.map((k) => `Unbekanntes Feld "${k}".${suggest(k, KNOWN_KEYS)}`).join(" ");
       }
