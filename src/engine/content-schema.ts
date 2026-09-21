@@ -1,6 +1,6 @@
 // Schemas für alle Spielinhalte (SPEC 4.2–4.4).
 // Die TypeScript-Typen werden direkt aus den Schemas abgeleitet – so können Inhalt und Code nicht auseinanderlaufen.
-// M1: Rooms und Hotspots. M2 ergänzt NPCs, Dialoge und Infos.
+// M1: Rooms und Hotspots. M2: NPCs, Dialoge und Infos.
 import { z } from "zod";
 
 z.config(z.locales.de());
@@ -21,14 +21,29 @@ const id = z
 const text = z.string().min(1, "Text darf nicht leer sein.");
 
 // Bedingungen – jede Bedingung ist ein Objekt mit genau einem Schlüssel.
+const trustLevel = z.number().int().min(0).max(5);
+
 export const conditionSchema = z.union(
-  [z.strictObject({ flag: id }), z.strictObject({ not_flag: id }), z.strictObject({ visited: id })],
-  { error: "Unbekannte Bedingung. Erlaubt in M1: flag, not_flag, visited." },
+  [
+    z.strictObject({ flag: id }),
+    z.strictObject({ not_flag: id }),
+    z.strictObject({ visited: id }),
+    z.strictObject({ fact: id }),
+    z.strictObject({ not_fact: id }),
+    z.strictObject({ trust_min: z.union([trustLevel, z.strictObject({ npc: id, value: trustLevel })]) }),
+  ],
+  { error: "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min." },
 );
 
-export const effectSchema = z.union([z.strictObject({ set_flag: id }), z.strictObject({ clear_flag: id })], {
-  error: "Unbekannter Effekt. Erlaubt in M1: set_flag, clear_flag.",
-});
+export const effectSchema = z.union(
+  [
+    z.strictObject({ set_flag: id }),
+    z.strictObject({ clear_flag: id }),
+    z.strictObject({ learn: id }),
+    z.strictObject({ trust: z.number().int().min(-5).max(5) }),
+  ],
+  { error: "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust." },
+);
 
 const lines = z.union([text, z.array(text).min(1)], {
   error: "Erwartet: ein Text oder eine Liste von Texten.",
@@ -91,9 +106,10 @@ export const hotspotSchema = z
     if: z.array(conditionSchema).optional(),
     untersuchen: textVariantsSchema.optional(),
     gehen: id.optional(),
+    sprechen: id.optional(),
   })
-  .refine((h) => h.untersuchen !== undefined || h.gehen !== undefined, {
-    error: "Hotspot braucht mindestens ein Verb: untersuchen oder gehen.",
+  .refine((h) => h.untersuchen !== undefined || h.gehen !== undefined || h.sprechen !== undefined, {
+    error: "Hotspot braucht mindestens ein Verb: untersuchen, gehen oder sprechen.",
   });
 
 export const roomSchema = z.strictObject({
@@ -111,13 +127,81 @@ export const configSchema = z.strictObject({
   empty_category_text: text.optional(),
 });
 
+export const FACT_CATEGORIES = ["spot", "risiko", "crews", "material", "szene"] as const;
+
+export const factSchema = z.strictObject({
+  id,
+  category: z.enum(FACT_CATEGORIES, { error: `Kategorie muss eine von ${FACT_CATEGORIES.join(", ")} sein.` }),
+  title: text,
+  text,
+  source: id,
+});
+export const factsFileSchema = z.array(factSchema);
+
+// Eine Antwortoption des Spielers. Führt entweder weiter (next) oder beendet das Gespräch (end).
+export const optionSchema = z
+  .strictObject({
+    text,
+    id: id.optional(),
+    if: z.array(conditionSchema).optional(),
+    show_locked: text.optional(),
+    effects: z.array(effectSchema).optional(),
+    once: z.literal(true).optional(),
+    next: id.optional(),
+    end: z.literal(true).optional(),
+  })
+  .refine((o) => (o.next !== undefined) !== (o.end === true), {
+    error: 'Eine Option braucht genau eins: "next" (weiter zu Knoten) oder "end: true" (Gespräch endet).',
+  });
+
+// Ein Dialogknoten: was der NPC sagt, und wie es danach weitergeht.
+export const dialogueNodeSchema = z
+  .strictObject({
+    text: lines,
+    effects: z.array(effectSchema).optional(),
+    options: z.array(optionSchema).min(1).optional(),
+    next: id.optional(),
+    end: z.literal(true).optional(),
+  })
+  .refine(
+    (n) => [n.options !== undefined, n.next !== undefined, n.end === true].filter(Boolean).length === 1,
+    {
+      error: 'Ein Knoten braucht genau eins: "options", "next" oder "end: true".',
+    },
+  );
+
+export const npcSchema = z.strictObject({
+  id,
+  name: text,
+  role: text,
+  room: id,
+  hotspot: id,
+  trust: z.union([z.strictObject({ start: trustLevel }), z.literal(false)], {
+    error: 'trust ist entweder "{ start: 0 }" (Zahl 0–5) oder "false" (kein Vertrauenswert).',
+  }),
+  dialogue: z.strictObject({
+    start: z.union([
+      id,
+      z.array(z.strictObject({ if: z.array(conditionSchema).optional(), node: id })).min(1),
+    ]),
+    nodes: z.record(id, dialogueNodeSchema),
+  }),
+});
+
 export type Condition = z.infer<typeof conditionSchema>;
 export type Effect = z.infer<typeof effectSchema>;
 export type Hotspot = z.infer<typeof hotspotSchema>;
 export type Room = z.infer<typeof roomSchema>;
 export type GameConfig = z.infer<typeof configSchema>;
+export type Fact = z.infer<typeof factSchema>;
+export type FactCategory = (typeof FACT_CATEGORIES)[number];
+export type DialogueOption = z.infer<typeof optionSchema>;
+export type DialogueNode = z.infer<typeof dialogueNodeSchema>;
+export type Npc = z.infer<typeof npcSchema>;
 
 export type GameContent = {
   config: GameConfig;
   rooms: Record<string, Room>;
+  npcs: Record<string, Npc>;
+  facts: Record<string, Fact>;
 };

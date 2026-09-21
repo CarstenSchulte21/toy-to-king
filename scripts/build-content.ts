@@ -28,7 +28,8 @@ if (errors.length > 0 || !content) {
 mkdirSync(join(root, "src/generated"), { recursive: true });
 writeFileSync(join(root, "src/generated/content.json"), JSON.stringify(content, null, 2) + "\n");
 console.log(
-  `✔ Inhalte ok: ${Object.keys(content.rooms).length} Room(s), ${files.length} Datei(en)` +
+  `✔ Inhalte ok: ${Object.keys(content.rooms).length} Room(s), ${Object.keys(content.npcs).length} NPC(s), ` +
+    `${Object.keys(content.facts).length} Info(s), ${files.length} Datei(en)` +
     (warnings.length ? `, ${warnings.length} Warnung(en)` : "") +
     ".",
 );

@@ -128,7 +128,7 @@ describe("validateContent", () => {
         `  - id: tonne\n    label: Tonne\n    rect: [10, 10, 30, 30]\n    if: [{visited: strase}]\n    untersuchen: "x"\n`,
       ),
     );
-    expect(r.errors.join("\n")).toContain('Bedingung "visited"');
+    expect(r.errors.join("\n")).toContain('"visited" zeigt auf "strase"');
   });
 
   it("meldet unbekannte Bedingungen", () => {
