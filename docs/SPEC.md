@@ -163,7 +163,7 @@ Die Spielfigur hat keinen festen Namen. Beim neuen Spiel gibt der Spieler seinen
 ## 5. Engine-Regeln
 
 1. `reduce(state, action, content)` ist eine reine Funktion und liefert `{ state, events }`. Die Engine zeigt nichts an; die UI reagiert auf Events.
-2. Aktionen M1: `ENTER_ROOM`, `INTERACT` (untersuchen, gehen), `CLOSE_TEXT`, `NEW_GAME` (mit Writer-Name). M2: `START_DIALOGUE`, `ADVANCE_LINE`, `CHOOSE_OPTION`, `END_DIALOGUE`, `MARK_FACTS_SEEN`.
+2. Aktionen M1: `ENTER_ROOM`, `INTERACT` (untersuchen, gehen), `NEW_GAME` (mit Writer-Name), `TICK` (Spielzeit). Textboxen schließt die Oberfläche selbst. M2: `START_DIALOGUE`, `ADVANCE_LINE`, `CHOOSE_OPTION`, `END_DIALOGUE`, `MARK_FACTS_SEEN`.
 3. Unbekannte IDs lassen den Zustand unverändert und erzeugen ein `WARNING`-Event. Kein Absturz.
 4. Textvarianten: die erste Variante, deren Bedingungen erfüllt sind, gewinnt. Ihre Effekte werden ausgeführt.
 5. Knoten betreten: erst Knoten-Effekte, dann Textzeilen, dann Optionen, `next` oder Ende.
@@ -229,6 +229,11 @@ Die Spielfigur hat keinen festen Namen. Beim neuen Spiel gibt der Spieler seinen
 | Neu F11.5 Debug-Panel (Should, M1) | Inhalte müssen testbar sein, ohne jedes Mal bis zur Stelle zu spielen. |
 | Neu F1.8 Writer-Name bei Spielstart (Must, M1) | Die Spielfigur hat keinen festen Namen; NPCs sprechen den Spieler mit seinem gewählten Namen an. |
 | F11.4 Feedback-Weg von Could/M6 auf Should/M2 | Der Tester soll Feedback genau an der Stelle geben können, an der es entsteht – sonst bleibt nur „irgendwas bei KRUX klang komisch". |
+| Textboxen ohne Engine-Aktion (`CLOSE_TEXT` entfällt) | Textboxen sind laut 4.1 kein Spielstand. Die Engine liefert `TEXT`-Ereignisse, die Oberfläche blättert sie durch. |
+| Neue Aktion `TICK` | Zählt `meta.playSeconds`, alle 15 Sekunden, solange gespielt wird. |
+| Sichtbare Platzhalter-Hotspots ohne Hintergrundbild | Unsichtbare Tap-Flächen auf leerem Grund sind unspielbar. Mit echter Grafik werden Hotspots wieder unsichtbar. |
+| Schriftwahl VT323 / Pixelify Sans im Debug-Panel | Grundlage für die Schriftentscheidung im Playtest. |
+| `fitToContent` | Steht ein Spielstand in einem Room, den es nicht mehr gibt, geht es im Start-Room weiter – Inhalte ändern sich während der Entwicklung. |
 | M2 mit vier Rooms statt drei | Die Straße als Knotenpunkt gibt der Streife einen natürlichen Ort und verbindet die anderen Rooms. |
 
 ## 9. Festlegungen (gelten, bis der Tester widerspricht)

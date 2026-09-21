@@ -39,6 +39,8 @@ content:check muss grün bleiben. Committe mit Verweis auf das Issue.
 
 ## M1 – Hinterhof
 
+**Stand 21.09.2026:** M1-1 und M1-3 bis M1-6 umgesetzt (62 Tests grün, Build grün). Offen: M1-0 und M1-2 (Einrichtung GitHub/Vercel, Product Owner), M1-7 (erster Test).
+
 **Spielbar am Ende:** Mit eigenem Writer-Namen starten, den Hinterhof auf dem Handy erkunden, Spielstand bleibt erhalten.
 **Tester-Fokus:** Ist die Schrift lesbar? Sind die Tap-Flächen treffbar? Klingen die Hinterhof-Texte echt?
 
