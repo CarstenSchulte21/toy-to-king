@@ -1,4 +1,4 @@
-# MEILENSTEINE – M1 & M2
+# MEILENSTEINE – M1 bis M3
 
 ## Rollen
 
@@ -307,3 +307,26 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 - [ ] Alle Kriterien aus SPEC 7, M2 erfüllt.
 - [ ] Alle `cringe`-Issues vom Tester geschlossen.
 - [ ] **Go/No-Go für M3:** Macht das Reden mit NPCs Spaß? Wenn nicht, wird vor M3 umgesteuert, nicht weitergebaut.
+
+---
+
+## M3 – Karte, Spots, Sprühen
+
+**Stand 21.09.2026:** umgesetzt auf Branch `m3`, Details in `SPEC-M3.md`. Offen: Preview prüfen, mergen, Playtest.
+
+**Spielbar am Ende:** Karte öffnen, zu einem Spot gehen, mit Style, Cap und Dose sprühen, das eigene Werk an der Wand und auf der Karte sehen.
+**Tester-Fokus:** Fühlt sich die Wahl von Style, Cap und Dose echt an – oder wie ein Quiz? Stimmen die Hinweise nach dem Sprühen? Stimmen die Spots (Heaven Spot, Zug, Hall) mit dem, was man aus der Szene kennt?
+
+### M3 – Playtest
+
+- [ ] Alle fünf Spots finden – ohne Hilfe?
+- [ ] Ist klar, woher man Skinny Cap, Fat Cap, NY Fat und High Pressure bekommt?
+- [ ] Welche Kombinationen fühlen sich falsch bewertet an? (z. B. „Das würde in echt anders laufen")
+- [ ] Wirkt der eigene Name an der Wand gut – oder zu klein, zu gleich?
+- [ ] Fehlt etwas, das beim Sprühen unbedingt dazugehört?
+
+### M3 – Abnahme und Entscheidungspunkt
+
+- [ ] Kriterien aus SPEC-M3 auf dem Handy bestätigt.
+- [ ] Playtest-Feedback als Issues erfasst.
+- [ ] **Vor M4:** Heat, Wanted, XP und Ränge bauen auf dieser Sprüh-Regel auf. Wenn sie sich unecht anfühlt, jetzt ändern – später wird es teuer.

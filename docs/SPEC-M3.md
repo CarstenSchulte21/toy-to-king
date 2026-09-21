@@ -2,6 +2,8 @@
 
 Bezug: `backlog.md` (E3, E4, E8, F1.4), `SPEC.md` (M1/M2, gilt weiter), `CONTENT.md`.
 
+**Stand 21.09.2026:** umgesetzt auf Branch `m3` (107 Tests grün, Build grün). Alle Kriterien aus Abschnitt 4 automatisch oder im Browser-Durchlauf geprüft; offen ist der Test auf echten Handys.
+
 ## 1. Ziel
 
 **Spielbar am Ende:** Man öffnet die Bezirkskarte, geht zu einem Spot und sprüht dort. Style, Cap und Dose bestimmen, wie gut das Werk wird. Das Werk bleibt am Spot sichtbar und steht auf der Karte.
@@ -51,11 +53,20 @@ Migration v1 → v2: `items` = Startausrüstung aus `config.yaml`, `works` = lee
 
 ## 4. Akzeptanzkriterien M3
 
-- [ ] **F3.1** Karte über das HUD erreichbar; zeigt alle bekannten Orte; Tippen reist dorthin; unbekannte Orte sind nicht wählbar.
-- [ ] **F3.2** Fünf Spots mit Typ, passenden Styles und Risiko; jeder erscheint erst mit der passenden Info.
-- [ ] **F4.1** Sprühen mit Style, Cap und Dose; Qualität nach Regel aus 2; Piece ohne Skinny Cap nicht wählbar, mit Begründung.
-- [ ] **F4.2** Das Werk ist danach am Spot sichtbar (Writer-Name, Qualität) und auf der Karte markiert; es bleibt nach dem Neuladen.
-- [ ] **F4.3** Alle Bezeichnungen wie im Glossar.
-- [ ] **F8.1 / F1.4** Tasche zeigt Caps und Dosen; Gespräche geben Material; Sprühen bietet nur, was man hat.
-- [ ] Alte Spielstände (v1) laden ohne Verlust.
-- [ ] Automatischer Durchlauf: Alles Material ist erreichbar, an jedem Spot ist Qualität 3 möglich.
+- [x] **F3.1** Karte über das HUD erreichbar; zeigt alle bekannten Orte; Tippen reist dorthin; unbekannte Orte sind nicht wählbar.
+- [x] **F3.2** Fünf Spots mit Typ, passenden Styles und Risiko; jeder erscheint erst mit der passenden Info.
+- [x] **F4.1** Sprühen mit Style, Cap und Dose; Qualität nach Regel aus 2; Piece ohne Skinny Cap nicht wählbar, mit Begründung.
+- [x] **F4.2** Das Werk ist danach am Spot sichtbar (Writer-Name, Qualität) und auf der Karte markiert; es bleibt nach dem Neuladen.
+- [x] **F4.3** Alle Bezeichnungen wie im Glossar.
+- [x] **F8.1 / F1.4** Tasche zeigt Caps und Dosen; Gespräche geben Material; Sprühen bietet nur, was man hat.
+- [x] Alte Spielstände (v1) laden ohne Verlust.
+- [x] Automatischer Durchlauf: Alles Material ist erreichbar, an jedem Spot ist Qualität 3 möglich.
+
+## 5. Abweichungen und Nachträge
+
+| Punkt | Grund |
+|-------|-------|
+| Das Verb „Sprühen" erscheint erst, wenn man den Spot kennt | Sonst stünde es an der linken Wand, bevor KRUX sein Okay gegeben hat. |
+| Sprüh-Menü zeigt Material-Tipps aus dem Blackbook | Die Infos von Sibel sollen dort helfen, wo man sie braucht. |
+| Werke erscheinen als Writer-Name mit Qualitätsanzeige am Spot | Platzhalter bis zur echten Grafik; Throw-up, Hollow und Piece sehen unterschiedlich aus. |
+| Karte ohne Straßennamen, nur schematische Linien | Echte Karte kommt mit dem Grafik-Schritt. |
