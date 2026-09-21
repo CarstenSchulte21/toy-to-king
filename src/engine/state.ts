@@ -3,7 +3,7 @@
 import { z } from "zod";
 import type { GameContent } from "./content-schema";
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const gameStateSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
@@ -15,10 +15,22 @@ export const gameStateSchema = z.object({
   trust: z.record(z.string(), z.number()),
   usedOnce: z.array(z.string()),
   newlyVisible: z.array(z.string()),
+  items: z.record(z.string(), z.number()), // Tasche: Caps und Dosen (ab v2)
+  works: z.record(
+    z.string(),
+    z.object({
+      style: z.string(),
+      cap: z.string(),
+      dose: z.string(),
+      quality: z.number().int().min(0).max(3),
+      at: z.string(),
+    }),
+  ), // eigene Werke je Spot (ab v2)
   meta: z.object({ createdAt: z.string(), updatedAt: z.string(), playSeconds: z.number() }),
 });
 
 export type GameState = z.infer<typeof gameStateSchema>;
+export type Work = GameState["works"][string];
 
 export type NameCheck = { ok: true; name: string } | { ok: false; error: string };
 
@@ -45,6 +57,8 @@ export function createNewGame(content: GameContent, playerName: string, now: str
     trust: {},
     usedOnce: [],
     newlyVisible: [],
+    items: { ...(content.config.start_items ?? {}) },
+    works: {},
     meta: { createdAt: now, updatedAt: now, playSeconds: 0 },
   };
 }

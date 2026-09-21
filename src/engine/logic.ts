@@ -22,6 +22,8 @@ export function evaluateCondition(condition: Condition, state: GameState, ctx: C
   if ("visited" in condition) return state.visited.includes(condition.visited);
   if ("fact" in condition) return state.facts[condition.fact] !== undefined;
   if ("not_fact" in condition) return state.facts[condition.not_fact] === undefined;
+  if ("has" in condition) return (state.items[condition.has] ?? 0) > 0;
+  if ("sprayed" in condition) return state.works[condition.sprayed] !== undefined;
   if ("trust_min" in condition) {
     const t = condition.trust_min;
     const npc = typeof t === "number" ? ctx.npc : t.npc;
@@ -51,6 +53,9 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
     // Einmal gelernt bleibt gelernt – und gilt nur beim ersten Mal als neu.
     if (state.facts[effect.learn]) return state;
     return { ...state, facts: { ...state.facts, [effect.learn]: { new: true } } };
+  }
+  if ("give" in effect) {
+    return { ...state, items: { ...state.items, [effect.give]: (state.items[effect.give] ?? 0) + 1 } };
   }
   if ("trust" in effect) {
     const npcId = ctx.npc;
@@ -108,9 +113,10 @@ export function visibleHotspotKeys(state: GameState, content: GameContent): Set<
   return keys;
 }
 
-export type Verb = "sprechen" | "untersuchen" | "gehen";
+export type Verb = "sprechen" | "sprühen" | "untersuchen" | "gehen";
 export const VERB_LABELS: Record<Verb, string> = {
   sprechen: "Sprechen",
+  sprühen: "Sprühen",
   untersuchen: "Untersuchen",
   gehen: "Gehen",
 };
@@ -119,6 +125,7 @@ export const VERB_LABELS: Record<Verb, string> = {
 export function availableVerbs(hotspot: Hotspot): Verb[] {
   const verbs: Verb[] = [];
   if (hotspot.sprechen !== undefined) verbs.push("sprechen");
+  if (hotspot.sprühen !== undefined) verbs.push("sprühen");
   if (hotspot.untersuchen !== undefined) verbs.push("untersuchen");
   if (hotspot.gehen !== undefined) verbs.push("gehen");
   return verbs;

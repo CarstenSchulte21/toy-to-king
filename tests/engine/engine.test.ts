@@ -53,6 +53,10 @@ const content: GameContent = {
   },
   npcs: {},
   facts: {},
+  items: {},
+  spray: null,
+  spots: {},
+  map: null,
 };
 
 // Kurzformen mit festem Kontext für die Tests ohne Gespräch.
@@ -92,7 +96,8 @@ describe("createNewGame", () => {
     expect(s.room).toBe("hof");
     expect(s.player).toEqual({ name: "KRAZE", crew: null });
     expect(s.visited).toEqual([]);
-    expect(s.schemaVersion).toBe(1);
+    expect(s.schemaVersion).toBe(2);
+    expect(s.works).toEqual({});
   });
 });
 
@@ -260,6 +265,17 @@ describe("migrate", () => {
     expect(() => migrate({ foo: 1 })).toThrow(SaveFormatError);
     expect(() => migrate({ ...game(), schemaVersion: 99 })).toThrow(/Version 99/);
     expect(() => migrate({ ...game(), visited: "hof" })).toThrow(/beschädigt/);
+  });
+  it("bringt Spielstände aus M1/M2 (v1) auf v2 – mit Startausrüstung, ohne Werke", () => {
+    const v1: Record<string, unknown> = { ...game(), schemaVersion: 1 };
+    delete v1.items;
+    delete v1.works;
+    const withStart = { ...content, config: { ...content.config, start_items: { standard_cap: 1 } } };
+    const migrated = migrate(v1, withStart);
+    expect(migrated.schemaVersion).toBe(2);
+    expect(migrated.items).toEqual({ standard_cap: 1 });
+    expect(migrated.works).toEqual({});
+    expect(migrated.player.name).toBe("KRAZE");
   });
   it("setzt auf den Start-Room zurück, wenn es den Room nicht mehr gibt", () => {
     expect(fitToContent(game({ room: "weg" }), content).room).toBe("hof");

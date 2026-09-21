@@ -7,6 +7,10 @@ const content: GameContent = {
   rooms: { hof: { id: "hof", name: "Hof", hotspots: [] } },
   npcs: {},
   facts: {},
+  items: {},
+  spray: null,
+  spots: {},
+  map: null,
 };
 const state = createNewGame(content, "KRAZE", "2026-01-01T00:00:00.000Z");
 
@@ -35,9 +39,9 @@ describe("loadGame", () => {
 
   it("unbekannte Version wird ignoriert", async () => {
     const store = new MemorySaveStore();
-    store.data.set("main", JSON.stringify({ ...state, schemaVersion: 2 }));
+    store.data.set("main", JSON.stringify({ ...state, schemaVersion: 99 }));
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    expect((await loadGame(store, "main", content)).warning).toContain("Version 2");
+    expect((await loadGame(store, "main", content)).warning).toContain("Version 99");
     warn.mockRestore();
   });
 

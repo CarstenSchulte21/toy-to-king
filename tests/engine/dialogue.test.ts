@@ -88,6 +88,10 @@ const content: GameContent = {
       },
     },
   },
+  items: {},
+  spray: null,
+  spots: {},
+  map: null,
 };
 
 function run(state: GameState, ...actions: Action[]): { state: GameState; events: GameEvent[] } {

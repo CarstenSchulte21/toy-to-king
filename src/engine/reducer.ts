@@ -14,6 +14,7 @@ import {
   visibleHotspotKeys,
   type Verb,
 } from "./logic";
+import { isSpotKnown, mapPlaces, rateSpray, sprayChoices, sprayResultText } from "./spray";
 import { createNewGame, validatePlayerName, type GameState } from "./state";
 
 export type Action =
@@ -24,6 +25,8 @@ export type Action =
   | { type: "CONTINUE_DIALOGUE"; npc: string; node: string }
   | { type: "MARK_FACTS_SEEN"; facts: string[] }
   | { type: "SEEN_HOTSPOTS"; keys: string[] }
+  | { type: "TRAVEL"; room: string }
+  | { type: "SPRAY"; spot: string; style: string; cap: string; dose: string }
   | { type: "TICK"; seconds: number };
 
 export type GameEvent =
@@ -33,6 +36,9 @@ export type GameEvent =
   | { type: "DIALOGUE_END"; npc: string }
   | { type: "FACT_LEARNED"; fact: string; title: string }
   | { type: "TRUST_CHANGED"; npc: string; from: number; to: number }
+  | { type: "ITEM_GAINED"; item: string; name: string }
+  | { type: "SPRAY_OPEN"; spot: string }
+  | { type: "SPRAYED"; spot: string; quality: number; label: string }
   | { type: "WARNING"; message: string };
 
 export type ReduceResult = { state: GameState; events: GameEvent[] };
@@ -62,6 +68,11 @@ export function reduce(
     for (const factId of Object.keys(next.facts)) {
       if (!state.facts[factId]) {
         events.push({ type: "FACT_LEARNED", fact: factId, title: content.facts[factId]?.title ?? factId });
+      }
+    }
+    for (const [item, count] of Object.entries(next.items)) {
+      if (count > (state.items[item] ?? 0)) {
+        events.push({ type: "ITEM_GAINED", item, name: content.items[item]?.name ?? item });
       }
     }
     for (const npcId of Object.keys(next.trust)) {
@@ -101,6 +112,14 @@ function reduceAction(state: GameState, action: Action, content: GameContent, no
       if (!found.node.next) return unchanged(state, `Knoten "${action.node}" hat kein "next".`);
       return goToNode(state, content, action.npc, found.node.next);
     }
+    case "TRAVEL": {
+      if (!mapPlaces(state, content).some((p) => p.room === action.room)) {
+        return unchanged(state, `"${action.room}" ist auf der Karte noch nicht bekannt.`);
+      }
+      return enterRoom(state, action.room, content);
+    }
+    case "SPRAY":
+      return spray(state, action, content, now);
     case "MARK_FACTS_SEEN": {
       const toMark = action.facts.filter((f) => state.facts[f]?.new);
       if (toMark.length === 0) return { state, events: [] };
@@ -160,6 +179,13 @@ function interact(state: GameState, hotspotId: string, verb: Verb, content: Game
 
   if (verb === "gehen") return enterRoom(state, hotspot.gehen!, content);
 
+  if (verb === "sprühen") {
+    const spot = content.spots[hotspot.sprühen!];
+    if (!spot || !isSpotKnown(spot, state, content))
+      return unchanged(state, `Hier kann man (noch) nicht sprühen.`);
+    return { state, events: [{ type: "SPRAY_OPEN", spot: spot.id }] };
+  }
+
   if (verb === "sprechen") {
     const npc = content.npcs[hotspot.sprechen!];
     if (!npc) return unchanged(state, `Unbekannter NPC "${hotspot.sprechen}".`);
@@ -205,4 +231,40 @@ function chooseOption(
     return { state: next, events: [{ type: "DIALOGUE_END", npc: action.npc }] };
   }
   return goToNode(next, content, action.npc, option.next);
+}
+
+function spray(
+  state: GameState,
+  action: Extract<Action, { type: "SPRAY" }>,
+  content: GameContent,
+  now: string,
+): ReduceResult {
+  const choices = sprayChoices(state, content, action.spot);
+  if (!choices) return unchanged(state, `Unbekannter Spot "${action.spot}".`);
+  const { spot } = choices;
+  if (state.room !== spot.room) return unchanged(state, `Für "${spot.name}" musst du vor Ort sein.`);
+  if (!isSpotKnown(spot, state, content)) return unchanged(state, `"${spot.name}" kennst du noch nicht.`);
+  const styleChoice = choices.styles.find((s) => s.id === action.style);
+  if (!styleChoice?.available) return unchanged(state, `Style "${action.style}" geht gerade nicht.`);
+  if (!choices.caps.some((c) => c.id === action.cap))
+    return unchanged(state, `Cap "${action.cap}" hast du nicht.`);
+  if (!choices.doses.some((d) => d.id === action.dose))
+    return unchanged(state, `Dose "${action.dose}" hast du nicht.`);
+
+  const style = content.spray!.styles.find((s) => s.id === action.style)!;
+  const rating = rateSpray(content, spot, style, action.cap, action.dose);
+  const next: GameState = {
+    ...state,
+    works: {
+      ...state.works,
+      [spot.id]: { style: style.id, cap: action.cap, dose: action.dose, quality: rating.quality, at: now },
+    },
+  };
+  return {
+    state: next,
+    events: [
+      { type: "SPRAYED", spot: spot.id, quality: rating.quality, label: rating.label },
+      { type: "TEXT", lines: [sprayResultText(content, next, spot, style, rating.label), ...rating.hints] },
+    ],
+  };
 }

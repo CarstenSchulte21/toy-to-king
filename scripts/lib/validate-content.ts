@@ -11,15 +11,23 @@ import {
   STAGE_WIDTH,
   configSchema,
   factsFileSchema,
+  itemsFileSchema,
+  mapSchema,
   npcSchema,
   roomSchema,
+  spotsFileSchema,
+  spraySchema,
   type Condition,
   type Effect,
   type Fact,
   type GameConfig,
   type GameContent,
+  type Item,
+  type MapConfig,
   type Npc,
   type Room,
+  type Spot,
+  type SprayRules,
   type TextVariants,
 } from "../../src/engine/content-schema";
 
@@ -28,6 +36,10 @@ export type ValidationResult = { content: GameContent | null; errors: string[]; 
 
 const CONFIG_PATH = "content/config.yaml";
 const FACTS_PATH = "content/facts.yaml";
+const ITEMS_PATH = "content/items.yaml";
+const SPRAY_PATH = "content/spray.yaml";
+const SPOTS_PATH = "content/spots.yaml";
+const MAP_PATH = "content/map.yaml";
 
 export function validateContent(files: ContentFile[]): ValidationResult {
   const errors: string[] = [];
@@ -37,9 +49,20 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   const rooms: Record<string, Room> = {};
   const npcs: Record<string, Npc> = {};
   const facts: Record<string, Fact> = {};
+  const items: Record<string, Item> = {};
+  const spots: Record<string, Spot> = {};
+  let spray: SprayRules | null = null;
+  let map: MapConfig | null = null;
   const fileOf: Record<string, string> = {};
   // Dateien mit Fehlern – Verweise darauf nicht zusätzlich als „fehlt" melden.
-  const broken = { rooms: new Set<string>(), npcs: new Set<string>(), facts: false };
+  const broken: Broken = {
+    rooms: new Set(),
+    npcs: new Set(),
+    facts: false,
+    items: false,
+    spots: false,
+    spray: false,
+  };
 
   if (!files.some((f) => f.path === CONFIG_PATH)) {
     errors.push(`${CONFIG_PATH} fehlt. Dort steht u. a. der Start-Room (start_room).`);
@@ -68,6 +91,29 @@ export function validateContent(files: ContentFile[]): ValidationResult {
         if (facts[fact.id]) errors.push(`${file.path}: Die Info "${fact.id}" gibt es zweimal.`);
         facts[fact.id] = fact;
       }
+    } else if (kind === "items" || kind === "spots") {
+      const parsed = (kind === "items" ? itemsFileSchema : spotsFileSchema).safeParse(data);
+      if (!parsed.success) {
+        pushIssues(file.path, data, parsed.error.issues, errors);
+        broken[kind] = true;
+        continue;
+      }
+      const target = (kind === "items" ? items : spots) as Record<string, Item | Spot>;
+      for (const entry of parsed.data) {
+        if (target[entry.id]) errors.push(`${file.path}: "${entry.id}" gibt es zweimal.`);
+        target[entry.id] = entry;
+      }
+    } else if (kind === "spray") {
+      const parsed = spraySchema.safeParse(data);
+      if (parsed.success) spray = parsed.data;
+      else {
+        pushIssues(file.path, data, parsed.error.issues, errors);
+        broken.spray = true;
+      }
+    } else if (kind === "map") {
+      const parsed = mapSchema.safeParse(data);
+      if (parsed.success) map = parsed.data;
+      else pushIssues(file.path, data, parsed.error.issues, errors);
     } else if (kind === "room" || kind === "npc") {
       const parsed = (kind === "room" ? roomSchema : npcSchema).safeParse(data);
       if (!parsed.success) {
@@ -96,14 +142,22 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     }
   }
 
+  const rules = spray as SprayRules | null;
+  const mapConfig = map as MapConfig | null;
   const ids = {
     rooms: Object.keys(rooms),
     npcs: Object.keys(npcs),
     facts: Object.keys(facts),
+    items: Object.keys(items),
+    spots: Object.keys(spots),
+    styles: rules ? rules.styles.map((s) => s.id) : [],
   };
   const refs = new RefChecker(ids, broken, errors);
 
-  if (config) refs.room(CONFIG_PATH, "start_room", config.start_room);
+  if (config) {
+    refs.room(CONFIG_PATH, "start_room", config.start_room);
+    for (const item of Object.keys(config.start_items ?? {})) refs.item(CONFIG_PATH, "start_items", item);
+  }
 
   // --- Rooms ---
   for (const room of Object.values(rooms)) {
@@ -118,6 +172,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
       checkRect(where, h.rect, errors, warnings);
       if (h.gehen !== undefined) refs.room(where, "gehen", h.gehen);
       if (h.sprechen !== undefined) refs.npc(where, "sprechen", h.sprechen);
+      if (h.sprühen !== undefined) refs.spot(where, "sprühen", h.sprühen);
       refs.conditions(where, h.if);
       checkVariants(`${where}, untersuchen`, h.untersuchen, refs, warnings, errors);
     }
@@ -192,6 +247,71 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     }
   }
 
+  // --- Material, Sprühen, Spots, Karte (M3) ---
+  const obtainable = new Set<string>(Object.keys(config?.start_items ?? {}));
+  for (const item of Object.values(items)) {
+    checkTexts(`${ITEMS_PATH}, "${item.id}"`, [item.name, item.text], warnings, errors);
+  }
+  if (rules) {
+    const seenStyles = new Set<string>();
+    for (const s of rules.styles) {
+      const where = `${SPRAY_PATH}, Style "${s.id}"`;
+      if (seenStyles.has(s.id)) errors.push(`${where}: Diesen Style gibt es zweimal.`);
+      seenStyles.add(s.id);
+      for (const c of s.ideal_caps) refs.item(where, "ideal_caps", c);
+      if (s.ideal_dose !== "egal") refs.item(where, "ideal_dose", s.ideal_dose);
+      for (const r of s.requires ?? []) refs.item(where, "requires", r);
+      if (s.requires && !s.requires_hint) {
+        warnings.push(`${where}: "requires" ohne "requires_hint" – der Spieler erfährt nicht, was fehlt.`);
+      }
+      const texts = [s.name, s.cap_hint, s.dose_hint, s.requires_hint].filter((x): x is string => !!x);
+      checkTexts(where, texts, warnings, errors);
+    }
+    checkTexts(`${SPRAY_PATH}, quality_labels`, rules.quality_labels, warnings, errors);
+    const unknown = [...rules.result.matchAll(/\{([^}]*)\}/g)]
+      .map((m) => m[1]!)
+      .filter((n) => !["style", "spot", "quality", "name"].includes(n));
+    if (unknown.length > 0) {
+      errors.push(
+        `${SPRAY_PATH}, result: Unbekannte Platzhalter ${unknown.map((u) => `{${u}}`).join(", ")}. ` +
+          `Erlaubt: {style}, {spot}, {quality}, {name}.`,
+      );
+    }
+  } else if (Object.keys(spots).length > 0 && !broken.spray) {
+    errors.push(`${SPRAY_PATH} fehlt – ohne Sprüh-Regeln kann man an den Spots nicht sprühen.`);
+  }
+  for (const spot of Object.values(spots)) {
+    const where = `${SPOTS_PATH}, Spot "${spot.id}"`;
+    refs.room(where, "room", spot.room);
+    for (const s of spot.fits) refs.style(where, "fits", s);
+    refs.conditions(where, spot.if);
+    checkTexts(where, [spot.name, spot.fit_hint], warnings, errors);
+    const room = rooms[spot.room];
+    const hotspot = room?.hotspots.find((h) => h.id === spot.hotspot);
+    if (room && !hotspot) {
+      const hint = suggest(
+        spot.hotspot,
+        room.hotspots.map((h) => h.id),
+      );
+      errors.push(
+        `${where}: "hotspot" zeigt auf "${spot.hotspot}" – den gibt es im Room "${spot.room}" nicht.${hint}`,
+      );
+    } else if (hotspot && hotspot.sprühen !== spot.id) {
+      warnings.push(
+        `${where}: Der Hotspot "${spot.hotspot}" hat kein "sprühen: ${spot.id}" – dort kann man nicht sprühen.`,
+      );
+    }
+  }
+  for (const place of mapConfig?.places ?? []) {
+    const where = `${MAP_PATH}, Ort "${place.room}"`;
+    refs.room(where, "room", place.room);
+    refs.conditions(where, place.if);
+    const [x, y] = place.pos;
+    if (x < 0 || y < 0 || x > STAGE_WIDTH || y > STAGE_HEIGHT) {
+      errors.push(`${where}: pos [${x}, ${y}] liegt außerhalb der Karte (${STAGE_WIDTH}×${STAGE_HEIGHT}).`);
+    }
+  }
+
   // Auch Untersuchen-Texte können Infos lehren.
   for (const room of Object.values(rooms)) {
     for (const v of variantList(room.description))
@@ -200,39 +320,79 @@ export function validateContent(files: ContentFile[]): ValidationResult {
       for (const v of variantList(h.untersuchen)) for (const e of v.effects ?? []) collectLearn(e, learnable);
     }
   }
+  collectGives(npcs, obtainable);
+  for (const item of ids.items) {
+    if (!obtainable.has(item))
+      warnings.push(`${ITEMS_PATH}, "${item}": Diesen Gegenstand bekommt man nirgends.`);
+  }
   for (const factId of ids.facts) {
     if (!learnable.has(factId))
       warnings.push(`${FACTS_PATH}, Info "${factId}": Diese Info kann man nirgends lernen.`);
   }
 
   const ok = errors.length === 0 && config !== null;
-  return { content: ok ? { config: config!, rooms, npcs, facts } : null, errors, warnings };
+  return {
+    content: ok ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig } : null,
+    errors,
+    warnings,
+  };
 }
 
 // ---------------------------------------------------------------------------
 
-type Kind = "config" | "facts" | "room" | "npc" | "other";
+type Kind = "config" | "facts" | "items" | "spray" | "spots" | "map" | "room" | "npc" | "other";
 
 function kindOf(path: string): Kind {
   if (path === CONFIG_PATH) return "config";
   if (path === FACTS_PATH) return "facts";
+  if (path === ITEMS_PATH) return "items";
+  if (path === SPRAY_PATH) return "spray";
+  if (path === SPOTS_PATH) return "spots";
+  if (path === MAP_PATH) return "map";
   if (path.startsWith("content/rooms/")) return "room";
   if (path.startsWith("content/npcs/")) return "npc";
   return "other";
 }
 
-type Broken = { rooms: Set<string>; npcs: Set<string>; facts: boolean };
+type Broken = {
+  rooms: Set<string>;
+  npcs: Set<string>;
+  facts: boolean;
+  items: boolean;
+  spots: boolean;
+  spray: boolean;
+};
+
+function collectGives(npcs: Record<string, Npc>, obtainable: Set<string>) {
+  for (const npc of Object.values(npcs)) {
+    for (const node of Object.values(npc.dialogue.nodes)) {
+      for (const e of node.effects ?? []) if ("give" in e) obtainable.add(e.give);
+      for (const o of node.options ?? [])
+        for (const e of o.effects ?? []) if ("give" in e) obtainable.add(e.give);
+    }
+  }
+}
 
 function markBroken(kind: Kind, path: string, broken: Broken) {
   if (kind === "room") broken.rooms.add(fileStem(path));
   if (kind === "npc") broken.npcs.add(fileStem(path));
   if (kind === "facts") broken.facts = true;
+  if (kind === "items") broken.items = true;
+  if (kind === "spots") broken.spots = true;
+  if (kind === "spray") broken.spray = true;
 }
 
 // Prüft Verweise auf Rooms, NPCs und Infos – mit Tippfehler-Vorschlag.
 class RefChecker {
   constructor(
-    private ids: { rooms: string[]; npcs: string[]; facts: string[] },
+    private ids: {
+      rooms: string[];
+      npcs: string[];
+      facts: string[];
+      items: string[];
+      spots: string[];
+      styles: string[];
+    },
     private broken: Broken,
     private errors: string[],
   ) {}
@@ -258,11 +418,34 @@ class RefChecker {
     );
   }
 
+  item(where: string, field: string, id: string) {
+    if (this.ids.items.includes(id) || this.broken.items) return;
+    this.errors.push(
+      `${where}: "${field}" zeigt auf "${id}" – diesen Gegenstand gibt es nicht in ${ITEMS_PATH}.${suggest(id, this.ids.items)}`,
+    );
+  }
+
+  spot(where: string, field: string, id: string) {
+    if (this.ids.spots.includes(id) || this.broken.spots) return;
+    this.errors.push(
+      `${where}: "${field}" zeigt auf "${id}" – diesen Spot gibt es nicht in ${SPOTS_PATH}.${suggest(id, this.ids.spots)}`,
+    );
+  }
+
+  style(where: string, field: string, id: string) {
+    if (this.ids.styles.includes(id) || this.broken.spray) return;
+    this.errors.push(
+      `${where}: "${field}" zeigt auf "${id}" – diesen Style gibt es nicht in ${SPRAY_PATH}.${suggest(id, this.ids.styles)}`,
+    );
+  }
+
   conditions(where: string, conditions: Condition[] | undefined, npc?: Npc) {
     for (const c of conditions ?? []) {
       if ("visited" in c) this.room(where, "visited", c.visited);
       if ("fact" in c) this.fact(where, "fact", c.fact);
       if ("not_fact" in c) this.fact(where, "not_fact", c.not_fact);
+      if ("has" in c) this.item(where, "has", c.has);
+      if ("sprayed" in c) this.spot(where, "sprayed", c.sprayed);
       if ("trust_min" in c) {
         if (typeof c.trust_min === "number") {
           if (!npc)
@@ -288,6 +471,7 @@ class RefChecker {
         this.fact(where, "learn", e.learn);
         learnable.add(e.learn);
       }
+      if ("give" in e) this.item(where, "give", e.give);
       if ("trust" in e) {
         if (!npc) this.errors.push(`${where}: "trust" geht nur in Gesprächen.`);
         else if (npc.trust === false)
@@ -313,6 +497,7 @@ function checkVariants(
     refs.conditions(where, v.if);
     for (const e of v.effects ?? []) {
       if ("learn" in e) refs.fact(where, "learn", e.learn);
+      if ("give" in e) refs.item(where, "give", e.give);
       if ("trust" in e) errors.push(`${where}: "trust" geht nur in Gesprächen.`);
     }
   }
@@ -423,6 +608,9 @@ const KNOWN_KEYS = [
   "start",
   "nodes",
   "node",
+  ...["sprühen", "has", "sprayed", "give", "kind", "styles", "ideal_caps", "ideal_dose", "requires"],
+  ...["requires_hint", "cap_hint", "dose_hint", "top_label", "quality_labels", "result", "type"],
+  ...["hotspot", "room", "fits", "fit_hint", "risk", "places", "pos", "start_items"],
 ];
 
 function pushIssues(file: string, data: unknown, issues: z.core.$ZodIssue[], errors: string[]) {

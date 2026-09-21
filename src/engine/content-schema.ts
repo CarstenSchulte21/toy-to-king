@@ -31,8 +31,12 @@ export const conditionSchema = z.union(
     z.strictObject({ fact: id }),
     z.strictObject({ not_fact: id }),
     z.strictObject({ trust_min: z.union([trustLevel, z.strictObject({ npc: id, value: trustLevel })]) }),
+    z.strictObject({ has: id }),
+    z.strictObject({ sprayed: id }),
   ],
-  { error: "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min." },
+  {
+    error: "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed.",
+  },
 );
 
 export const effectSchema = z.union(
@@ -41,8 +45,9 @@ export const effectSchema = z.union(
     z.strictObject({ clear_flag: id }),
     z.strictObject({ learn: id }),
     z.strictObject({ trust: z.number().int().min(-5).max(5) }),
+    z.strictObject({ give: id }),
   ],
-  { error: "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust." },
+  { error: "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give." },
 );
 
 const lines = z.union([text, z.array(text).min(1)], {
@@ -107,10 +112,16 @@ export const hotspotSchema = z
     untersuchen: textVariantsSchema.optional(),
     gehen: id.optional(),
     sprechen: id.optional(),
+    sprühen: id.optional(),
   })
-  .refine((h) => h.untersuchen !== undefined || h.gehen !== undefined || h.sprechen !== undefined, {
-    error: "Hotspot braucht mindestens ein Verb: untersuchen, gehen oder sprechen.",
-  });
+  .refine(
+    (h) =>
+      h.untersuchen !== undefined ||
+      h.gehen !== undefined ||
+      h.sprechen !== undefined ||
+      h.sprühen !== undefined,
+    { error: "Hotspot braucht mindestens ein Verb: untersuchen, gehen, sprechen oder sprühen." },
+  );
 
 export const roomSchema = z.strictObject({
   id,
@@ -125,6 +136,66 @@ export const configSchema = z.strictObject({
   trust_labels: z.array(text).length(6, "trust_labels braucht genau 6 Stufen (0–5).").optional(),
   categories: z.record(z.string(), text).optional(),
   empty_category_text: text.optional(),
+  start_items: z.record(id, z.number().int().min(1)).optional(),
+});
+
+// ---------- M3: Material, Sprühen, Spots, Karte ----------
+
+export const itemSchema = z.strictObject({
+  id,
+  name: text,
+  kind: z.enum(["cap", "dose"], { error: 'kind ist "cap" oder "dose".' }),
+  text,
+});
+export const itemsFileSchema = z.array(itemSchema);
+
+export const styleSchema = z.strictObject({
+  id,
+  name: text,
+  ideal_caps: z.array(id).min(1),
+  ideal_dose: z.union([id, z.literal("egal")]),
+  requires: z.array(id).optional(), // Gegenstände, ohne die der Style nicht geht (Piece: Skinny für die Outline)
+  requires_hint: text.optional(),
+  cap_hint: text,
+  dose_hint: text.optional(),
+  top_label: text.optional(), // eigener Name für die beste Stufe, z. B. "Burner" beim Piece
+});
+
+export const spraySchema = z.strictObject({
+  styles: z.array(styleSchema).min(1),
+  quality_labels: z.array(text).length(4, "quality_labels braucht genau 4 Stufen (0–3)."),
+  result: text, // Ergebnissatz mit {style}, {spot} und {quality}
+});
+
+export const SPOT_TYPES = ["zug", "heaven_spot", "legale_wand", "rolltor", "hauswand"] as const;
+export const RISK_LEVELS = ["kein", "niedrig", "mittel", "hoch"] as const;
+
+export const spotSchema = z.strictObject({
+  id,
+  name: text,
+  type: z.enum(SPOT_TYPES, { error: `type muss eine von ${SPOT_TYPES.join(", ")} sein.` }),
+  room: id,
+  hotspot: id,
+  fits: z.array(id).min(1),
+  fit_hint: text,
+  risk: z.enum(RISK_LEVELS, { error: `risk muss eine von ${RISK_LEVELS.join(", ")} sein.` }),
+  if: z.array(conditionSchema).optional(),
+});
+export const spotsFileSchema = z.array(spotSchema);
+
+const pos = z.tuple([z.number().int(), z.number().int()], {
+  error: "pos braucht zwei ganze Zahlen: [x, y].",
+});
+
+export const mapSchema = z.strictObject({
+  title: text,
+  places: z.array(
+    z.strictObject({
+      room: id,
+      pos,
+      if: z.array(conditionSchema).optional(), // ohne Bedingung: sichtbar, sobald man dort war
+    }),
+  ),
 });
 
 export const FACT_CATEGORIES = ["spot", "risiko", "crews", "material", "szene"] as const;
@@ -198,10 +269,19 @@ export type FactCategory = (typeof FACT_CATEGORIES)[number];
 export type DialogueOption = z.infer<typeof optionSchema>;
 export type DialogueNode = z.infer<typeof dialogueNodeSchema>;
 export type Npc = z.infer<typeof npcSchema>;
+export type Item = z.infer<typeof itemSchema>;
+export type Style = z.infer<typeof styleSchema>;
+export type SprayRules = z.infer<typeof spraySchema>;
+export type Spot = z.infer<typeof spotSchema>;
+export type MapConfig = z.infer<typeof mapSchema>;
 
 export type GameContent = {
   config: GameConfig;
   rooms: Record<string, Room>;
   npcs: Record<string, Npc>;
   facts: Record<string, Fact>;
+  items: Record<string, Item>;
+  spray: SprayRules | null;
+  spots: Record<string, Spot>;
+  map: MapConfig | null;
 };
