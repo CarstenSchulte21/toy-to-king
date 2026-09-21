@@ -1,0 +1,124 @@
+id: laden
+name: Sibel
+role: Farbenladen
+room: farbenladen
+hotspot: sibel
+trust:
+  start: 0
+
+dialogue:
+  start:
+    - if: [{flag: sibel_kennt_dich}]
+      node: wieder_da
+    - node: erstes_mal
+
+  nodes:
+    erstes_mal:
+      text: "Hi. Suchst du was Bestimmtes, oder guckst du nur?"
+      effects:
+        - set_flag: sibel_kennt_dich
+      options:
+        - text: "Ich brauch was für saubere Outlines."
+          effects:
+            - trust: 1
+          next: caps
+        - text: "Was ist das Billigste, was du hast?"
+          next: billig
+        - text: "Nur gucken."
+          next: nur_gucken
+
+    nur_gucken:
+      text: "Klar. Wenn du Fragen hast, ich bin hier."
+      end: true
+
+    billig:
+      text:
+        - "Billig ist hier gar nichts."
+        - "Aber Low Pressure ist für den Anfang eh besser. Verzeiht mehr."
+      effects:
+        - learn: druck
+      next: hub
+
+    wieder_da:
+      text: "Na, {name}. Was brauchst du?"
+      next: hub
+
+    hub:
+      text: "Sonst noch was?"
+      options:
+        - text: "Welcher Cap wofür?"
+          if: [{not_fact: caps}]
+          effects:
+            - trust: 1
+          next: caps
+        - text: "Low oder High Pressure – was ist der Unterschied?"
+          if: [{not_fact: druck}]
+          next: druck
+        - text: "Viel Ärger hier in letzter Zeit?"
+          id: aerger
+          once: true
+          next: kamera_thema
+        - text: "Kann ich hier was mitgehen lassen?"
+          id: klauen
+          once: true
+          next: klauen
+        - text: "Wer kauft hier eigentlich so?"
+          if: [{trust_min: 2}]
+          show_locked: "Über Kunden redet Sibel nicht mit jedem."
+          next: kunden
+        - text: "Danke, bis dann."
+          end: true
+
+    caps:
+      text:
+        - "Für saubere Outlines Skinny Cap. Für Fill-ins Fat Cap."
+        - "NY Fat nur, wenn's schnell gehen muss. Damit malst du keine Details."
+      effects:
+        - learn: caps
+      next: hub
+
+    druck:
+      text:
+        - "Low Pressure ist langsamer und kontrollierter. Gut für Details und für den Anfang."
+        - "High Pressure deckt schneller, tropft aber auch schneller. Das ist was fürs Bombing."
+      effects:
+        - learn: druck
+      next: hub
+
+    kamera_thema:
+      text:
+        - "Seit letzter Woche hängt eine Kamera über der Tür. Hat der Vermieter angebracht."
+        - "Die zeigt nicht auf meinen Laden. Die zeigt auf die Rolltore."
+      effects:
+        - learn: kamera
+      options:
+        - text: "Nervt bestimmt."
+          next: kamera_nervt
+        - text: "Nimmt die auch nachts auf?"
+          next: kamera_frage
+
+    kamera_nervt:
+      text: "Und wie. Die Hälfte meiner Kunden kommt jetzt lieber hinten rum."
+      effects:
+        - trust: 1
+      next: hub
+
+    kamera_frage:
+      text: "Frag ich mich auch. Aber das willst du nicht ausgerechnet von mir wissen, oder?"
+      next: hub
+
+    klauen:
+      text:
+        - "Nein."
+        - "Und frag das hier besser nicht noch mal."
+      effects:
+        - trust: -1
+      next: hub
+
+    kunden:
+      text:
+        - "Die meisten kommen einmal die Woche. Manche jeden Tag."
+        - "KRUX kam früher auch. Seit Monaten nicht mehr. Keiner weiß, woher er seine Farbe hat."
+      effects:
+        - learn: krux_kauft_nicht
+      next: hub

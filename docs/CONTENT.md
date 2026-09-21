@@ -108,12 +108,12 @@ hotspots:
 
   - id: laterne
     label: Laternenmast
-    rect: [140, 20, 15, 130]
+    rect: [140, 20, 16, 130]
     untersuchen: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
 
   - id: kamera
     label: Kamera
-    rect: [200, 30, 20, 15]
+    rect: [200, 28, 20, 16]
     if: [{fact: kamera}]
     untersuchen: "Die neue Kamera über dem Farbenladen. Sie zeigt genau auf die Rolltore."
 
@@ -191,7 +191,7 @@ description: "Jeder Zentimeter bemalt, bis unter die Decke. Das Licht flackert."
 hotspots:
   - id: tagwand
     label: Wand voller Tags
-    rect: [10, 30, 70, 110]
+    rect: [20, 30, 65, 110]
     untersuchen:
       - "Tags über Tags über Tags. Einige kennst du von den Stickern."
       - "Hier malt nur, wer was kann."
@@ -205,7 +205,7 @@ hotspots:
 
   - id: linke_wand
     label: Linke Wand
-    rect: [0, 40, 10, 100]
+    rect: [0, 40, 16, 100]
     untersuchen:
       - if: [{fact: krux_frage}]
         text: "Die linke Wand. Mit KRUX' Okay. Jetzt fehlt nur noch Farbe."
@@ -219,7 +219,7 @@ hotspots:
 
   - id: zaunloch
     label: Aufgebogener Zaun
-    rect: [270, 90, 35, 60]
+    rect: [266, 90, 35, 60]
     if: [{fact: zaun}]
     untersuchen:
       - "Der Zaun ist unten aufgebogen, gerade breit genug."
@@ -227,7 +227,7 @@ hotspots:
 
   - id: raus
     label: Zur Straße
-    rect: [305, 50, 15, 110]
+    rect: [304, 50, 16, 110]
     gehen: strasse
 ```
 

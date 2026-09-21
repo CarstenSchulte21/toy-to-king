@@ -25,7 +25,9 @@ describe("validateContent", () => {
     const read = (p: string) => ({ path: p, text: readFileSync(p, "utf8") });
     const files = [
       read("content/config.yaml"),
+      read("content/facts.yaml"),
       ...readdirSync("content/rooms").map((f) => read(`content/rooms/${f}`)),
+      ...readdirSync("content/npcs").map((f) => read(`content/npcs/${f}`)),
     ];
     const r = validateContent(files);
     expect(r.errors).toEqual([]);

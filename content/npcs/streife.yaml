@@ -1,0 +1,70 @@
+id: streife
+name: Frau Brandt
+role: Streife
+room: strasse
+hotspot: brandt
+trust: false
+
+dialogue:
+  start:
+    - if: [{flag: brandt_misstrauisch}]
+      node: misstrauisch
+    - if: [{flag: brandt_kennt_dich}]
+      node: wieder_da
+    - node: erstes_mal
+
+  nodes:
+    erstes_mal:
+      text: "Na. Alles gut bei dir?"
+      effects:
+        - set_flag: brandt_kennt_dich
+      options:
+        - text: "Ja, alles gut. Lange Schicht?"
+          next: schicht
+        - text: "Ich hab nichts gemacht!"
+          next: nervoes
+        - text: "Muss weiter."
+          end: true
+
+    schicht:
+      text:
+        - "Nachtschicht. Die dritte diese Woche."
+        - "Um zwei bin ich wieder unten in der Unterführung. Da ist nachts immer was los."
+      effects:
+        - learn: streife_zwei
+      options:
+        - text: "Klingt anstrengend."
+          next: anstrengend
+        - text: "Was ist denn da unten los?"
+          next: nachfragen
+
+    anstrengend:
+      text: "Man gewöhnt sich dran. Na dann."
+      end: true
+
+    nachfragen:
+      text:
+        - "Das Übliche. Frische Farbe an den Wänden."
+        - "Aber das interessiert dich ja bestimmt nicht."
+      end: true
+
+    nervoes:
+      text:
+        - "Hab ich auch nicht behauptet."
+        - "Aber jetzt merk ich mir dein Gesicht."
+      effects:
+        - set_flag: brandt_misstrauisch
+      end: true
+
+    misstrauisch:
+      text: "Du schon wieder. Ich hab dich im Blick."
+      end: true
+
+    wieder_da:
+      text: "Na. Alles ruhig?"
+      options:
+        - text: "Alles ruhig. Wieder Nachtschicht?"
+          if: [{not_fact: streife_zwei}]
+          next: schicht
+        - text: "Alles ruhig."
+          end: true

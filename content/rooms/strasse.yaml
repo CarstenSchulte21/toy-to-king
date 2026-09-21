@@ -1,0 +1,45 @@
+id: strasse
+name: Straße
+description: "Die Ladenzeile. Kiosk, Handyladen, Farbenladen. Und eine Streife, die hier öfter steht als der Bus."
+hotspots:
+  - id: rolltore
+    label: Rolltore
+    rect: [40, 60, 90, 80]
+    untersuchen:
+      - if: [{fact: buff_montag}]
+        text: "Alle drei Rolltore frisch grau. Montag war Buff-Tag."
+      - text:
+          - "Drei Rolltore, alle voll mit Tags."
+          - "Dazwischen graue Flecken. Irgendwer räumt hier regelmäßig auf."
+
+  - id: laterne
+    label: Laternenmast
+    rect: [140, 20, 16, 130]
+    untersuchen: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
+
+  - id: kamera
+    label: Kamera
+    rect: [200, 28, 20, 16]
+    if: [{fact: kamera}]
+    untersuchen: "Die neue Kamera über dem Farbenladen. Sie zeigt genau auf die Rolltore."
+
+  - id: brandt
+    label: Polizistin
+    rect: [240, 90, 30, 70]
+    untersuchen: "Eine Polizistin lehnt am Streifenwagen und trinkt Kaffee aus einem Pappbecher."
+    sprechen: streife
+
+  - id: zum_hinterhof
+    label: Hinterhof
+    rect: [0, 60, 20, 100]
+    gehen: hinterhof
+
+  - id: zum_laden
+    label: Farbenladen
+    rect: [180, 50, 50, 90]
+    gehen: farbenladen
+
+  - id: zur_unterfuehrung
+    label: Unterführung
+    rect: [290, 70, 30, 90]
+    gehen: unterfuehrung

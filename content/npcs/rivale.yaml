@@ -1,0 +1,114 @@
+id: rivale
+name: KRUX
+role: Rivale
+room: unterfuehrung
+hotspot: krux
+trust:
+  start: 0
+
+dialogue:
+  start:
+    - if: [{flag: krux_kennt_dich}]
+      node: wieder_da
+    - node: erstes_mal
+
+  nodes:
+    erstes_mal:
+      text:
+        - "Hm."
+        - "Der mit den Mülltonnen. Süß."
+      effects:
+        - set_flag: krux_kennt_dich
+      next: hub
+
+    wieder_da:
+      text: "{name}. Schon wieder."
+      next: hub
+
+    hub:
+      text: "Was?"
+      options:
+        - text: "Ich wollte fragen, bevor ich hier male."
+          if: [{fact: krux}, {not_fact: krux_frage}]
+          effects:
+            - trust: 1
+          next: fragen
+        - text: "Die Outline an deinem Piece – in einem Zug gezogen?"
+          id: outline
+          once: true
+          effects:
+            - trust: 1
+          next: outline
+        - text: "Du weißt, dass die Streife um zwei hier durchfährt?"
+          if: [{fact: streife_zwei}]
+          id: streife
+          once: true
+          effects:
+            - trust: 1
+          next: streife
+        - text: "Warum kaufst du nicht mehr bei Sibel?"
+          if: [{fact: krux_kauft_nicht}]
+          id: sibel
+          once: true
+          next: sibel
+        - text: "Dein Piece ist stark."
+          id: lob
+          once: true
+          next: lob
+        - text: "Ich mal hier, wo ich will."
+          id: angeben
+          once: true
+          effects:
+            - trust: -1
+          next: angeben
+        - text: "Kennst du gute Spots?"
+          if: [{trust_min: 2}]
+          show_locked: "KRUX erzählt dir sowas nicht. Noch nicht."
+          next: bruecke
+        - text: "Bin weg."
+          end: true
+
+    fragen:
+      text:
+        - "Guck an. Einer, der fragt."
+        - "Die linke Wand kannst du haben. Wenn's schlecht aussieht, mal ich drüber."
+      effects:
+        - learn: krux_frage
+      next: hub
+
+    outline:
+      text:
+        - "Hast du also doch Augen im Kopf."
+        - "Ja. Skinny Cap, ein Zug. Übung."
+      next: hub
+
+    streife:
+      text:
+        - "Weiß ich."
+        - "Aber gut, dass du's auch weißt. Die meisten lernen das auf die harte Tour."
+      next: hub
+
+    sibel:
+      text:
+        - "Wer erzählt so was?"
+        - "Ich hab meine Quellen. Geht dich nichts an."
+      next: hub
+
+    lob:
+      text:
+        - "Weiß ich."
+      next: hub
+
+    angeben:
+      text:
+        - "Klar. Mach mal."
+        - "Und dann guck, wie lange es da steht."
+      end: true
+
+    bruecke:
+      text:
+        - "Die Eisenbahnbrücke. Da war seit Jahren keiner oben."
+        - "Wer da oben steht, ist kein Toy mehr. Runterfallen solltest du halt nicht."
+      effects:
+        - learn: bruecke
+      next: hub

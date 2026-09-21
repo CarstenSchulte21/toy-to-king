@@ -13,8 +13,11 @@ hotspots:
     label: Garagentor
     rect: [110, 60, 90, 90]
     untersuchen:
-      - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
-      - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
+      - if: [{fact: buff_montag}]
+        text: "Grau. Wie alles hier nach einem Montag."
+      - text:
+          - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
+          - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
 
   - id: feuerleiter
     label: Feuerleiter
@@ -36,10 +39,10 @@ hotspots:
     untersuchen:
       - "Ein älterer Typ auf einer Getränkekiste. Blackbook auf dem Knie, Kaffee daneben."
       - "Er zeichnet, ohne aufzusehen."
-    # M2: sprechen: mentor
+    sprechen: mentor
 
   - id: durchgang
     label: Durchgang
     rect: [295, 60, 25, 100]
     untersuchen: "Der Durchgang zur Straße."
-    # M2: gehen: strasse
+    gehen: strasse

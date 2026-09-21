@@ -1,0 +1,44 @@
+id: unterfuehrung
+name: Unterführung
+description: "Jeder Zentimeter bemalt, bis unter die Decke. Das Licht flackert."
+hotspots:
+  - id: tagwand
+    label: Wand voller Tags
+    rect: [20, 30, 65, 110]
+    untersuchen:
+      - "Tags über Tags über Tags. Einige kennst du von den Stickern."
+      - "Hier malt nur, wer was kann."
+
+  - id: krux_piece
+    label: Großes Piece
+    rect: [90, 30, 120, 90]
+    untersuchen:
+      - "Ein Piece über die halbe Wand. Wildstyle, sauberes Fill-in, harte Outline."
+      - "Unten rechts: KRUX. Da malt keiner drüber."
+
+  - id: linke_wand
+    label: Linke Wand
+    rect: [0, 40, 16, 100]
+    untersuchen:
+      - if: [{fact: krux_frage}]
+        text: "Die linke Wand. Mit KRUX' Okay. Jetzt fehlt nur noch Farbe."
+      - text: "Die linke Wand ist fast leer. Seltsam, bei so viel Platz."
+
+  - id: krux
+    label: Typ mit Kapuze
+    rect: [215, 85, 30, 75]
+    untersuchen: "Ein Typ mit Kapuze lehnt an der Wand und scrollt auf dem Handy. Er hat dich längst gesehen."
+    sprechen: rivale
+
+  - id: zaunloch
+    label: Aufgebogener Zaun
+    rect: [266, 90, 35, 60]
+    if: [{fact: zaun}]
+    untersuchen:
+      - "Der Zaun ist unten aufgebogen, gerade breit genug."
+      - "Dahinter Schotter, Gleise, abgestellte Waggons. Nicht heute."
+
+  - id: raus
+    label: Zur Straße
+    rect: [304, 50, 16, 110]
+    gehen: strasse

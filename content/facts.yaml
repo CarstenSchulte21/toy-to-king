@@ -1,0 +1,65 @@
+- id: hall
+  category: spot
+  title: Hall hinterm Jugendzentrum
+  text: "Legale Wand. Man hat Zeit und keinen Stress."
+  source: mentor
+
+- id: buff_montag
+  category: risiko
+  title: Buff-Tag Montag
+  text: "Die Stadt bufft die Rolltore in der Ladenzeile jeden Montag."
+  source: mentor
+
+- id: krux
+  category: crews
+  title: KRUX' Unterführung
+  text: "Die Unterführung ist KRUX' Spot. Wer ohne zu fragen malt, wird gecrosst."
+  source: mentor
+
+- id: zaun
+  category: spot
+  title: Loch im Zaun
+  text: "Hinten rechts in der Unterführung ist der Zaun aufgebogen. Dahinter: das Abstellgleis."
+  source: mentor
+
+- id: caps
+  category: material
+  title: Welcher Cap wofür
+  text: "Skinny für Outlines, Fat für Fill-ins, NY Fat, wenn's schnell gehen muss."
+  source: laden
+
+- id: druck
+  category: material
+  title: Low oder High Pressure
+  text: "Low Pressure verzeiht mehr. High Pressure deckt schneller, tropft aber leichter."
+  source: laden
+
+- id: kamera
+  category: risiko
+  title: Kamera am Laden
+  text: "Über dem Farbenladen hängt seit letzter Woche eine Kamera. Sie zeigt auf die Rolltore."
+  source: laden
+
+- id: krux_kauft_nicht
+  category: crews
+  title: KRUX kauft woanders
+  text: "KRUX kauft seit Monaten nicht mehr bei Sibel. Keiner weiß, woher er seine Farbe hat."
+  source: laden
+
+- id: krux_frage
+  category: spot
+  title: Linke Wand
+  text: "KRUX lässt dich an die linke Wand der Unterführung. Wenn's schlecht aussieht, malt er drüber."
+  source: rivale
+
+- id: bruecke
+  category: spot
+  title: Die Eisenbahnbrücke
+  text: "Auf der Eisenbahnbrücke war seit Jahren keiner. Heaven Spot."
+  source: rivale
+
+- id: streife_zwei
+  category: risiko
+  title: Streife um zwei
+  text: "Die Streife fährt nachts gegen zwei durch die Unterführung."
+  source: streife

@@ -1,0 +1,124 @@
+id: mentor
+name: Kalle
+role: Mentor
+room: hinterhof
+hotspot: kalle
+trust:
+  start: 0
+
+dialogue:
+  start:
+    - if: [{flag: kalle_kennt_dich}]
+      node: wieder_da
+    - node: erstes_mal
+
+  nodes:
+    erstes_mal:
+      text:
+        - "{name}. Du bist das also mit den Tags an den Mülltonnen."
+        - "Handstyle wackelt noch. Aber du bleibst dran, das seh ich."
+      effects:
+        - set_flag: kalle_kennt_dich
+      options:
+        - text: "Und wer bist du?"
+          next: wer_bist_du
+        - text: "Ich weiß, dass die noch nicht gut sind."
+          if: [{not_flag: kalle_ehrlich}]
+          effects:
+            - trust: 1
+          next: ehrlich
+        - text: "Muss los."
+          end: true
+
+    ehrlich:
+      text: "Gut. Wer das weiß, wird besser. Wer's nicht weiß, bleibt Toy."
+      effects:
+        - set_flag: kalle_ehrlich
+      next: hub
+
+    besser_machen:
+      text:
+        - "Erst mal: weniger Tonnen, mehr Blackbook."
+        - "Hundert Mal auf Papier, bevor du einmal an die Wand gehst."
+      effects:
+        - set_flag: kalle_ehrlich
+      next: hub
+
+    wer_bist_du:
+      text:
+        - "Hab früher die Line hier gemalt. Lange her."
+        - "Heute male ich an der Hall hinterm Jugendzentrum. Legal, in Ruhe, mit Kaffee."
+      effects:
+        - learn: hall
+      options:
+        - text: "Warum nicht mehr an der Line?"
+          next: warum_nicht_mehr
+        - text: "Kann ich dich was fragen?"
+          next: hub
+
+    warum_nicht_mehr:
+      text:
+        - "Irgendwann kennst du jede Streife beim Vornamen."
+        - "Und die kennen deinen Tag."
+      next: hub
+
+    wieder_da:
+      text: "Na. Wieder da."
+      next: hub
+
+    hub:
+      text: "Was willst du wissen?"
+      options:
+        - text: "Wo kann ich hier malen?"
+          next: spots
+        - text: "Was ist mit der Unterführung?"
+          if: [{not_fact: krux}]
+          next: unterfuehrung
+        - text: "Was muss ich an meinen Tags besser machen?"
+          if: [{not_flag: kalle_ehrlich}]
+          effects:
+            - trust: 1
+          next: besser_machen
+        - text: "Guck mal in mein Blackbook."
+          id: blackbook_zeigen
+          once: true
+          effects:
+            - trust: 1
+          next: blackbook
+        - text: "Wie komm ich an bessere Spots?"
+          if: [{trust_min: 2}]
+          show_locked: "Dafür kennt Kalle dich noch nicht gut genug."
+          next: zaun
+        - text: "Ich bin raus."
+          end: true
+
+    spots:
+      text:
+        - "Die Rolltore in der Ladenzeile gehen. Aber die Stadt bufft da jeden Montag."
+        - "Was du am Wochenende machst, ist am Dienstag weg."
+      effects:
+        - learn: buff_montag
+      next: hub
+
+    unterfuehrung:
+      text:
+        - "Die Unterführung ist KRUX' Spot."
+        - "Wer da ohne zu fragen malt, wird gecrosst. Ohne Ausnahme."
+      effects:
+        - learn: krux
+      next: hub
+
+    blackbook:
+      text:
+        - "Zeig her."
+        - "Deine Buchstaben stehen zu eng. Gib ihnen Luft, dann wird das auch als Hollow lesbar."
+        - "Die Connection hier ist gut. Bleib dabei."
+      next: hub
+
+    zaun:
+      text:
+        - "Hinten in der Unterführung, rechts, ist der Zaun aufgebogen."
+        - "Dahinter stehen nachts die Züge. Da gehst du erst hin, wenn du weißt, was du tust."
+      effects:
+        - learn: zaun
+      next: hub

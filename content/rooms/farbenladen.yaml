@@ -1,0 +1,38 @@
+id: farbenladen
+name: Farbenladen
+description: "Regale bis unter die Decke, Dosen nach Farben sortiert. Riecht nach Lack."
+hotspots:
+  - id: regal_low
+    label: Regal Low Pressure
+    rect: [10, 20, 80, 120]
+    untersuchen: "Low Pressure. Dutzende Farbtöne, jeder mit eigenem Namen."
+
+  - id: regal_high
+    label: Regal High Pressure
+    rect: [95, 20, 60, 120]
+    untersuchen: "High Pressure. Weniger Farben, mehr Druck. Das Regal fürs Bombing."
+
+  - id: capkiste
+    label: Cap-Kiste
+    rect: [170, 110, 40, 25]
+    untersuchen:
+      - "Eine Kiste voller Caps, sortiert in kleine Fächer: Skinny, Soft, Fat, NY Fat."
+      - "Daneben ein Zettel: Nicht einfach mitnehmen. Fragen."
+
+  - id: pinnwand
+    label: Pinnwand
+    rect: [220, 25, 50, 50]
+    untersuchen:
+      - "Ein Flyer für eine Jam im Jugendzentrum. Das Datum ist schon vorbei."
+      - "Darunter, halb verdeckt: Legale Wand – Anmeldung im Jugendzentrum."
+
+  - id: sibel
+    label: Frau an der Theke
+    rect: [240, 85, 35, 70]
+    untersuchen: "Hinter der Theke sortiert eine Frau Caps. Sie sieht kurz hoch und nickt."
+    sprechen: laden
+
+  - id: raus
+    label: Zur Straße
+    rect: [290, 60, 30, 100]
+    gehen: strasse
