@@ -1,0 +1,18 @@
+start_room: hinterhof
+
+trust_labels:
+  - Fremder
+  - Gesehen
+  - Bekannt
+  - Respekt
+  - Vertraut
+  - Family
+
+categories:
+  spot: Spots
+  risiko: Risiko
+  crews: Crews
+  material: Material
+  szene: Szene
+
+empty_category_text: "Noch nichts. Rede mit Leuten."

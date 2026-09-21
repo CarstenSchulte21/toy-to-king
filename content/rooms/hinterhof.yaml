@@ -1,0 +1,45 @@
+id: hinterhof
+name: Hinterhof
+description: "Hinterhof. Hier hat alles angefangen: drei Mülltonnen und ein Edding."
+hotspots:
+  - id: muelltonnen
+    label: Mülltonnen
+    rect: [20, 110, 70, 50]
+    untersuchen:
+      - "Drei Tonnen, alle mit deinem Tag drauf."
+      - "Von links nach rechts wird der Handstyle besser. Die erste Tonne will keiner mehr sehen."
+
+  - id: rolltor
+    label: Garagentor
+    rect: [110, 60, 90, 90]
+    untersuchen:
+      - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
+      - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
+
+  - id: feuerleiter
+    label: Feuerleiter
+    rect: [215, 20, 30, 120]
+    untersuchen:
+      - "Die Feuerleiter endet zwei Meter über dem Boden."
+      - "Oben, direkt unterm Dach, ist die Wand komplett frei. Noch."
+
+  - id: stromkasten
+    label: Stromkasten
+    rect: [255, 100, 30, 45]
+    untersuchen:
+      - "Stromkasten voller Sticker. Ein paar Namen kennst du. Die meisten nicht."
+      - "Einer taucht überall auf: KRUX. Sauberer Handstyle, das muss man ihm lassen."
+
+  - id: kalle
+    label: Mann auf der Kiste
+    rect: [150, 105, 30, 55]
+    untersuchen:
+      - "Ein älterer Typ auf einer Getränkekiste. Blackbook auf dem Knie, Kaffee daneben."
+      - "Er zeichnet, ohne aufzusehen."
+    # M2: sprechen: mentor
+
+  - id: durchgang
+    label: Durchgang
+    rect: [295, 60, 25, 100]
+    untersuchen: "Der Durchgang zur Straße."
+    # M2: gehen: strasse
