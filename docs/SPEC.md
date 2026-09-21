@@ -163,7 +163,7 @@ Die Spielfigur hat keinen festen Namen. Beim neuen Spiel gibt der Spieler seinen
 ## 5. Engine-Regeln
 
 1. `reduce(state, action, content)` ist eine reine Funktion und liefert `{ state, events }`. Die Engine zeigt nichts an; die UI reagiert auf Events.
-2. Aktionen M1: `ENTER_ROOM`, `INTERACT` (untersuchen, gehen), `NEW_GAME` (mit Writer-Name), `TICK` (Spielzeit). Textboxen schließt die Oberfläche selbst. M2: `START_DIALOGUE`, `ADVANCE_LINE`, `CHOOSE_OPTION`, `END_DIALOGUE`, `MARK_FACTS_SEEN`.
+2. Aktionen M1: `ENTER_ROOM`, `INTERACT` (untersuchen, gehen), `NEW_GAME` (mit Writer-Name), `TICK` (Spielzeit). Textboxen schließt die Oberfläche selbst. M2: Gespräch starten über `INTERACT` mit Verb `sprechen`, `CHOOSE_OPTION`, `CONTINUE_DIALOGUE`, `MARK_FACTS_SEEN`, `SEEN_HOTSPOTS`. Zeilen weiterblättern und Gespräch verlassen macht die Oberfläche, weil die Gesprächsposition laut 4.1 kein Spielstand ist.
 3. Unbekannte IDs lassen den Zustand unverändert und erzeugen ein `WARNING`-Event. Kein Absturz.
 4. Textvarianten: die erste Variante, deren Bedingungen erfüllt sind, gewinnt. Ihre Effekte werden ausgeführt.
 5. Knoten betreten: erst Knoten-Effekte, dann Textzeilen, dann Optionen, `next` oder Ende.
@@ -234,6 +234,9 @@ Die Spielfigur hat keinen festen Namen. Beim neuen Spiel gibt der Spieler seinen
 | Sichtbare Platzhalter-Hotspots ohne Hintergrundbild | Unsichtbare Tap-Flächen auf leerem Grund sind unspielbar. Mit echter Grafik werden Hotspots wieder unsichtbar. |
 | Schriftwahl VT323 / Pixelify Sans im Debug-Panel | Grundlage für die Schriftentscheidung im Playtest. |
 | `fitToContent` | Steht ein Spielstand in einem Room, den es nicht mehr gibt, geht es im Start-Room weiter – Inhalte ändern sich während der Entwicklung. |
+| Gesprächsaktionen anders geschnitten (siehe 5, Punkt 2) | Die Engine bekommt nur Aktionen, die den Spielstand ändern. Wo man im Gespräch steht, hält die Oberfläche. |
+| Hinweise zu neuen Infos und Vertrauen erscheinen im Gespräch unter dem Text | Als Einblendung oben verdeckten sie im Handy-Querformat den NPC-Text. |
+| Automatischer Durchlauf probiert alle Gesprächsverläufe je NPC und gibt Wissen zwischen NPCs weiter | Ein Durchlauf über alle NPCs gleichzeitig ist kombinatorisch zu groß. |
 | M2 mit vier Rooms statt drei | Die Straße als Knotenpunkt gibt der Streife einen natürlichen Ort und verbindet die anderen Rooms. |
 
 ## 9. Festlegungen (gelten, bis der Tester widerspricht)

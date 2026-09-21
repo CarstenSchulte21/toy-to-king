@@ -39,7 +39,7 @@ content:check muss grün bleiben. Committe mit Verweis auf das Issue.
 
 ## M1 – Hinterhof
 
-**Stand 21.09.2026:** M1-1 und M1-3 bis M1-6 umgesetzt (62 Tests grün, Build grün). Offen: M1-0 und M1-2 (Einrichtung GitHub/Vercel, Product Owner), M1-7 (erster Test).
+**Stand 21.09.2026:** M1 umgesetzt und auf GitHub. Offen: M1-7 (erster Test durch den Tester).
 
 **Spielbar am Ende:** Mit eigenem Writer-Namen starten, den Hinterhof auf dem Handy erkunden, Spielstand bleibt erhalten.
 **Tester-Fokus:** Ist die Schrift lesbar? Sind die Tap-Flächen treffbar? Klingen die Hinterhof-Texte echt?
@@ -175,6 +175,8 @@ Fertig, wenn es über die Preview-URL auf einem Handy im Querformat bedienbar is
 ---
 
 ## M2 – NPCs, Vertrauen, Blackbook
+
+**Stand 21.09.2026:** M2-1 bis M2-7 umgesetzt auf Branch `m2` (93 Tests grün, Build grün). Offen: Preview prüfen und mergen (Product Owner), M2-8 (Playtest).
 
 **Spielbar am Ende:** Vier Rooms, vier NPCs, Infos erarbeiten, Infos öffnen neue Stellen.
 **Tester-Fokus:** Machen die Gespräche Spaß? Fühlen sich die Infos nützlich an? Klingt jede Figur echt – vor allem KRUX?
