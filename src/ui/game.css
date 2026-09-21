@@ -643,3 +643,181 @@ body {
 .dialogue-notice {
   color: var(--c64-cyan);
 }
+
+/* ---------- M3: Sprühen, Karte, Tasche, Werke ---------- */
+.spray {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  box-sizing: border-box;
+  background: #14161a;
+  border: 1px solid var(--c64-grey);
+  z-index: 32;
+}
+.spray-spot {
+  margin: 0;
+  color: var(--c64-grey);
+}
+.spray-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.spray-label {
+  width: 30px;
+  flex: none;
+  color: var(--c64-light-grey);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.chip {
+  min-height: 16px;
+  padding: 0 4px;
+  background: var(--c64-black);
+  border: 1px solid var(--c64-grey);
+  color: var(--c64-light-grey) !important;
+  cursor: pointer;
+}
+.chip.on {
+  border-color: var(--c64-yellow);
+  background: var(--c64-yellow);
+  color: var(--c64-black) !important;
+}
+.chip.locked {
+  border-style: dashed;
+  color: var(--c64-grey) !important;
+}
+.spray-reason {
+  margin: 0;
+  color: var(--c64-light-red);
+}
+.spray-go {
+  align-self: flex-start;
+  min-width: 90px;
+}
+.spray-go:disabled {
+  border-color: var(--c64-grey);
+  color: var(--c64-grey) !important;
+}
+.spray-tips {
+  margin-top: auto;
+  color: var(--c64-cyan);
+  font-size: calc(var(--font-size) - 2px);
+  line-height: calc(var(--line-height) - 1px);
+}
+.spray-tips p {
+  margin: 0;
+}
+.spray-tips-title {
+  color: var(--c64-grey);
+}
+
+.map {
+  background: #101418;
+  z-index: 32;
+}
+.map-streets {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 138px, #222a33 138px, #222a33 146px, transparent 146px),
+    linear-gradient(0deg, transparent 112px, #222a33 112px, #222a33 120px, transparent 120px),
+    linear-gradient(35deg, transparent 60%, #1b2229 60%, #1b2229 62%, transparent 62%);
+}
+.map-head {
+  position: relative;
+  padding: 4px;
+}
+.map-place {
+  position: absolute;
+  transform: translate(-4px, -4px);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.map-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--c64-cyan);
+  flex: none;
+}
+.map-place.current .map-dot {
+  background: var(--c64-yellow);
+  box-shadow:
+    0 0 0 2px var(--c64-black),
+    0 0 0 3px var(--c64-yellow);
+}
+.map-name {
+  padding: 0 2px;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--c64-white);
+}
+.map-spot {
+  padding: 0 2px;
+  border: 1px solid var(--c64-light-red);
+  color: var(--c64-light-red);
+  font-size: calc(var(--font-size) - 2px);
+}
+.map-spot.done {
+  border-color: var(--c64-yellow);
+}
+.map-hint {
+  position: absolute;
+  left: 4px;
+  bottom: 2px;
+  margin: 0;
+  color: var(--c64-grey);
+}
+.quality {
+  display: inline-flex;
+  gap: 1px;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+.quality .pip {
+  border-color: var(--c64-yellow);
+}
+.quality .pip.on {
+  background: var(--c64-yellow);
+}
+.bag-group {
+  margin: 3px 0 0;
+  color: var(--c64-grey);
+}
+
+/* Eigenes Werk am Spot: der Writer-Name an der Wand */
+.work {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  padding: 0 3px;
+  color: var(--c64-yellow);
+  text-shadow: 1px 1px 0 var(--c64-black);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.work-throwup,
+.work-piece {
+  font-size: calc(var(--font-size) + 6px);
+  line-height: calc(var(--line-height) + 6px);
+}
+.work-piece {
+  color: var(--c64-light-red);
+  -webkit-text-stroke: 1px var(--c64-yellow);
+}
+.work-hollow {
+  font-size: calc(var(--font-size) + 6px);
+  line-height: calc(var(--line-height) + 6px);
+  color: transparent;
+  -webkit-text-stroke: 1px var(--c64-yellow);
+}

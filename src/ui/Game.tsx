@@ -7,6 +7,7 @@ import contentJson from "@/generated/content.json";
 import {
   createNewGame,
   reduce,
+  sprayChoices,
   viewDialogue,
   type Action,
   type GameContent,
@@ -14,13 +15,16 @@ import {
   type GameState,
 } from "@/engine";
 import { LocalStorageSaveStore, createAutosaver, loadGame } from "@/save/SaveStore";
+import { BagView } from "./BagView";
 import { Blackbook } from "./Blackbook";
 import { DebugPanel, type FontChoice } from "./DebugPanel";
 import { DialoguePanel } from "./DialoguePanel";
 import { buildVersion, type FeedbackContext } from "./feedback";
 import { FeedbackPanel } from "./FeedbackPanel";
+import { MapView } from "./MapView";
 import { RoomView } from "./RoomView";
 import { ConfirmNewGame, MainMenu, NameEntry, PauseMenu, TextBox } from "./Screens";
+import { SprayPanel } from "./SprayPanel";
 import { Stage, useStageScale } from "./Stage";
 
 const content = contentJson as unknown as GameContent;
@@ -45,6 +49,9 @@ export function Game() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [paused, setPaused] = useState(false);
   const [blackbook, setBlackbook] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [bagOpen, setBagOpen] = useState(false);
+  const [spraySpot, setSpraySpot] = useState<{ spot: string; title: string } | null>(null);
   const [feedback, setFeedback] = useState<FeedbackContext | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [debug, setDebug] = useState(false);
@@ -83,6 +90,20 @@ export function Game() {
             break;
           case "FACT_LEARNED":
             toast(`Neu im Blackbook: ${e.title}`);
+            break;
+          case "ITEM_GAINED":
+            toast(`Neu in der Tasche: ${e.name}`);
+            break;
+          case "SPRAY_OPEN": {
+            const spot = content.spots[e.spot];
+            const hotspot = spot
+              ? content.rooms[spot.room]?.hotspots.find((h) => h.id === spot.hotspot)
+              : undefined;
+            setSpraySpot({ spot: e.spot, title: hotspot?.label ?? e.spot });
+            break;
+          }
+          case "SPRAYED":
+            setSpraySpot(null);
             break;
           case "TRUST_CHANGED": {
             const name = content.npcs[e.npc]?.name ?? e.npc;
@@ -147,6 +168,9 @@ export function Game() {
     setCursor(null);
     setPaused(false);
     setBlackbook(false);
+    setMapOpen(false);
+    setBagOpen(false);
+    setSpraySpot(null);
   };
 
   const startNewGame = (name: string) => {
@@ -193,7 +217,21 @@ export function Game() {
   const room = state ? content.rooms[state.room] : undefined;
   const dialogue = state && cursor ? viewDialogue(state, content, cursor.npc, cursor.node) : null;
   const hasNewFacts = state ? Object.values(state.facts).some((f) => f.new) : false;
-  const overlayOpen = lines.length > 0 || dialogue !== null || paused || blackbook || feedback !== null;
+  const choices = state && spraySpot ? sprayChoices(state, content, spraySpot.spot) : null;
+  const materialTips = state
+    ? Object.keys(state.facts)
+        .map((id) => content.facts[id])
+        .filter((f): f is NonNullable<typeof f> => f !== undefined && f.category === "material")
+    : [];
+  const overlayOpen =
+    lines.length > 0 ||
+    dialogue !== null ||
+    paused ||
+    blackbook ||
+    mapOpen ||
+    bagOpen ||
+    choices !== null ||
+    feedback !== null;
 
   return (
     <div className={`game font-${font}`}>
@@ -235,6 +273,18 @@ export function Game() {
                   >
                     Blackbook{hasNewFacts && <span className="badge" />}
                   </button>
+                  {content.map && (
+                    <button
+                      className="hud-btn hud-bb"
+                      aria-label="Karte"
+                      onPointerUp={() => setMapOpen(true)}
+                    >
+                      Karte
+                    </button>
+                  )}
+                  <button className="hud-btn hud-bb" aria-label="Tasche" onPointerUp={() => setBagOpen(true)}>
+                    Tasche
+                  </button>
                 </div>
                 <span className="hud-name">{state.player.name}</span>
               </div>
@@ -263,6 +313,30 @@ export function Game() {
                 onClose={() => setBlackbook(false)}
               />
             )}
+            {mapOpen && (
+              <MapView
+                content={content}
+                state={state}
+                onTravel={(target) => {
+                  setMapOpen(false);
+                  dispatch({ type: "TRAVEL", room: target });
+                }}
+                onClose={() => setMapOpen(false)}
+              />
+            )}
+            {bagOpen && <BagView content={content} state={state} onClose={() => setBagOpen(false)} />}
+            {choices && spraySpot && (
+              <SprayPanel
+                key={spraySpot.spot}
+                title={spraySpot.title}
+                choices={choices}
+                tips={materialTips}
+                onSpray={(style, cap, dose) =>
+                  dispatch({ type: "SPRAY", spot: spraySpot.spot, style, cap, dose })
+                }
+                onClose={() => setSpraySpot(null)}
+              />
+            )}
             {paused && (
               <PauseMenu
                 onResume={() => setPaused(false)}
@@ -273,7 +347,7 @@ export function Game() {
                 onMainMenu={toMainMenu}
               />
             )}
-            {!dialogue && !blackbook && (
+            {!dialogue && !blackbook && !mapOpen && !bagOpen && !choices && (
               <div className="toasts" aria-live="polite">
                 {toasts.map((t) => (
                   <div key={t.id} className="toast">

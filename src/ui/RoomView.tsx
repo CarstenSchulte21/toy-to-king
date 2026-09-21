@@ -15,6 +15,7 @@ import {
   type Room,
   type Verb,
 } from "@/engine";
+import { Pips } from "./MapView";
 
 type Menu = { hotspot: Hotspot; x: number; y: number } | null;
 
@@ -88,6 +89,12 @@ export function RoomView(props: {
             aria-label={h.label}
           >
             {(placeholder || outlines) && <span className="hotspot-label">{h.label}</span>}
+            {h.sprühen && state.works[h.sprühen] && (
+              <span className={`work work-${state.works[h.sprühen]!.style}`}>
+                {state.player.name}
+                <Pips value={state.works[h.sprühen]!.quality} />
+              </span>
+            )}
           </button>
         );
       })}
