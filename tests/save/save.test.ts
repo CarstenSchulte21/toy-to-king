@@ -77,3 +77,16 @@ describe("createAutosaver", () => {
     expect(store.data.has("main")).toBe(true);
   });
 });
+
+describe("createAutosaver.cancel", () => {
+  it("verwirft ungespeicherte Änderungen", async () => {
+    vi.useFakeTimers();
+    const store = new MemorySaveStore();
+    const auto = createAutosaver(store, "main", 1000);
+    auto.schedule(state);
+    auto.cancel();
+    await vi.advanceTimersByTimeAsync(2000);
+    await auto.flush();
+    expect(store.data.has("main")).toBe(false);
+  });
+});

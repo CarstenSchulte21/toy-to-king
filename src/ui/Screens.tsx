@@ -1,0 +1,109 @@
+"use client";
+// Hauptmenü, Namenseingabe, Textbox und Pausenmenü – alles innerhalb der 320×180-Bühne.
+import { useState, type FormEvent } from "react";
+import { validatePlayerName } from "@/engine";
+
+export function MainMenu(props: { canContinue: boolean; onContinue: () => void; onNewGame: () => void }) {
+  return (
+    <div className="screen menu">
+      <h1 className="title">TOY TO KING</h1>
+      <div className="menu-buttons">
+        {props.canContinue && (
+          <button className="btn" onClick={props.onContinue}>
+            Weiterspielen
+          </button>
+        )}
+        <button className="btn" onClick={props.onNewGame}>
+          Neues Spiel
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function ConfirmNewGame(props: { onYes: () => void; onNo: () => void }) {
+  return (
+    <div className="screen menu">
+      <p className="menu-text">Neues Spiel starten? Dein bisheriger Spielstand wird überschrieben.</p>
+      <div className="menu-buttons">
+        <button className="btn" onClick={props.onYes}>
+          Ja, neu starten
+        </button>
+        <button className="btn" onClick={props.onNo}>
+          Abbrechen
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function NameEntry(props: { onDone: (name: string) => void; onBack: () => void }) {
+  const [value, setValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const check = validatePlayerName(value);
+    if (!check.ok) setError(check.error);
+    else props.onDone(check.name);
+  };
+
+  return (
+    <form className="screen name-entry" onSubmit={submit}>
+      <label className="menu-text" htmlFor="writer-name">
+        Dein Writer-Name
+      </label>
+      <input
+        id="writer-name"
+        className="name-input"
+        value={value}
+        maxLength={16}
+        autoComplete="off"
+        autoCapitalize="characters"
+        spellCheck={false}
+        onChange={(e) => {
+          setValue(e.target.value);
+          setError(null);
+        }}
+      />
+      <p className={error ? "hint error" : "hint"}>{error ?? "2–16 Zeichen: Buchstaben, Ziffern, - und _"}</p>
+      <div className="menu-buttons row">
+        <button type="button" className="btn" onClick={props.onBack}>
+          Zurück
+        </button>
+        <button type="submit" className="btn">
+          Los
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export function TextBox(props: { line: string; more: boolean; onNext: () => void }) {
+  return (
+    <div className="textbox-layer" onPointerUp={props.onNext}>
+      <div className="textbox">
+        <p>{props.line}</p>
+        <span className="textbox-next">{props.more ? "▼" : "■"}</span>
+      </div>
+    </div>
+  );
+}
+
+export function PauseMenu(props: { onResume: () => void; onMainMenu: () => void }) {
+  return (
+    <div className="overlay">
+      <div className="screen menu">
+        <p className="menu-text">Pause</p>
+        <div className="menu-buttons">
+          <button className="btn" onClick={props.onResume}>
+            Weiter
+          </button>
+          <button className="btn" onClick={props.onMainMenu}>
+            Hauptmenü
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

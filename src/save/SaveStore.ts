@@ -81,5 +81,11 @@ export function createAutosaver(store: SaveStore, slot: string, intervalMs = 100
       if (timer !== null) clearTimeout(timer);
       await write();
     },
+    // Verwirft ungespeicherte Änderungen, z. B. bevor der Spielstand gelöscht wird.
+    cancel() {
+      if (timer !== null) clearTimeout(timer);
+      timer = null;
+      pending = null;
+    },
   };
 }
