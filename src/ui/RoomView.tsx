@@ -9,6 +9,7 @@ import {
   VERB_LABELS,
   availableVerbs,
   visibleHotspots,
+  type GameContent,
   type GameState,
   type Hotspot,
   type Room,
@@ -21,16 +22,17 @@ const MENU_WIDTH = 84;
 const MENU_ITEM_HEIGHT = 18;
 
 export function RoomView(props: {
+  content: GameContent;
   room: Room;
   state: GameState;
   scale: number;
   outlines: boolean;
   onVerb: (hotspot: Hotspot, verb: Verb) => void;
 }) {
-  const { room, state, scale, outlines, onVerb } = props;
+  const { content, room, state, scale, outlines, onVerb } = props;
   const [menu, setMenu] = useState<Menu>(null);
   const placeholder = !room.background;
-  const hotspots = visibleHotspots(room, state);
+  const hotspots = visibleHotspots(room, state, content);
 
   const openMenu = (event: PointerEvent, hotspot: Hotspot) => {
     event.stopPropagation();

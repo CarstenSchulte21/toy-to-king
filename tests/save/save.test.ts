@@ -5,6 +5,8 @@ import { MemorySaveStore, createAutosaver, loadGame } from "@/save/SaveStore";
 const content: GameContent = {
   config: { start_room: "hof" },
   rooms: { hof: { id: "hof", name: "Hof", hotspots: [] } },
+  npcs: {},
+  facts: {},
 };
 const state = createNewGame(content, "KRAZE", "2026-01-01T00:00:00.000Z");
 

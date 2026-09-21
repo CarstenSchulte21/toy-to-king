@@ -21,6 +21,12 @@ export function migrate(saved: unknown): GameState {
 // Inhalte ändern sich während der Entwicklung. Steht ein Spielstand in einem Room,
 // den es nicht mehr gibt, geht es im Start-Room weiter statt mit einem Fehler.
 export function fitToContent(state: GameState, content: GameContent): GameState {
-  if (content.rooms[state.room]) return state;
-  return { ...state, room: content.config.start_room };
+  let next = state;
+  if (!content.rooms[next.room]) next = { ...next, room: content.config.start_room };
+  // Infos, die aus dem Inhalt gestrichen wurden, verschwinden auch aus dem Blackbook.
+  const known = Object.keys(next.facts).filter((f) => content.facts[f]);
+  if (known.length !== Object.keys(next.facts).length) {
+    next = { ...next, facts: Object.fromEntries(known.map((f) => [f, next.facts[f]!])) };
+  }
+  return next;
 }

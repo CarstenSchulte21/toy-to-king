@@ -1,21 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   SaveFormatError,
-  applyEffect,
   availableVerbs,
   createNewGame,
-  evaluateAll,
-  evaluateCondition,
   fitToContent,
   migrate,
   reduce,
   renderText,
-  resolveText,
   validatePlayerName,
-  visibleHotspots,
   type GameContent,
   type GameState,
 } from "@/engine";
+import * as E from "@/engine";
 
 const NOW = "2026-01-01T00:00:00.000Z";
 const LATER = "2026-01-01T00:05:00.000Z";
@@ -55,7 +51,17 @@ const content: GameContent = {
     },
     strasse: { id: "strasse", name: "Straße", hotspots: [] },
   },
+  npcs: {},
+  facts: {},
 };
+
+// Kurzformen mit festem Kontext für die Tests ohne Gespräch.
+const ctx = { content };
+const evaluateCondition = (c: E.Condition, s: GameState) => E.evaluateCondition(c, s, ctx);
+const evaluateAll = (c: E.Condition[] | undefined, s: GameState) => E.evaluateAll(c, s, ctx);
+const applyEffect = (s: GameState, e: E.Effect) => E.applyEffect(s, e, ctx);
+const resolveText = (v: E.TextVariants | undefined, s: GameState) => E.resolveText(v, s, ctx);
+const visibleHotspots = (r: E.Room, s: GameState) => E.visibleHotspots(r, s, content);
 
 function game(overrides: Partial<GameState> = {}): GameState {
   return { ...createNewGame(content, "KRAZE", NOW), ...overrides };

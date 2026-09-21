@@ -142,6 +142,7 @@ export function Game() {
         {screen === "play" && state && room && (
           <>
             <RoomView
+              content={content}
               room={room}
               state={state}
               scale={scale}
