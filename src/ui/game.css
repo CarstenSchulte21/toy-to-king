@@ -355,3 +355,291 @@ body {
   white-space: pre-wrap;
   word-break: break-all;
 }
+
+/* ---------- M2: HUD-Erweiterung ---------- */
+.hud-left {
+  display: flex;
+  gap: 3px;
+}
+.hud-bb {
+  position: relative;
+  width: auto;
+  padding: 0 4px;
+  color: var(--c64-yellow) !important;
+}
+.badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 6px;
+  height: 6px;
+  background: var(--c64-light-red);
+}
+
+/* Neu sichtbare Hotspots glitzern */
+.hotspot-new {
+  animation: glitter 0.4s steps(2, start) 6;
+}
+@keyframes glitter {
+  0% {
+    outline: 1px solid var(--c64-yellow);
+    box-shadow: 0 0 0 2px var(--c64-yellow);
+  }
+  100% {
+    outline: 1px solid transparent;
+    box-shadow: none;
+  }
+}
+
+/* Gespräch */
+.dialogue {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.72);
+}
+.dialogue-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 24px;
+}
+.portrait {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c64-yellow);
+  background: var(--c64-dark-grey);
+  color: var(--c64-yellow);
+  flex: none;
+}
+.dialogue-who {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.dialogue-name {
+  color: var(--c64-yellow);
+}
+.dialogue-role {
+  color: var(--c64-grey);
+}
+.trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+}
+.pip {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border: 1px solid var(--c64-cyan);
+}
+.pip.on {
+  background: var(--c64-cyan);
+}
+.trust-label {
+  margin-left: 3px;
+  color: var(--c64-cyan);
+}
+.small-btn {
+  min-height: 16px;
+  padding: 0 4px;
+  background: var(--c64-black);
+  border: 1px solid var(--c64-grey);
+  color: var(--c64-light-grey) !important;
+  cursor: pointer;
+}
+.dialogue-text {
+  position: relative;
+  min-height: 34px;
+  padding: 3px 12px 3px 5px;
+  background: var(--c64-black);
+  border: 1px solid var(--c64-white);
+  cursor: pointer;
+}
+.dialogue-text p {
+  margin: 0;
+}
+.options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+.option {
+  width: 100%;
+  min-height: 16px;
+  padding: 1px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  background: var(--c64-black);
+  border: 1px solid var(--c64-yellow);
+  color: var(--c64-yellow) !important;
+  cursor: pointer;
+}
+.option:active {
+  background: var(--c64-yellow);
+  color: var(--c64-black) !important;
+}
+.option.locked {
+  border-color: var(--c64-grey);
+  color: var(--c64-grey) !important;
+  cursor: default;
+}
+.option-hint {
+  color: var(--c64-grey);
+  font-size: calc(var(--font-size) - 2px);
+}
+
+/* Toasts */
+.toasts {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  pointer-events: none;
+}
+.toast {
+  padding: 1px 6px;
+  background: var(--c64-black);
+  border: 1px solid var(--c64-cyan);
+  color: var(--c64-cyan);
+  white-space: nowrap;
+}
+
+/* Blackbook */
+.blackbook {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  box-sizing: border-box;
+  background: #1a1712;
+  border: 1px solid var(--c64-grey);
+}
+.bb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.bb-title {
+  color: var(--c64-yellow);
+  letter-spacing: 1px;
+}
+.bb-tabs {
+  display: flex;
+  gap: 2px;
+  margin: 3px 0;
+}
+.bb-tab {
+  flex: 1;
+  min-height: 16px;
+  padding: 0 2px;
+  background: none;
+  border: 1px solid var(--c64-grey);
+  color: var(--c64-light-grey) !important;
+  cursor: pointer;
+}
+.bb-tab.active {
+  border-color: var(--c64-yellow);
+  color: var(--c64-yellow) !important;
+}
+.bb-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.bb-entry {
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--c64-dark-grey);
+}
+.bb-entry p {
+  margin: 1px 0;
+}
+.bb-entry-title {
+  color: var(--c64-yellow);
+}
+.bb-new {
+  color: var(--c64-light-red);
+}
+.bb-source {
+  color: var(--c64-grey);
+}
+
+/* Feedback – außerhalb der Bühne, normale Schriftgröße fürs Tippen */
+.feedback-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 16px
+    max(16px, env(safe-area-inset-left));
+  box-sizing: border-box;
+  background: var(--c64-black);
+  font-family: "VT323", monospace;
+  font-size: 20px;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.feedback-panel h2 {
+  margin: 0;
+  color: var(--c64-yellow);
+  font-weight: normal;
+}
+.feedback-where {
+  margin: 0;
+  color: var(--c64-grey);
+}
+.feedback-panel textarea {
+  flex: 1;
+  min-height: 80px;
+  padding: 8px;
+  font: inherit;
+  font-size: 18px;
+  color: var(--c64-white);
+  background: #111;
+  border: 1px solid var(--c64-white);
+  resize: none;
+}
+.feedback-status {
+  margin: 0;
+  color: var(--c64-cyan);
+}
+.feedback-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.feedback-buttons button {
+  font: inherit;
+  padding: 6px 16px;
+  color: var(--c64-light-grey);
+  background: var(--c64-black);
+  border: 1px solid var(--c64-grey);
+}
+.feedback-buttons button.primary {
+  color: var(--c64-yellow);
+  border-color: var(--c64-yellow);
+}
+.dialogue-notice {
+  color: var(--c64-cyan);
+}

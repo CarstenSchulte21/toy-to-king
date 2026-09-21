@@ -2,7 +2,7 @@
 // Zeigt einen Room mit seinen Hotspots und dem Verbmenü.
 // Ohne Hintergrundbild (M1/M2) werden Hotspots als beschriftete Platzhalter-Kästen gezeichnet,
 // sonst wäre auf einem leeren Bildschirm nichts zu finden.
-import { useState, type PointerEvent } from "react";
+import { useEffect, useState, type PointerEvent } from "react";
 import {
   STAGE_HEIGHT,
   STAGE_WIDTH,
@@ -27,12 +27,24 @@ export function RoomView(props: {
   state: GameState;
   scale: number;
   outlines: boolean;
+  // Solange ein Gespräch oder Menü offen ist, wird nichts als „gesehen" markiert.
+  active: boolean;
   onVerb: (hotspot: Hotspot, verb: Verb) => void;
+  onSeenHotspots: (keys: string[]) => void;
 }) {
-  const { content, room, state, scale, outlines, onVerb } = props;
+  const { content, room, state, scale, outlines, active, onVerb, onSeenHotspots } = props;
   const [menu, setMenu] = useState<Menu>(null);
   const placeholder = !room.background;
   const hotspots = visibleHotspots(room, state, content);
+
+  // Neu freigeschaltete Hotspots glitzern einmal kurz auf (F2.8), danach gelten sie als gesehen.
+  const fresh = hotspots.map((h) => `${room.id}.${h.id}`).filter((k) => state.newlyVisible.includes(k));
+  const freshKey = fresh.join(",");
+  useEffect(() => {
+    if (!active || !freshKey) return;
+    const id = setTimeout(() => onSeenHotspots(freshKey.split(",")), 2400);
+    return () => clearTimeout(id);
+  }, [active, freshKey, onSeenHotspots]);
 
   const openMenu = (event: PointerEvent, hotspot: Hotspot) => {
     event.stopPropagation();
@@ -65,6 +77,7 @@ export function RoomView(props: {
           "hotspot",
           placeholder ? "hotspot-placeholder" : "",
           outlines ? "hotspot-outline" : "",
+          active && fresh.includes(`${room.id}.${h.id}`) ? "hotspot-new" : "",
         ];
         return (
           <button
