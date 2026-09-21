@@ -5,7 +5,10 @@ hotspots:
   - id: rolltore
     label: Rolltore
     rect: [40, 60, 90, 80]
+    sprühen: rolltore
     untersuchen:
+      - if: [{sprayed: rolltore}]
+        text: "Zwischen all den Tags: deiner. Mal sehen, wie lange er hält."
       - if: [{fact: buff_montag}]
         text: "Alle drei Rolltore frisch grau. Montag war Buff-Tag."
       - text:

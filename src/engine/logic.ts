@@ -122,10 +122,15 @@ export const VERB_LABELS: Record<Verb, string> = {
 };
 
 // Nur die Verben, die der Hotspot wirklich hat, landen im Menü.
-export function availableVerbs(hotspot: Hotspot): Verb[] {
+// Sprühen erst, wenn man den Spot kennt (dafür braucht es Spielstand und Inhalt).
+export function availableVerbs(hotspot: Hotspot, state?: GameState, content?: GameContent): Verb[] {
   const verbs: Verb[] = [];
   if (hotspot.sprechen !== undefined) verbs.push("sprechen");
-  if (hotspot.sprühen !== undefined) verbs.push("sprühen");
+  if (hotspot.sprühen !== undefined) {
+    const spot = content?.spots[hotspot.sprühen];
+    const known = !state || !content || (spot !== undefined && evaluateAll(spot.if, state, { content }));
+    if (known) verbs.push("sprühen");
+  }
   if (hotspot.untersuchen !== undefined) verbs.push("untersuchen");
   if (hotspot.gehen !== undefined) verbs.push("gehen");
   return verbs;

@@ -1,0 +1,24 @@
+id: bruecke
+name: Eisenbahnbrücke
+description: "Oben auf der Eisenbahnbrücke. Der Wind zieht, unten fahren die Autos."
+hotspots:
+  - id: brueckenwand
+    label: Brückenblech
+    rect: [60, 40, 180, 60]
+    sprühen: bruecke
+    untersuchen:
+      - if: [{sprayed: bruecke}]
+        text: "Dein Name über der Straße. Den sieht jetzt jeder, der unten langfährt."
+      - text:
+          - "Das Blech an der Brücke. Seit Jahren hat hier keiner gemalt."
+          - "Von unten sieht man das von der ganzen Straße aus."
+
+  - id: aussicht
+    label: Aussicht
+    rect: [250, 20, 60, 50]
+    untersuchen: "Von hier siehst du den ganzen Bezirk. Die Unterführung, die Ladenzeile, das Abstellgleis."
+
+  - id: runter
+    label: Runter zur Straße
+    rect: [0, 110, 40, 70]
+    gehen: strasse

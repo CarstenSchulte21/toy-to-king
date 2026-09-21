@@ -113,6 +113,9 @@ dialogue:
         - "Zeig her."
         - "Deine Buchstaben stehen zu eng. Gib ihnen Luft, dann wird das auch als Hollow lesbar."
         - "Die Connection hier ist gut. Bleib dabei."
+        - "Und nimm den Fat Cap. Deine Fill-ins brauchen das."
+      effects:
+        - give: fat_cap
       next: hub
 
     zaun:

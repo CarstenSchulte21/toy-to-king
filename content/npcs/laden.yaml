@@ -73,8 +73,10 @@ dialogue:
       text:
         - "Für saubere Outlines Skinny Cap. Für Fill-ins Fat Cap."
         - "NY Fat nur, wenn's schnell gehen muss. Damit malst du keine Details."
+        - "Hier, nimm einen Skinny mit. Geht aufs Haus."
       effects:
         - learn: caps
+        - give: skinny_cap
       next: hub
 
     druck:
@@ -98,9 +100,12 @@ dialogue:
           next: kamera_frage
 
     kamera_nervt:
-      text: "Und wie. Die Hälfte meiner Kunden kommt jetzt lieber hinten rum."
+      text:
+        - "Und wie. Die Hälfte meiner Kunden kommt jetzt lieber hinten rum."
+        - "Hier, die High Pressure ist verbeult. Verkaufen kann ich die eh nicht mehr."
       effects:
         - trust: 1
+        - give: high_pressure
       next: hub
 
     kamera_frage:

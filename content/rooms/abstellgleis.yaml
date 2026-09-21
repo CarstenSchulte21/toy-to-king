@@ -1,0 +1,24 @@
+id: abstellgleis
+name: Abstellgleis
+description: "Hinter dem Zaun. Schotter, abgestellte Waggons, kein Mensch zu sehen."
+hotspots:
+  - id: waggon
+    label: Waggon
+    rect: [40, 50, 200, 80]
+    sprühen: abstellgleis
+    untersuchen:
+      - if: [{sprayed: abstellgleis}]
+        text: "Dein Werk auf dem Waggon. Wenn der losfährt, fährt dein Name mit."
+      - text:
+          - "Ein abgestellter Waggon. Die Seite ist fast leer."
+          - "Nur ein paar alte Tags, halb abgewaschen."
+
+  - id: gleise
+    label: Gleise
+    rect: [250, 120, 60, 50]
+    untersuchen: "Die Gleise glänzen. Hier fährt nachts noch was."
+
+  - id: zurueck
+    label: Zurück durch den Zaun
+    rect: [0, 60, 20, 110]
+    gehen: unterfuehrung

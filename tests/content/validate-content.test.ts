@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readContentFiles } from "../helpers/content-files";
 import { describe, expect, it } from "vitest";
 import { validateContent, type ContentFile } from "../../scripts/lib/validate-content";
 
@@ -22,14 +22,7 @@ describe("validateContent", () => {
   });
 
   it("akzeptiert die echten Inhalte aus content/", () => {
-    const read = (p: string) => ({ path: p, text: readFileSync(p, "utf8") });
-    const files = [
-      read("content/config.yaml"),
-      read("content/facts.yaml"),
-      ...readdirSync("content/rooms").map((f) => read(`content/rooms/${f}`)),
-      ...readdirSync("content/npcs").map((f) => read(`content/npcs/${f}`)),
-    ];
-    const r = validateContent(files);
+    const r = validateContent(readContentFiles());
     expect(r.errors).toEqual([]);
     expect(r.warnings).toEqual([]);
   });

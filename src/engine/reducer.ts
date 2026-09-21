@@ -174,7 +174,7 @@ function interact(state: GameState, hotspotId: string, verb: Verb, content: Game
   if (!isHotspotVisible(hotspot, state, content)) {
     return unchanged(state, `Hotspot "${hotspotId}" ist gerade nicht sichtbar.`);
   }
-  if (!availableVerbs(hotspot).includes(verb))
+  if (!availableVerbs(hotspot, state, content).includes(verb))
     return unchanged(state, `Hotspot "${hotspotId}" kann nicht "${verb}".`);
 
   if (verb === "gehen") return enterRoom(state, hotspot.gehen!, content);

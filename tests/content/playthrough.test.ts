@@ -1,11 +1,12 @@
 // Automatischer Durchlauf durch alle echten Inhalte (SPEC 7, M2):
 // Probiert systematisch jede Antwort in jedem Gespräch aus und prüft,
 // ob jede Info erreichbar ist, ob man überall weiterkommt und wie viel Vertrauen möglich ist.
-import { readdirSync, readFileSync } from "node:fs";
+import { readContentFiles } from "../helpers/content-files";
 import { describe, expect, it } from "vitest";
 import { validateContent } from "../../scripts/lib/validate-content";
 import {
   createNewGame,
+  rateSpray,
   reduce,
   trustOf,
   viewDialogue,
@@ -15,14 +16,7 @@ import {
 } from "@/engine";
 
 function loadContent(): GameContent {
-  const read = (p: string) => ({ path: p, text: readFileSync(p, "utf8") });
-  const dir = (d: string) => readdirSync(d).map((f) => read(`${d}/${f}`));
-  const r = validateContent([
-    read("content/config.yaml"),
-    read("content/facts.yaml"),
-    ...dir("content/rooms"),
-    ...dir("content/npcs"),
-  ]);
+  const r = validateContent(readContentFiles());
   if (!r.content) throw new Error(r.errors.join("\n"));
   return r.content;
 }
@@ -30,6 +24,7 @@ function loadContent(): GameContent {
 type Cursor = { npc: string; node: string } | null;
 type Explored = {
   learned: Set<string>;
+  items: Set<string>;
   maxTrust: number;
   unlockedHotspots: Set<string>;
   stuck: string[];
@@ -43,6 +38,7 @@ function exploreNpc(content: GameContent, seed: GameState, npcId: string): Explo
   const npc = content.npcs[npcId]!;
   const out: Explored = {
     learned: new Set(),
+    items: new Set(),
     maxTrust: 0,
     unlockedHotspots: new Set(),
     stuck: [],
@@ -79,6 +75,7 @@ function exploreNpc(content: GameContent, seed: GameState, npcId: string): Explo
     seen.add(k);
     out.states++;
     Object.keys(state.facts).forEach((f) => out.learned.add(f));
+    Object.keys(state.items).forEach((i) => out.items.add(i));
     state.newlyVisible.forEach((h) => out.unlockedHotspots.add(h));
     out.maxTrust = Math.max(out.maxTrust, trustOf(state, content, npcId));
 
@@ -104,6 +101,7 @@ function explore(content: GameContent) {
   const known = new Set<string>();
   const result = {
     learned: known,
+    items: new Set<string>(),
     maxTrust: {} as Record<string, number>,
     unlockedHotspots: new Set<string>(),
     stuck: [] as string[],
@@ -118,6 +116,7 @@ function explore(content: GameContent) {
       const r = exploreNpc(content, seed, npcId);
       result.states += r.states;
       result.stuck.push(...r.stuck);
+      r.items.forEach((i) => result.items.add(i));
       r.unlockedHotspots.forEach((h) => result.unlockedHotspots.add(h));
       result.maxTrust[npcId] = Math.max(result.maxTrust[npcId] ?? 0, r.maxTrust);
       for (const f of r.learned) {
@@ -140,6 +139,8 @@ function reachableRooms(content: GameContent): Set<string> {
     if (seen.has(id)) continue;
     seen.add(id);
     for (const h of content.rooms[id]?.hotspots ?? []) if (h.gehen) queue.push(h.gehen);
+    // Über die Karte erreichbare Orte (Schnellreise, sobald die Info bekannt ist).
+    for (const p of content.map?.places ?? []) if (p.if) queue.push(p.room);
   }
   return seen;
 }
@@ -169,6 +170,26 @@ describe("Durchlauf durch die echten Inhalte", () => {
   it("Infos schalten Hotspots frei: Zaun und Kamera", () => {
     expect(result.unlockedHotspots).toContain("unterfuehrung.zaunloch");
     expect(result.unlockedHotspots).toContain("strasse.kamera");
+  });
+
+  it("alles Material ist erreichbar", () => {
+    expect([...result.items].sort()).toEqual(Object.keys(content.items).sort());
+  });
+
+  it("an jedem Spot ist mit erreichbarem Material Qualität 3 möglich", () => {
+    const has = (id: string) => result.items.has(id);
+    const caps = Object.values(content.items).filter((i) => i.kind === "cap" && has(i.id));
+    const doses = Object.values(content.items).filter((i) => i.kind === "dose" && has(i.id));
+    for (const spot of Object.values(content.spots)) {
+      const best = Math.max(
+        ...content
+          .spray!.styles.filter((s) => (s.requires ?? []).every(has))
+          .flatMap((s) =>
+            caps.flatMap((c) => doses.map((d) => rateSpray(content, spot, s, c.id, d.id).quality)),
+          ),
+      );
+      expect(best, spot.id).toBe(3);
+    }
   });
 
   it("alle Rooms und alle NPCs sind vom Start aus erreichbar", () => {

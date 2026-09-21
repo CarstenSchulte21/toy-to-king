@@ -51,7 +51,7 @@ export function RoomView(props: {
     const stage = (event.currentTarget as HTMLElement).closest(".stage")!.getBoundingClientRect();
     const x = (event.clientX - stage.left) / scale;
     const y = (event.clientY - stage.top) / scale;
-    const verbs = availableVerbs(hotspot);
+    const verbs = availableVerbs(hotspot, state, content);
     const height = (verbs.length + 1) * MENU_ITEM_HEIGHT + 4;
     setMenu({
       hotspot,
@@ -99,7 +99,7 @@ export function RoomView(props: {
           onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="verb-menu-title">{menu.hotspot.label}</div>
-          {availableVerbs(menu.hotspot).map((verb) => (
+          {availableVerbs(menu.hotspot, state, content).map((verb) => (
             <button
               key={verb}
               className="verb"

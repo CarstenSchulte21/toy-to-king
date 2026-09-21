@@ -19,7 +19,10 @@ hotspots:
   - id: linke_wand
     label: Linke Wand
     rect: [0, 40, 16, 100]
+    sprühen: linke_wand
     untersuchen:
+      - if: [{sprayed: linke_wand}]
+        text: "Dein Werk, direkt neben KRUX. Jetzt muss es sich halten."
       - if: [{fact: krux_frage}]
         text: "Die linke Wand. Mit KRUX' Okay. Jetzt fehlt nur noch Farbe."
       - text: "Die linke Wand ist fast leer. Seltsam, bei so viel Platz."
@@ -36,7 +39,8 @@ hotspots:
     if: [{fact: zaun}]
     untersuchen:
       - "Der Zaun ist unten aufgebogen, gerade breit genug."
-      - "Dahinter Schotter, Gleise, abgestellte Waggons. Nicht heute."
+      - "Dahinter Schotter, Gleise, abgestellte Waggons."
+    gehen: abstellgleis
 
   - id: raus
     label: Zur Straße

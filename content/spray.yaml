@@ -1,0 +1,38 @@
+# Qualität: +1 passender Cap, +1 passende Dose, +1 Style passt zum Spot → 0 bis 3.
+quality_labels:
+  - wackelig
+  - geht so
+  - sauber
+  - sitzt
+
+result: "{style} an {spot}: {quality}."
+
+styles:
+  - id: tag
+    name: Tag
+    ideal_caps: [skinny_cap, standard_cap]
+    ideal_dose: egal
+    cap_hint: "Für einen sauberen Tag ist der Strahl zu breit. Skinny oder Standard-Cap."
+
+  - id: throwup
+    name: Throw-up
+    ideal_caps: [fat_cap, ny_fat]
+    ideal_dose: high_pressure
+    cap_hint: "Mit dem Cap dauert das Fill-in ewig. Fat Cap oder NY Fat."
+    dose_hint: "Mit Low Pressure deckt das Fill-in zu langsam."
+
+  - id: hollow
+    name: Hollow
+    ideal_caps: [skinny_cap]
+    ideal_dose: egal
+    cap_hint: "Ein Hollow lebt von der Outline. Mit Skinny wird die sauberer."
+
+  - id: piece
+    name: Piece
+    ideal_caps: [fat_cap]
+    ideal_dose: low_pressure
+    requires: [skinny_cap]
+    requires_hint: "Für die Outline brauchst du einen Skinny Cap."
+    cap_hint: "Fürs Fill-in brauchst du einen Fat Cap."
+    dose_hint: "Für Fades und Highlights ist High Pressure zu hart."
+    top_label: Burner

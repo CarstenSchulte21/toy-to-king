@@ -1,0 +1,48 @@
+- id: rolltore
+  name: den Rolltoren
+  type: rolltor
+  room: strasse
+  hotspot: rolltore
+  fits: [tag, throwup]
+  fit_hint: "Die Rolltore sind für schnelle Sachen. Für mehr hast du hier keine Ruhe."
+  risk: mittel
+
+- id: hall
+  name: der Hall
+  type: legale_wand
+  room: jugendzentrum
+  hotspot: hall_wand
+  fits: [piece, hollow]
+  fit_hint: "An der Hall zählen Pieces. Alles andere geht hier unter."
+  risk: kein
+  if: [{fact: hall}]
+
+- id: linke_wand
+  name: der linken Wand
+  type: hauswand
+  room: unterfuehrung
+  hotspot: linke_wand
+  fits: [throwup, piece]
+  fit_hint: "Neben KRUX' Piece wirkt das zu klein."
+  risk: niedrig
+  if: [{fact: krux_frage}]
+
+- id: bruecke
+  name: der Brücke
+  type: heaven_spot
+  room: bruecke
+  hotspot: brueckenwand
+  fits: [throwup, hollow]
+  fit_hint: "Da oben zählt, was man von unten lesen kann. Groß und schnell."
+  risk: hoch
+  if: [{fact: bruecke}]
+
+- id: abstellgleis
+  name: einem Waggon
+  type: zug
+  room: abstellgleis
+  hotspot: waggon
+  fits: [throwup, piece]
+  fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
+  risk: hoch
+  if: [{fact: zaun}]

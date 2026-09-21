@@ -1,0 +1,29 @@
+- id: standard_cap
+  name: Standard-Cap
+  kind: cap
+  text: "Der Cap, der auf der Dose steckt. Geht für alles, ist für nichts richtig gut."
+
+- id: skinny_cap
+  name: Skinny Cap
+  kind: cap
+  text: "Dünner, präziser Strahl. Für Tags und Outlines."
+
+- id: fat_cap
+  name: Fat Cap
+  kind: cap
+  text: "Breiter Strahl. Für Fill-ins."
+
+- id: ny_fat
+  name: NY Fat
+  kind: cap
+  text: "Sehr breit. Füllt schnell, verzeiht nichts."
+
+- id: low_pressure
+  name: Low Pressure
+  kind: dose
+  text: "Wenig Druck, viel Kontrolle. Gut für Details und Fades."
+
+- id: high_pressure
+  name: High Pressure
+  kind: dose
+  text: "Viel Druck, deckt schnell. Tropft aber leichter."
