@@ -75,7 +75,8 @@ Nicht Teil von M3.5: Bombing, Piece und Wildstyle als spielbare Styles. Sie steh
 
 ## 5. Offene Punkte
 
-- Die Toleranz, das Tempo und die Zeitgrenzen sind Startwerte und werden nach dem Test auf dem Handy nachgestellt.
+- Die Toleranz, das Tempo und die Zeitgrenzen sind Startwerte. Erste Rückmeldung vom Handy: schwerer als am Rechner, das ist gewollt. Die Zeit wurde an die Zahl der Buchstaben angepasst.
+- Für M4 vorgemerkt: Wer schnell und sauber sprüht, bekommt einen Tempo-Bonus auf XP. Später verkürzt Tempo auch die Zeit an der Wand (Heat). Die Daten dafür sind schon da, die Zeitstempel der Fingerbahnen werden gespeichert.
 - Der Tag ist bisher nur „geht so". Die Skizzen des Testers sollen hier helfen.
 - Die Werkgrafik im Raum ist eine Übergangslösung, bis es echte Raumgrafik gibt.
 
@@ -85,7 +86,7 @@ Nicht Teil von M3.5: Bombing, Piece und Wildstyle als spielbare Styles. Sie steh
 |-------|-----------|-------|
 | Drips | Entstehen durch Verweilen: Der Finger bleibt innerhalb von 4 px, bei High Pressure 350 ms, bei Low Pressure knapp 900 ms. Nicht durch die Farbmenge. | Mit der Farbmenge tropften spitze Buchstaben (M, W) auch bei sauberem Tempo. Das wäre unfair. |
 | Deckung | Jeder Pixel braucht eine leicht zufällige Farbmenge (0,5–1,0). Wenig Farbe ergibt ein fleckiges Bild statt gar keins. | Man sieht, dass etwas fehlt, statt dass die Stelle leer bleibt. |
-| Zeit je Ebene | Länge der Führungslinie geteilt durch das angenehme Tempo (7 × Flow px/s), mal 1,4, plus 3 s, zwischen 6 und 45 s. Low Pressure bekommt dadurch mehr Zeit. | Low Pressure muss langsamer gefahren werden und soll trotzdem schaffbar sein. |
+| Zeit je Ebene | Länge der Führungslinie geteilt durch das angenehme Tempo (7 × Flow px/s), mal 1,5, plus 3 s, plus 1,2 s je Buchstabe, zwischen 8 und 60 s. Die Restzeit steht in Sekunden daneben. | Low Pressure muss langsamer gefahren werden und soll trotzdem schaffbar sein. Tester (Handy): Bei langen Namen wurde es zu knapp, weil jeder Buchstabe neu ansetzen heißt und lange Namen klein werden. |
 | Bombing, Piece, Wildstyle | Im Menü sichtbar und gesperrt (Flags `rang_bomber`, `rang_piece`, `rang_king`, die M4 setzt). Bis dahin würden sie wie Straight Letter gezeichnet. | Die eigenen Formen kommen mit M4. |
 | Bubble-Buchstaben | Eigene Skelette für S, 5, E, B, R, P | Sonst sind sie bei dickem Strich nicht lesbar (S wird zu 8, R zu A). |
 | Werk im Raum | Wird aus den gespeicherten Fingerbahnen neu berechnet und verkleinert in den Hotspot gesetzt. | Wie geplant. Echte Raumgrafik folgt später. |

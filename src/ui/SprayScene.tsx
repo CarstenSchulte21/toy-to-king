@@ -449,6 +449,7 @@ export function SprayScene(props: {
             <span className="pass-time">
               <i style={{ width: `${Math.round(left * 100)}%` }} />
             </span>
+            <span className="pass-seconds">{Math.ceil((left * limit) / 1000)} s</span>
             <button className="small-btn" onPointerUp={finishPass}>
               Fertig
             </button>

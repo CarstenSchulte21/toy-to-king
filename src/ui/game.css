@@ -816,6 +816,11 @@ body {
   height: 5px;
   border: 1px solid var(--c64-grey);
 }
+.pass-seconds {
+  color: var(--c64-light-grey);
+  min-width: 20px;
+  text-align: right;
+}
 .pass-time i {
   display: block;
   height: 100%;
