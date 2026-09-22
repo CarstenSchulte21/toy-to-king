@@ -35,9 +35,11 @@ export const conditionSchema = z.union(
     z.strictObject({ trust_min: z.union([trustLevel, z.strictObject({ npc: id, value: trustLevel })]) }),
     z.strictObject({ has: id }),
     z.strictObject({ sprayed: id }),
+    z.strictObject({ rank_min: id }), // Rang aus progress.yaml (M4a)
   ],
   {
-    error: "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed.",
+    error:
+      "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed, rank_min.",
   },
 );
 
@@ -190,6 +192,7 @@ export const styleSchema = z.strictObject({
   only_at: z.array(id).optional(), // nur an diesen Spots
   only_at_hint: text.optional(),
   top_label: text.optional(), // eigener Name für die beste Stufe, z. B. "Burner"
+  xp: z.number().int().min(0).optional(), // Grundwert für die XP (M4a)
 });
 
 export const spraySchema = z.strictObject({
@@ -234,6 +237,26 @@ export const mapSchema = z.strictObject({
       if: z.array(conditionSchema).optional(), // ohne Bedingung: sichtbar, sobald man dort war
     }),
   ),
+});
+
+// ---------- M4a: Aufstieg ----------
+
+export const rankSchema = z.strictObject({
+  id,
+  name: text,
+  xp: z.number().int().min(0),
+  text: text.optional(), // ein Satz beim Aufstieg
+  unlocks: text.optional(), // was jetzt neu ist
+});
+
+export const progressSchema = z.strictObject({
+  ranks: z.array(rankSchema).min(2),
+  quality_factors: z.array(z.number().min(0)).length(4, "quality_factors braucht genau 4 Stufen (0–3)."),
+  spot_factors: z.partialRecord(z.enum(SPOT_TYPES), z.number().min(0)),
+  tempo_bonus_max: z.number().min(0).max(1),
+  tempo_min_quality: z.number().int().min(0).max(3),
+  repeat_share: z.number().min(0).max(1),
+  rank_up_title: text, // Überschrift auf dem Aufstiegs-Bildschirm
 });
 
 export const FACT_CATEGORIES = ["spot", "risiko", "crews", "material", "szene"] as const;
@@ -312,6 +335,8 @@ export type Style = z.infer<typeof styleSchema>;
 export type SprayRules = z.infer<typeof spraySchema>;
 export type Spot = z.infer<typeof spotSchema>;
 export type MapConfig = z.infer<typeof mapSchema>;
+export type Rank = z.infer<typeof rankSchema>;
+export type Progress = z.infer<typeof progressSchema>;
 
 export type GameContent = {
   config: GameConfig;
@@ -322,4 +347,5 @@ export type GameContent = {
   spray: SprayRules | null;
   spots: Record<string, Spot>;
   map: MapConfig | null;
+  progress: Progress | null;
 };

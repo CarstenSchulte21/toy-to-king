@@ -699,6 +699,17 @@ body {
   color: var(--c64-grey);
   margin-left: 4px;
 }
+.sketch-dose {
+  position: absolute;
+  left: 120px;
+  right: 92px;
+  bottom: 3px;
+}
+.sketch-dose .sketch-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
 .sketch-info {
   position: absolute;
   left: 120px;
@@ -752,8 +763,8 @@ body {
   color: var(--c64-grey) !important;
 }
 .swatch {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
   padding: 0;
   border: 1px solid var(--c64-grey);
   color: var(--c64-black) !important;
@@ -864,6 +875,43 @@ body {
 }
 .spray-result .menu-buttons {
   align-self: flex-end;
+}
+.spray-xp {
+  margin-left: 6px;
+  color: var(--c64-cyan);
+}
+
+/* Aufstieg (M4a) */
+.hud-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  color: var(--c64-cyan);
+}
+.hud-xp {
+  display: inline-block;
+  width: 24px;
+  height: 4px;
+  border: 1px solid var(--c64-grey);
+}
+.hud-xp i {
+  display: block;
+  height: 100%;
+  background: var(--c64-cyan);
+}
+.rank-up {
+  z-index: 34;
+  gap: 4px;
+}
+.rank-up-title {
+  margin: 0;
+  color: var(--c64-grey);
+  letter-spacing: 1px;
+}
+.rank-up-unlocks {
+  margin: 0 0 6px;
+  color: var(--c64-cyan);
 }
 
 .map {

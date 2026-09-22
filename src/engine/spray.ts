@@ -110,12 +110,16 @@ export function resolveColors(content: GameContent, colors: WorkColors) {
   const fill = (colors.fill ?? [])
     .map((c) => colorIndex(content, c))
     .filter((c): c is number => c !== undefined);
+  const one = (id: string | undefined, key: "line" | "outline" | "second" | "background") => {
+    const value = colorIndex(content, id);
+    return value === undefined ? {} : { [key]: value };
+  };
   return {
-    ...(colorIndex(content, colors.line) !== undefined ? { line: colorIndex(content, colors.line)! } : {}),
+    ...one(colors.line, "line"),
     ...(fill.length ? { fill } : {}),
-    ...(colorIndex(content, colors.outline) !== undefined
-      ? { outline: colorIndex(content, colors.outline)! }
-      : {}),
+    ...one(colors.outline, "outline"),
+    ...one(colors.second, "second"),
+    ...one(colors.background, "background"),
   };
 }
 

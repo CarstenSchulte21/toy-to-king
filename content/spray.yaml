@@ -20,22 +20,29 @@ styles:
   - id: tag
     name: Tag
     look: tag
+    xp: 10
     caps:
       line: [skinny_cap, standard_cap]
 
   - id: straight
     name: Straight Letter
     look: straight
+    xp: 20
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
+    if: [{rank_min: tagger}]
+    locked_hint: "Erst der Handstyle. Straight Letter gibt's ab Tagger."
 
   - id: bubble
     name: Bubble
     look: bubble
+    xp: 30
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
+    if: [{rank_min: tagger}]
+    locked_hint: "Bubbles gibt's ab Tagger. Tag erst mal weiter."
 
   - id: bombing
     name: Bombing
@@ -43,8 +50,9 @@ styles:
     caps:
       fill: [ny_fat, fat_cap]
       outline: [standard_cap, skinny_cap]
-    if: [{flag: rang_bomber}]
-    locked_hint: "Bombing kommt, wenn dein Name in der Stadt was zählt."
+    xp: 50
+    if: [{rank_min: bomber}]
+    locked_hint: "Bombing kommt, wenn dein Name im Bezirk was zählt. Ab Bomber."
 
   - id: piece
     name: Piece
@@ -52,8 +60,9 @@ styles:
     caps:
       fill: [fat_cap]
       outline: [skinny_cap]
-    if: [{flag: rang_piece}]
-    locked_hint: "Für ein Piece bist du noch nicht so weit."
+    xp: 120
+    if: [{rank_min: piece_writer}]
+    locked_hint: "Für ein Piece bist du noch nicht so weit. Ab Piece-Writer."
     only_at: [hall]
     only_at_hint: "Ein Piece malst du nicht zwischen Tür und Angel. Dafür gibt's die Hall."
     top_label: Burner
@@ -64,8 +73,9 @@ styles:
     caps:
       fill: [fat_cap]
       outline: [skinny_cap]
-    if: [{flag: rang_king}]
-    locked_hint: "Wildstyle ist was für Leute, die jeder kennt."
+    xp: 200
+    if: [{rank_min: piece_writer}, {flag: wildstyle_gelernt}]
+    locked_hint: "Wildstyle zeigt dir keiner umsonst. Frag jemanden, der ihn kann."
     only_at: [hall]
     only_at_hint: "Wildstyle nur an der Hall. Da hast du die Zeit dafür."
     top_label: Burner

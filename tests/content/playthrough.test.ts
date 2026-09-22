@@ -9,8 +9,13 @@ import {
   buildLettering,
   comfortableSpeed,
   passesFor,
+  hasRank,
+  rankAt,
   rateWork,
   renderWork,
+  timeLeftShare,
+  xpForWork,
+  xpGain,
   traceGuide,
   reduce,
   trustOf,
@@ -188,8 +193,12 @@ describe("Durchlauf durch die echten Inhalte", () => {
     for (const spot of Object.values(content.spots)) {
       let best = 0;
       // Gesperrte Styles (Ränge ab M4) zählen hier nicht.
+      // Styles, die nur über Ränge oder das KRUX-Gespräch gesperrt sind, erreicht man im Spiel.
       const styles = content.spray!.styles.filter(
-        (s) => !s.if && (s.requires ?? []).every(has) && (!s.only_at || s.only_at.includes(spot.id)),
+        (s) =>
+          (s.requires ?? []).every(has) &&
+          (!s.only_at || s.only_at.includes(spot.id)) &&
+          (s.if ?? []).every((c) => "rank_min" in c || "flag" in c),
       );
       for (const style of styles) {
         for (const dose of doses) {
@@ -219,4 +228,63 @@ describe("Durchlauf durch die echten Inhalte", () => {
     expect([...rooms].sort()).toEqual(Object.keys(content.rooms).sort());
     for (const npc of Object.values(content.npcs)) expect(rooms).toContain(npc.room);
   });
+});
+
+describe("Aufstieg (M4a)", () => {
+  const content = loadContent();
+
+  it("jeder Rang ist der Reihe nach erreichbar, King zum Schluss", () => {
+    const has = () => true;
+    const reached: string[] = [];
+    let xp = 0;
+    const best: Record<string, number> = {};
+    const doses = Object.values(content.items).filter((i) => i.kind === "dose");
+    // Immer das Werk sprühen, das gerade am meisten bringt – mit dem, was der Rang freigibt.
+    for (let round = 0; round < 60; round++) {
+      const rank = rankAt(content, xp);
+      if (rank && !reached.includes(rank.id)) reached.push(rank.id);
+      let bestGain = 0;
+      let bestSpot = "";
+      let bestXp = 0;
+      for (const spot of Object.values(content.spots)) {
+        for (const style of content.spray!.styles) {
+          if (!(style.requires ?? []).every(has)) continue;
+          if (style.only_at && !style.only_at.includes(spot.id)) continue;
+          // Gesperrt, solange der Rang fehlt. Flags (KRUX) gelten ab dem nötigen Rang als erreichbar.
+          const locked = (style.if ?? []).some(
+            (c) => "rank_min" in c && !hasRank({ xp } as GameState, content, c.rank_min),
+          );
+          if (locked) continue;
+          for (const dose of doses) {
+            const l = buildLettering("PLAYER", style.look, 3);
+            const passes = passesFor(style.look).map((kind) => ({
+              kind,
+              cap: (style.caps[kind] ?? [])[0]!,
+              strokes: traceGuide(l, comfortableSpeed(dose.flow!)),
+            }));
+            const work = {
+              style: style.id,
+              colors: { line: "farbe_schwarz", fill: ["farbe_chrom"], outline: "farbe_schwarz" },
+              dose: dose.id,
+              passes,
+              seed: 3,
+            };
+            const stats = renderWork(content, "PLAYER", work)!.stats;
+            const quality = rateWork(content, spot, style, work, stats).quality;
+            const value = xpForWork(content, spot, style, quality, timeLeftShare(l, content, work));
+            const gain = xpGain(content, value, best[spot.id] ?? 0);
+            if (gain > bestGain) {
+              bestGain = gain;
+              bestSpot = spot.id;
+              bestXp = value;
+            }
+          }
+        }
+      }
+      if (bestGain <= 0) break;
+      best[bestSpot] = Math.max(best[bestSpot] ?? 0, bestXp);
+      xp += bestGain;
+    }
+    expect(reached).toEqual(content.progress!.ranks.map((r) => r.id));
+  }, 120_000);
 });

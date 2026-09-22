@@ -1,6 +1,6 @@
 # SPEC – TOY TO KING, Meilenstein M4a „Aufstieg"
 
-**Stand 22.09.2026:** Entwurf, noch nicht umgesetzt. Die Werte in Abschnitt 3 sind Startwerte.
+**Stand 22.09.2026:** umgesetzt auf Branch `m4a` (133 Tests grün, Build grün). Die Werte in Abschnitt 3 sind Startwerte. Offen ist der Test auf echten Handys.
 
 Bezug: `backlog.md` (E5: F5.1, F5.2, F5.4), `SPEC-M3.5.md` (gilt weiter), Tester-Feedback (Style-Leiter, Tempo-Bonus).
 
@@ -74,17 +74,26 @@ Ein automatischer Test rechnet den kürzesten Weg durch: Jeder Rang muss mit den
 
 ## 5. Akzeptanzkriterien
 
-- [ ] Nach jedem Werk werden XP angezeigt, im HUD stehen Rang und Fortschritt.
-- [ ] Neuer Rang: eigener Bildschirm, neue Styles sind danach im Sketch wählbar. Gesperrte Styles nennen den nötigen Rang.
-- [ ] Wiederholen am selben Spot bringt nur die Verbesserung oder 20 %.
-- [ ] Tempo-Bonus nur ab Qualität 2.
-- [ ] Bombing, Piece und Wildstyle mit eigener Form. Ideales Nachfahren ergibt Qualität 3 (automatischer Test).
-- [ ] Wildstyle nur nach dem KRUX-Gespräch, das erst ab Piece-Writer und mit eigenem Werk an der Hall erscheint.
-- [ ] Alte Spielstände bekommen XP für vorhandene Werke und behalten ihre Styles.
-- [ ] Der Durchlauf-Test belegt: Alle Ränge der Reihe nach erreichbar, keiner überspringbar.
+- [x] Nach jedem Werk werden XP angezeigt, im HUD stehen Rang und Fortschritt.
+- [x] Neuer Rang: eigener Bildschirm, neue Styles sind danach im Sketch wählbar. Gesperrte Styles nennen den nötigen Rang.
+- [x] Wiederholen am selben Spot bringt nur die Verbesserung oder 20 %.
+- [x] Tempo-Bonus nur ab Qualität 2.
+- [x] Bombing, Piece und Wildstyle mit eigener Form. Ideales Nachfahren ergibt Qualität 3 (automatischer Test).
+- [x] Wildstyle nur nach dem KRUX-Gespräch, das erst ab Piece-Writer und mit eigenem Werk an der Hall erscheint.
+- [x] Alte Spielstände bekommen XP für vorhandene Werke und behalten ihre Styles.
+- [x] Der Durchlauf-Test belegt: Alle Ränge der Reihe nach erreichbar, keiner überspringbar.
 
 ## 6. Offene Fragen an den Tester
 
 - Stimmen die Rangnamen (Tagger, Bomber, Piece-Writer)? Oder sagt man anders?
 - Passt es, dass man Wildstyle von einem anderen Writer lernt?
 - Welche Spots sollten am meisten bringen?
+
+## 7. Abweichungen bei der Umsetzung
+
+| Thema | Umsetzung | Grund |
+|-------|-----------|-------|
+| Aufstiegs-Bildschirm | Erscheint erst, wenn man das Ergebnis an der Wand weggeklickt hat | Sonst verdeckt er das frische Werk. |
+| Background und Second Outline | Sind freiwillig: Wer keine Farbe dafür wählt, sprüht ohne | Am Anfang hat man nur zwei Farben. |
+| Bombing, Piece, Wildstyle | Nutzen dieselben zwei Ebenen wie die Throw-ups. Unterschiedlich sind Form, Schräge, Arrows, Spitzen, Connections, 3D, Splits, Second Outline und Background. | Mehr Ebenen wären auf dem Handy zu lang. |
+| Kalle und KRUX | Kalle hat je eine Zeile zu Tagger, Bomber und Piece-Writer. KRUX erklärt Wildstyle erst, wenn man Piece-Writer ist und etwas an der Hall stehen hat. | Wie geplant. |

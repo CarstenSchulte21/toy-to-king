@@ -89,6 +89,21 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "Dafür kennt Kalle dich noch nicht gut genug."
           next: zaun
+        - text: "Guck mal, wie weit ich bin."
+          id: rang_tagger
+          once: true
+          if: [{rank_min: tagger}]
+          next: rang_tagger
+        - text: "Hast du gesehen, was im Bezirk hängt?"
+          id: rang_bomber
+          once: true
+          if: [{rank_min: bomber}]
+          next: rang_bomber
+        - text: "Ich war an der Hall."
+          id: rang_piece
+          once: true
+          if: [{rank_min: piece_writer}]
+          next: rang_piece
         - text: "Ich bin raus."
           end: true
 
@@ -124,4 +139,26 @@ dialogue:
         - "Dahinter stehen nachts die Züge. Da gehst du erst hin, wenn du weißt, was du tust."
       effects:
         - learn: zaun
+      next: hub
+
+    rang_tagger:
+      text:
+        - "Hab dein Tag an den Rolltoren gesehen. Sitzt sauber."
+        - "Jetzt mach es größer. Ein Tag ist eine Unterschrift, kein Bild."
+      effects:
+        - trust: 1
+      next: hub
+
+    rang_bomber:
+      text:
+        - "Halbe Straße voll, ja. Dein Name steht öfter da als meiner."
+        - "Pass trotzdem auf, wo du malst. Nicht jede Wand verzeiht das."
+      next: hub
+
+    rang_piece:
+      text:
+        - "Ich weiß. Steht gut da."
+        - "An der Hall hast du Zeit. Nutz sie für die Details, nicht für mehr Fläche."
+      effects:
+        - trust: 1
       next: hub

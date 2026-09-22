@@ -1,5 +1,6 @@
 // Gespeicherte Spielstände prüfen und – wenn sich das Format ändert – auf die neue Version bringen.
 import type { GameContent } from "./content-schema";
+import { xpForWork } from "./progress";
 import { SCHEMA_VERSION, gameStateSchema, type GameState } from "./state";
 
 export class SaveFormatError extends Error {}
@@ -51,6 +52,21 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
       for (const c of colors) items[c] = Math.max(items[c] ?? 0, content!.config.start_items![c]!);
       return { ...s, schemaVersion: 3, works, items };
     },
+    // v3 → v4 (M4a): XP für die Werke, die es schon gibt. Ohne Tempo-Bonus, den kennen wir nachträglich nicht.
+    3: (s, content) => {
+      const works = (s.works ?? {}) as Record<string, { style?: string; quality?: number }>;
+      const best: Record<string, number> = {};
+      let xp = 0;
+      for (const [spotId, work] of Object.entries(works)) {
+        const spot = content?.spots[spotId];
+        const style = content?.spray?.styles.find((st) => st.id === work.style);
+        if (!content || !spot || !style) continue;
+        const value = xpForWork(content, spot, style, work.quality ?? 0);
+        best[spotId] = value;
+        xp += value;
+      }
+      return { ...s, schemaVersion: 4, xp, best };
+    },
   };
 
 export function migrate(saved: unknown, content?: GameContent): GameState {
@@ -79,11 +95,15 @@ export function fitToContent(state: GameState, content: GameContent): GameState 
   if (known.length !== Object.keys(next.facts).length) {
     next = { ...next, facts: Object.fromEntries(known.map((f) => [f, next.facts[f]!])) };
   }
-  // Dasselbe für Werke an Spots, die es nicht mehr gibt.
+  // Werke und Bestwerte zu Spots oder Styles, die es nicht mehr gibt, fallen weg.
   const styles = new Set(content.spray?.styles.map((s) => s.id) ?? []);
   const spots = Object.keys(next.works).filter((s) => content.spots[s] && styles.has(next.works[s]!.style));
   if (spots.length !== Object.keys(next.works).length) {
     next = { ...next, works: Object.fromEntries(spots.map((s) => [s, next.works[s]!])) };
+  }
+  const best = Object.keys(next.best).filter((s) => content.spots[s]);
+  if (best.length !== Object.keys(next.best).length) {
+    next = { ...next, best: Object.fromEntries(best.map((s) => [s, next.best[s]!])) };
   }
   return next;
 }

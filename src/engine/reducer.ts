@@ -15,11 +15,13 @@ import {
   type Verb,
 } from "./logic";
 import { passesFor, type PassKind, type Stroke } from "./lettering";
+import { rankOf, timeLeftShare, xpForWork, xpGain } from "./progress";
 import {
   isSpotKnown,
   mapPlaces,
   rateWork,
   renderWork,
+  letteringFor,
   sprayChoices,
   sprayResultText,
   styleOf,
@@ -56,7 +58,17 @@ export type GameEvent =
   | { type: "TRUST_CHANGED"; npc: string; from: number; to: number }
   | { type: "ITEM_GAINED"; item: string; name: string }
   | { type: "SPRAY_OPEN"; spot: string }
-  | { type: "SPRAYED"; spot: string; quality: number; label: string; text: string; hints: string[] }
+  | {
+      type: "SPRAYED";
+      spot: string;
+      quality: number;
+      label: string;
+      text: string;
+      hints: string[];
+      xp: number;
+    }
+  | { type: "XP_GAINED"; amount: number; total: number }
+  | { type: "RANK_UP"; rank: string; name: string; text?: string; unlocks?: string }
   | { type: "WARNING"; message: string };
 
 export type ReduceResult = { state: GameState; events: GameEvent[] };
@@ -278,6 +290,9 @@ function spray(
       return unchanged(state, "Fürs Fill-in braucht es 1–2 Farben aus deiner Tasche.");
     if (!hasColor(colors.outline)) return unchanged(state, "Für die Outline fehlt eine Farbe, die du hast.");
   }
+  for (const extra of [colors.second, colors.background]) {
+    if (extra !== undefined && !hasColor(extra)) return unchanged(state, "Die Farbe hast du nicht.");
+  }
   if (!choices.doses.some((d) => d.id === action.dose))
     return unchanged(state, `Dose "${action.dose}" hast du nicht.`);
   const expected = passesFor(style.look);
@@ -297,6 +312,8 @@ function spray(
     style: style.id,
     colors: {
       ...(style.look === "tag" ? { line: colors.line } : { fill: colors.fill, outline: colors.outline }),
+      ...(colors.second !== undefined ? { second: colors.second } : {}),
+      ...(colors.background !== undefined ? { background: colors.background } : {}),
     },
     dose: action.dose,
     passes: action.passes.map((p) => ({
@@ -308,9 +325,22 @@ function spray(
   };
   const result = renderWork(content, state.player.name, draft)!;
   const rating = rateWork(content, spot, style, draft, result.stats);
+
+  // Aufstieg (M4a): XP für das Werk, angerechnet wird die Verbesserung an diesem Spot.
+  const lettering = letteringFor(content, state.player.name, style.id, draft.seed);
+  const xp = lettering
+    ? xpForWork(content, spot, style, rating.quality, timeLeftShare(lettering, content, draft))
+    : 0;
+  const bestBefore = state.best[spot.id] ?? 0;
+  const gain = xpGain(content, xp, bestBefore);
+  const totalXp = (state.xp ?? 0) + gain;
+  const rankBefore = rankOf(state, content);
+
   const next: GameState = {
     ...state,
     works: { ...state.works, [spot.id]: { ...draft, quality: rating.quality, at: now } },
+    best: { ...state.best, [spot.id]: Math.max(bestBefore, xp) },
+    xp: totalXp,
     lastSketch: {
       style: style.id,
       colors: draft.colors,
@@ -321,17 +351,27 @@ function spray(
       },
     },
   };
-  return {
-    state: next,
-    events: [
-      {
-        type: "SPRAYED",
-        spot: spot.id,
-        quality: rating.quality,
-        label: rating.label,
-        text: sprayResultText(content, next, spot, style, rating.label),
-        hints: rating.hints,
-      },
-    ],
-  };
+  const rankAfter = rankOf(next, content);
+  const events: GameEvent[] = [
+    {
+      type: "SPRAYED",
+      spot: spot.id,
+      quality: rating.quality,
+      label: rating.label,
+      text: sprayResultText(content, next, spot, style, rating.label),
+      hints: rating.hints,
+      xp: gain,
+    },
+  ];
+  if (gain > 0) events.push({ type: "XP_GAINED", amount: gain, total: totalXp });
+  if (rankAfter && rankAfter.id !== rankBefore?.id) {
+    events.push({
+      type: "RANK_UP",
+      rank: rankAfter.id,
+      name: rankAfter.name,
+      ...(rankAfter.text ? { text: rankAfter.text } : {}),
+      ...(rankAfter.unlocks ? { unlocks: rankAfter.unlocks } : {}),
+    });
+  }
+  return { state: next, events };
 }

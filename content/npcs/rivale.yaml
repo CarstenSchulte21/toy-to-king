@@ -67,6 +67,12 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "KRUX erzählt dir sowas nicht. Noch nicht."
           next: bruecke
+        - text: "Dein Wildstyle. Wie kriegt man die Buchstaben so ineinander?"
+          id: wildstyle
+          once: true
+          if: [{rank_min: piece_writer}, {sprayed: hall}]
+          show_locked: "Danach fragst du ihn besser erst, wenn du selbst was an der Hall stehen hast."
+          next: wildstyle
         - text: "Bin weg."
           end: true
 
@@ -115,4 +121,14 @@ dialogue:
       effects:
         - learn: bruecke
         - give: ny_fat
+      next: hub
+
+    wildstyle:
+      text:
+        - "Dein Piece an der Hall. Hab ich gesehen."
+        - "Wildstyle ist kein Trick. Du verschränkst die Buchstaben, bis nur noch Writer sie lesen."
+        - "Arrows an die Enden, Connections dazwischen. Skizzier das zehnmal, bevor du an eine Wand gehst."
+      effects:
+        - set_flag: wildstyle_gelernt
+        - trust: 1
       next: hub

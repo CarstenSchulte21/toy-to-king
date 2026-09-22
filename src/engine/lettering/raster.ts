@@ -49,6 +49,27 @@ export function stampDisc(m: Mask, c: Pt, r: number): void {
   stampCapsule(m, c, c, r);
 }
 
+// Fläche eines Polygons (für Arrows und Spitzen).
+export function stampPolygon(m: Mask, pts: Pt[]): void {
+  if (pts.length < 3) return;
+  const xs = pts.map((p) => p[0]);
+  const ys = pts.map((p) => p[1]);
+  const box = clampBox(Math.min(...xs) - 1, Math.min(...ys) - 1, Math.max(...xs) + 1, Math.max(...ys) + 1);
+  for (let y = box.y0; y <= box.y1; y++) {
+    for (let x = box.x0; x <= box.x1; x++) {
+      const px = x + 0.5;
+      const py = y + 0.5;
+      let inside = false;
+      for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        const [xi, yi] = pts[i]!;
+        const [xj, yj] = pts[j]!;
+        if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+      }
+      if (inside) m[y * WORK_W + x] = 1;
+    }
+  }
+}
+
 export function stampPolyline(m: Mask, pts: Pt[], r: number): void {
   if (pts.length === 1) stampDisc(m, pts[0]!, r);
   for (let i = 0; i < pts.length - 1; i++) stampCapsule(m, pts[i]!, pts[i + 1]!, r);

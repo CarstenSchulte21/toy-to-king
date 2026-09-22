@@ -3,6 +3,7 @@ export * from "./state";
 export * from "./logic";
 export * from "./dialogue";
 export * from "./spray";
+export * from "./progress";
 export * from "./reducer";
 export * from "./migrate";
 export {
@@ -15,6 +16,7 @@ export {
   WORK_W,
   buildLettering,
   comfortableSpeed,
+  decorFor,
   paletteIndex,
   passTimeLimit,
   passesFor,

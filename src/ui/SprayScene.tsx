@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import {
   PASS_LABELS,
+  decorFor,
   WORK_H,
   WORK_W,
   letteringFor,
@@ -28,7 +29,7 @@ type SprayAction = Extract<Action, { type: "SPRAY" }>;
 type Phase =
   | { kind: "sketch" }
   | { kind: "pass"; index: number }
-  | { kind: "result"; text: string; hints: string[] }
+  | { kind: "result"; text: string; hints: string[]; xp: number }
   | { kind: "error"; message: string };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -70,6 +71,8 @@ export function SprayScene(props: {
       line: hasColor(last?.colors.line) ? last!.colors.line! : c0,
       fill: last?.colors.fill?.every(hasColor) && last.colors.fill.length ? last.colors.fill : c1 ? [c1] : [],
       outline: hasColor(last?.colors.outline) ? last!.colors.outline! : c0,
+      second: hasColor(last?.colors.second) ? last!.colors.second : undefined,
+      background: hasColor(last?.colors.background) ? last!.colors.background : undefined,
       dose: choices.doses.some((d) => d.id === last?.dose) ? last!.dose : (choices.doses[0]?.id ?? null),
       caps: Object.fromEntries(
         (["line", "fill", "outline"] as PassKind[]).map((k) => [
@@ -85,15 +88,22 @@ export function SprayScene(props: {
   const [line, setLine] = useState(initial.line);
   const [fill, setFill] = useState<string[]>(initial.fill);
   const [outline, setOutline] = useState(initial.outline);
+  const [second, setSecond] = useState<string | undefined>(initial.second);
+  const [background, setBackground] = useState<string | undefined>(initial.background);
   const [dose, setDose] = useState<string | null>(initial.dose);
   const [caps, setCaps] = useState<Record<PassKind, string>>(initial.caps);
   const [reason, setReason] = useState<string | null>(null);
 
   const styleChoice = choices.styles.find((s) => s.id === style);
   const isTag = styleChoice?.look === "tag";
+  const decor = styleChoice ? decorFor(styleChoice.look) : null;
   const colors = useMemo<WorkColors>(
-    () => (isTag ? { line } : { fill, outline }),
-    [isTag, line, fill, outline],
+    () => ({
+      ...(isTag ? { line } : { fill, outline }),
+      ...(decor?.second && second ? { second } : {}),
+      ...(decor?.background && background ? { background } : {}),
+    }),
+    [isTag, line, fill, outline, decor?.second, decor?.background, second, background],
   );
   const passKinds: PassKind[] = styleChoice?.passes ?? [];
   const ready = !!styleChoice?.available && !!dose && (isTag ? !!line : fill.length > 0 && !!outline);
@@ -198,7 +208,7 @@ export function SprayScene(props: {
     });
     const sprayed = events.find((e) => e.type === "SPRAYED");
     if (sprayed?.type === "SPRAYED") {
-      setPhase({ kind: "result", text: sprayed.text, hints: sprayed.hints });
+      setPhase({ kind: "result", text: sprayed.text, hints: sprayed.hints, xp: sprayed.xp });
     } else {
       const warning = events.find((e) => e.type === "WARNING");
       setPhase({ kind: "error", message: warning?.type === "WARNING" ? warning.message : "Das ging nicht." });
@@ -311,7 +321,7 @@ export function SprayScene(props: {
       </button>
     );
   };
-  const colorName = (id?: string) => choices.colors.find((c) => c.id === id)?.name ?? "–";
+  const colorName = (id?: string) => choices.colors.find((c) => c.id === id)?.name ?? "keine";
 
   return (
     <div className={`overlay spray-scene phase-${phase.kind}`}>
@@ -378,6 +388,32 @@ export function SprayScene(props: {
                 </Row>
               </>
             )}
+            {decor?.second && (
+              <Row label="2. Outline" value={colorName(second)}>
+                {choices.colors.map((c) => (
+                  <Swatch
+                    key={c.id}
+                    id={c.id}
+                    on={second === c.id}
+                    onPick={() => setSecond(second === c.id ? undefined : c.id)}
+                  />
+                ))}
+              </Row>
+            )}
+            {decor?.background && (
+              <Row label="Background" value={colorName(background)}>
+                {choices.colors.map((c) => (
+                  <Swatch
+                    key={c.id}
+                    id={c.id}
+                    on={background === c.id}
+                    onPick={() => setBackground(background === c.id ? undefined : c.id)}
+                  />
+                ))}
+              </Row>
+            )}
+          </div>
+          <div className="sketch-dose">
             <Row label="Dose">
               {choices.doses.map((d) => (
                 <button
@@ -469,7 +505,10 @@ export function SprayScene(props: {
 
       {(phase.kind === "result" || phase.kind === "error") && (
         <div className="spray-result">
-          <p className="spray-result-text">{phase.kind === "result" ? phase.text : phase.message}</p>
+          <p className="spray-result-text">
+            {phase.kind === "result" ? phase.text : phase.message}
+            {phase.kind === "result" && phase.xp > 0 && <span className="spray-xp">+{phase.xp} XP</span>}
+          </p>
           {phase.kind === "result" && phase.hints.map((h) => <p key={h}>{h}</p>)}
           <div className="menu-buttons row">
             <button className="btn" onPointerUp={again}>

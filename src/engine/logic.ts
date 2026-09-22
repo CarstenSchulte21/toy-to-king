@@ -1,6 +1,7 @@
 // Bedingungen, Effekte und Texte – die Bausteine, aus denen die Spielregeln bestehen.
 // Jeder Bedingungs- und Effekttyp ist ein eigener Fall im switch. Neue Typen kommen als weiterer Fall dazu.
 import type { Condition, Effect, GameContent, Hotspot, Room, TextVariants } from "./content-schema";
+import { hasRank } from "./progress";
 import type { GameState } from "./state";
 
 // Kontext: Welcher NPC ist im Gespräch? Nötig für "trust_min: 2" und "trust: 1" ohne Namen.
@@ -24,6 +25,7 @@ export function evaluateCondition(condition: Condition, state: GameState, ctx: C
   if ("not_fact" in condition) return state.facts[condition.not_fact] === undefined;
   if ("has" in condition) return (state.items[condition.has] ?? 0) > 0;
   if ("sprayed" in condition) return state.works[condition.sprayed] !== undefined;
+  if ("rank_min" in condition) return hasRank(state, ctx.content, condition.rank_min);
   if ("trust_min" in condition) {
     const t = condition.trust_min;
     const npc = typeof t === "number" ? ctx.npc : t.npc;
