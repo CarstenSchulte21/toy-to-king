@@ -645,29 +645,89 @@ body {
 }
 
 /* ---------- M3: Sprühen, Karte, Tasche, Werke ---------- */
-.spray {
+/* Sprühen 2.0 (M3.5) */
+.spray-scene {
+  background: var(--c64-black);
+  z-index: 31;
+}
+.spray-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 320px;
+  height: 180px;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+.phase-sketch .spray-canvas {
+  left: 118px;
+  top: 34px;
+  width: 200px;
+  height: 112.5px;
+  pointer-events: none;
+  outline: 1px solid var(--c64-dark-grey);
+}
+.sketch-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 116px;
+  padding: 3px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  padding: 4px;
-  box-sizing: border-box;
   background: #14161a;
-  border: 1px solid var(--c64-grey);
-  z-index: 32;
+  overflow-y: auto;
 }
-.spray-spot {
-  margin: 0;
+.sketch-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sketch-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.sketch-label {
+  color: var(--c64-light-grey);
+}
+.sketch-label em {
+  font-style: normal;
+  color: var(--c64-grey);
+  margin-left: 4px;
+}
+.sketch-info {
+  position: absolute;
+  left: 120px;
+  right: 2px;
+  top: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 4px;
   color: var(--c64-grey);
 }
-.spray-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.sketch-reason,
+.sketch-tips {
+  position: absolute;
+  left: 120px;
+  right: 90px;
+  top: 150px;
+  margin: 0;
 }
-.spray-label {
-  width: 30px;
-  flex: none;
-  color: var(--c64-light-grey);
+.sketch-reason {
+  color: var(--c64-light-red);
+}
+.sketch-tips {
+  color: var(--c64-cyan);
+  font-size: calc(var(--font-size) - 2px);
+  line-height: calc(var(--line-height) - 1px);
+}
+.sketch-tips p {
+  margin: 0;
 }
 .chips {
   display: flex;
@@ -675,8 +735,8 @@ body {
   gap: 2px;
 }
 .chip {
-  min-height: 16px;
-  padding: 0 4px;
+  min-height: 15px;
+  padding: 0 3px;
   background: var(--c64-black);
   border: 1px solid var(--c64-grey);
   color: var(--c64-light-grey) !important;
@@ -691,29 +751,114 @@ body {
   border-style: dashed;
   color: var(--c64-grey) !important;
 }
-.spray-reason {
-  margin: 0;
-  color: var(--c64-light-red);
+.swatch {
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 1px solid var(--c64-grey);
+  color: var(--c64-black) !important;
+  font-size: 8px;
+  line-height: 12px;
+  cursor: pointer;
+}
+.swatch.on {
+  outline: 2px solid var(--c64-yellow);
+  outline-offset: -1px;
 }
 .spray-go {
-  align-self: flex-start;
-  min-width: 90px;
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  min-width: 80px;
 }
 .spray-go:disabled {
   border-color: var(--c64-grey);
   color: var(--c64-grey) !important;
 }
-.spray-tips {
-  margin-top: auto;
-  color: var(--c64-cyan);
-  font-size: calc(var(--font-size) - 2px);
-  line-height: calc(var(--line-height) - 1px);
+.pass-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  min-height: 18px;
+  padding: 1px 3px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.8);
 }
-.spray-tips p {
+.pass-name {
+  color: var(--c64-yellow);
+  white-space: nowrap;
+}
+.pass-colors {
+  display: flex;
+  gap: 1px;
+}
+.pass-colors i,
+.bag-swatch {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--c64-grey);
+}
+.bag-swatch {
+  margin-right: 3px;
+  vertical-align: -1px;
+}
+.pass-cap {
+  color: var(--c64-light-grey);
+}
+.pass-time {
+  flex: 1;
+  min-width: 30px;
+  height: 5px;
+  border: 1px solid var(--c64-grey);
+}
+.pass-time i {
+  display: block;
+  height: 100%;
+  background: var(--c64-yellow);
+}
+.pass-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
   margin: 0;
+  padding: 0 8px;
+  text-align: center;
+  color: var(--c64-yellow);
+  text-shadow: 1px 1px 0 var(--c64-black);
+  pointer-events: none;
 }
-.spray-tips-title {
-  color: var(--c64-grey);
+.pass-abort {
+  position: absolute;
+  left: 2px;
+  bottom: 2px;
+}
+.spray-result {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.85);
+  border-top: 1px solid var(--c64-yellow);
+}
+.spray-result p {
+  margin: 0;
+  color: var(--c64-light-grey);
+}
+.spray-result .spray-result-text {
+  color: var(--c64-yellow);
+}
+.spray-result .menu-buttons {
+  align-self: flex-end;
 }
 
 .map {
@@ -797,27 +942,18 @@ body {
 /* Eigenes Werk am Spot: der Writer-Name an der Wand */
 .work {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(-4deg);
-  padding: 0 3px;
-  color: var(--c64-yellow);
-  text-shadow: 1px 1px 0 var(--c64-black);
-  white-space: nowrap;
+  inset: 1px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
 }
-.work-throwup,
-.work-piece {
-  font-size: calc(var(--font-size) + 6px);
-  line-height: calc(var(--line-height) + 6px);
+.work-image {
+  max-width: 100%;
+  max-height: calc(100% - 5px);
+  object-fit: contain;
 }
-.work-piece {
-  color: var(--c64-light-red);
-  -webkit-text-stroke: 1px var(--c64-yellow);
-}
-.work-hollow {
-  font-size: calc(var(--font-size) + 6px);
-  line-height: calc(var(--line-height) + 6px);
-  color: transparent;
-  -webkit-text-stroke: 1px var(--c64-yellow);
+.work .quality {
+  margin-top: 1px;
 }

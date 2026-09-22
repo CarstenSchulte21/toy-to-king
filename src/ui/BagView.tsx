@@ -1,6 +1,7 @@
 "use client";
-// Tasche (F1.4): Caps und Dosen, die man hat.
-import type { GameContent, GameState } from "@/engine";
+// Tasche (F1.4): Caps, Dosen und Farben, die man hat.
+import { paletteIndex, type GameContent, type GameState } from "@/engine";
+import { rgbCss } from "./paint";
 
 export function BagView(props: { content: GameContent; state: GameState; onClose: () => void }) {
   const { content, state } = props;
@@ -9,7 +10,8 @@ export function BagView(props: { content: GameContent; state: GameState; onClose
     .map(([id, count]) => ({ ...content.items[id]!, count }));
   const groups = [
     { kind: "cap", title: "Caps" },
-    { kind: "dose", title: "Dosen" },
+    { kind: "dose", title: "Druck" },
+    { kind: "color", title: "Farben" },
   ] as const;
   return (
     <div className="overlay blackbook">
@@ -28,6 +30,9 @@ export function BagView(props: { content: GameContent; state: GameState; onClose
               .map((i) => (
                 <div key={i.id} className="bb-entry">
                   <span className="bb-entry-title">
+                    {i.color && (
+                      <i className="bag-swatch" style={{ background: rgbCss(paletteIndex(i.color)) }} />
+                    )}
                     {i.name}
                     {i.count > 1 ? ` ×${i.count}` : ""}
                   </span>

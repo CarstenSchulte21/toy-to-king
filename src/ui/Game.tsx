@@ -7,7 +7,6 @@ import contentJson from "@/generated/content.json";
 import {
   createNewGame,
   reduce,
-  sprayChoices,
   viewDialogue,
   type Action,
   type GameContent,
@@ -24,7 +23,7 @@ import { FeedbackPanel } from "./FeedbackPanel";
 import { MapView } from "./MapView";
 import { RoomView } from "./RoomView";
 import { ConfirmNewGame, MainMenu, NameEntry, PauseMenu, TextBox } from "./Screens";
-import { SprayPanel } from "./SprayPanel";
+import { SprayScene } from "./SprayScene";
 import { Stage, useStageScale } from "./Stage";
 
 const content = contentJson as unknown as GameContent;
@@ -103,7 +102,7 @@ export function Game() {
             break;
           }
           case "SPRAYED":
-            setSpraySpot(null);
+            // Das Ergebnis zeigt die Sprüh-Szene selbst.
             break;
           case "TRUST_CHANGED": {
             const name = content.npcs[e.npc]?.name ?? e.npc;
@@ -121,12 +120,13 @@ export function Game() {
   );
 
   const dispatch = useCallback(
-    (action: Action) => {
+    (action: Action): GameEvent[] => {
       const current = stateRef.current;
-      if (!current) return;
+      if (!current) return [];
       const result = reduce(current, action, content);
       if (result.state !== current) commit(result.state);
       handleEvents(result.events);
+      return result.events;
     },
     [commit, handleEvents],
   );
@@ -217,7 +217,6 @@ export function Game() {
   const room = state ? content.rooms[state.room] : undefined;
   const dialogue = state && cursor ? viewDialogue(state, content, cursor.npc, cursor.node) : null;
   const hasNewFacts = state ? Object.values(state.facts).some((f) => f.new) : false;
-  const choices = state && spraySpot ? sprayChoices(state, content, spraySpot.spot) : null;
   const materialTips = state
     ? Object.keys(state.facts)
         .map((id) => content.facts[id])
@@ -230,7 +229,7 @@ export function Game() {
     blackbook ||
     mapOpen ||
     bagOpen ||
-    choices !== null ||
+    spraySpot !== null ||
     feedback !== null;
 
   return (
@@ -325,15 +324,15 @@ export function Game() {
               />
             )}
             {bagOpen && <BagView content={content} state={state} onClose={() => setBagOpen(false)} />}
-            {choices && spraySpot && (
-              <SprayPanel
+            {spraySpot && (
+              <SprayScene
                 key={spraySpot.spot}
+                content={content}
+                state={state}
+                spot={spraySpot.spot}
                 title={spraySpot.title}
-                choices={choices}
                 tips={materialTips}
-                onSpray={(style, cap, dose) =>
-                  dispatch({ type: "SPRAY", spot: spraySpot.spot, style, cap, dose })
-                }
+                onSpray={(action) => dispatch(action)}
                 onClose={() => setSpraySpot(null)}
               />
             )}
@@ -347,7 +346,7 @@ export function Game() {
                 onMainMenu={toMainMenu}
               />
             )}
-            {!dialogue && !blackbook && !mapOpen && !bagOpen && !choices && (
+            {!dialogue && !blackbook && !mapOpen && !bagOpen && !spraySpot && (
               <div className="toasts" aria-live="polite">
                 {toasts.map((t) => (
                   <div key={t.id} className="toast">
