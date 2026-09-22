@@ -50,6 +50,7 @@ In M1 ohne Gespräch, ohne Ausgang und ohne Info-Bedingungen – die kennt die E
 ```yaml
 id: hinterhof
 name: Hinterhof
+background: hinterhof.png
 description: "Hinterhof. Hier hat alles angefangen: drei Mülltonnen und ein Edding."
 hotspots:
   - id: muelltonnen
@@ -63,8 +64,11 @@ hotspots:
     label: Garagentor
     rect: [110, 60, 90, 90]
     untersuchen:
-      - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
-      - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
+      - if: [{fact: buff_montag}]
+        text: "Grau. Wie alles hier nach einem Montag."
+      - text:
+          - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
+          - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
 
   - id: feuerleiter
     label: Feuerleiter
@@ -86,13 +90,13 @@ hotspots:
     untersuchen:
       - "Ein älterer Typ auf einer Getränkekiste. Blackbook auf dem Knie, Kaffee daneben."
       - "Er zeichnet, ohne aufzusehen."
-    # M2: sprechen: mentor
+    sprechen: mentor
 
   - id: durchgang
     label: Durchgang
     rect: [295, 60, 25, 100]
     untersuchen: "Der Durchgang zur Straße."
-    # M2: gehen: strasse
+    gehen: strasse
 ```
 
 ### 2.2 Straße (M2)
@@ -100,6 +104,7 @@ hotspots:
 ```yaml
 id: strasse
 name: Straße
+background: strasse.png
 description: "Die Ladenzeile. Kiosk, Handyladen, Farbenladen. Und eine Streife, die hier öfter steht als der Bus."
 hotspots:
   - id: rolltore
@@ -153,6 +158,7 @@ hotspots:
 ```yaml
 id: farbenladen
 name: Farbenladen
+background: farbenladen.png
 description: "Regale bis unter die Decke, Dosen nach Farben sortiert. Riecht nach Lack."
 hotspots:
   - id: regal_low
@@ -196,6 +202,7 @@ hotspots:
 ```yaml
 id: unterfuehrung
 name: Unterführung
+background: unterfuehrung.png
 description: "Jeder Zentimeter bemalt, bis unter die Decke. Das Licht flackert."
 hotspots:
   - id: tagwand
@@ -1166,6 +1173,7 @@ places:
 ```yaml
 id: jugendzentrum
 name: Jugendzentrum
+background: jugendzentrum.png
 description: "Hinter dem Jugendzentrum: eine lange Wand, Stück für Stück bemalt. Legal. Hier hat man Zeit."
 hotspots:
   - id: hall_wand
@@ -1200,6 +1208,7 @@ hotspots:
 ```yaml
 id: bruecke
 name: Eisenbahnbrücke
+background: bruecke.png
 description: "Oben auf der Eisenbahnbrücke. Der Wind zieht, unten fahren die Autos."
 hotspots:
   - id: brueckenwand
@@ -1227,6 +1236,7 @@ hotspots:
 ```yaml
 id: abstellgleis
 name: Abstellgleis
+background: abstellgleis.png
 description: "Hinter dem Zaun. Schotter, abgestellte Waggons, kein Mensch zu sehen."
 hotspots:
   - id: waggon
@@ -1301,3 +1311,10 @@ tempo_bonus_max: 0.3
 tempo_min_quality: 2
 repeat_share: 0.2
 ```
+
+## 7. Raumbilder (Grafik-Schritt)
+
+Die Hintergründe liegen als PNG in `public/art/<room>.png` und entstehen aus Code:
+`scripts/lib/rooms-art.ts` malt jede Szene, `npm run art` schreibt die Bilder.
+Jeder Room verweist über `background: <room>.png` darauf. Wer ein Bild ändern will, ändert die Szene
+und lässt `npm run art` neu laufen – ein Test vergleicht Bild und Szene.

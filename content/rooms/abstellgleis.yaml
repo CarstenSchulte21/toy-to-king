@@ -1,5 +1,6 @@
 id: abstellgleis
 name: Abstellgleis
+background: abstellgleis.png
 description: "Hinter dem Zaun. Schotter, abgestellte Waggons, kein Mensch zu sehen."
 hotspots:
   - id: waggon

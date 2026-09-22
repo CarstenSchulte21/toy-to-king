@@ -1,5 +1,6 @@
 id: strasse
 name: Straße
+background: strasse.png
 description: "Die Ladenzeile. Kiosk, Handyladen, Farbenladen. Und eine Streife, die hier öfter steht als der Bus."
 hotspots:
   - id: rolltore

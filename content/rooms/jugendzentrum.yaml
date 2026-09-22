@@ -1,5 +1,6 @@
 id: jugendzentrum
 name: Jugendzentrum
+background: jugendzentrum.png
 description: "Hinter dem Jugendzentrum: eine lange Wand, Stück für Stück bemalt. Legal. Hier hat man Zeit."
 hotspots:
   - id: hall_wand

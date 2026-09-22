@@ -1,5 +1,6 @@
 id: unterfuehrung
 name: Unterführung
+background: unterfuehrung.png
 description: "Jeder Zentimeter bemalt, bis unter die Decke. Das Licht flackert."
 hotspots:
   - id: tagwand
