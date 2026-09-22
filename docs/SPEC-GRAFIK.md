@@ -15,7 +15,7 @@ Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M
 | Thema | Entscheidung | Begründung |
 |-------|--------------|------------|
 | Bilder aus Code | Die Szenen stehen als Zeichen-Code in `scripts/lib/rooms-art.ts`, `npm run art` erzeugt daraus die PNGs in `public/art/`. | Änderungen sind nachvollziehbar, und ein Test prüft, dass Bild und Code zusammenpassen. Später kann jedes PNG durch ein gemaltes Bild ersetzt werden. |
-| Palette | Dieselben 16 C64-Farben wie die Werke | Alles wirkt aus einer Welt. |
+| Palette | 32 Farben: die 16 C64-Farben plus 16 Zwischentöne für Haut, Mauerwerk, Metall und Nacht. Die ersten 16 bleiben unverändert, gespeicherte Werke sehen genauso aus wie vorher. | 16 Farben reichten für Gesichter und Schattierungen nicht (Tester). Der Retro-Look bleibt. |
 | Größe | 320×180, genau die Bühne | Keine Skalierung, keine unscharfen Kanten. |
 | Motive | Jede Szene richtet sich nach den Hotspot-Rechtecken der Room-Datei | Wer etwas sieht, kann es auch antippen – und umgekehrt. |
 | Fremde Werke | Die Pieces und Tags an den Wänden entstehen aus denselben Buchstaben-Skeletten wie die eigenen Werke, nur klein: KRUX in der Unterführung, SEB, ZINK, MOA und ARO an der Hall, ein verblasstes TOY daneben. | Die Wände zeigen echte Namen statt bunter Kästen. |
@@ -58,3 +58,22 @@ Adventures der späten 80er (Zak McKracken). Geändert:
 | Licht | Keins | Lichtkegel unter Laterne, Deckenlampen, Flutlicht |
 | Fremde Werke | Farbige Kästen | Schriftzüge aus den Buchstaben der Engine, Tags als kleine Handstyles statt Kritzelwürmer |
 | Boden | Flach | Fluchtlinien im Laden, Schotter mit Streuung, Bordstein, Fahrbahnmarkierung |
+
+## 7. Runde 3 nach Tester-Feedback
+
+Der Tester fand Runde 2 „schon viel besser", die Gesichter aber weiter zu kindlich: runder Kopf, zwei
+Punkte als Augen, ein Strich als Mund. Dazu der Wunsch nach 32 Farben. Geändert:
+
+| Thema | Vorher | Jetzt |
+|-------|--------|-------|
+| Palette | 16 Farben | 32 Farben (`src/engine/lettering/palette.ts`), die neuen 16 sind Zwischentöne: vier Hauttöne, vier Graustufen, Navy, Stahlblau, Himmelblau, Moos, Tannengrün, Sandbraun, Dunkelbraun, Rost |
+| Kopfform | Kreis | Schädel oben rund, zum Kinn schmaler, mit Ohren |
+| Gesicht | Zwei Punkte, ein Strich | Lidschatten, Augenweiß mit Pupille, Brauen, Nase mit Schattenkante, Mund mit Unterlippe, Falten bei Kalle |
+| Proportion | Kopf etwa ein Viertel der Höhe (kindlich) | Kopf gut ein Sechstel, längere Beine |
+| Kleidung | Zwei Töne | Drei Töne, Kragen, Ärmelbund, Gürtel mit Schnalle, Reißverschluss |
+| Kopfbedeckung | Ein Klotz | Kalle: Strickmütze mit Umschlag. Brandt: Schirmmütze mit Abzeichen. KRUX: Kapuze mit Öffnung, Schatten im Gesicht und Kordeln |
+| Bart | Graue Fläche | Zwei Töne im Wechsel, Schnurrbart, Mund bleibt frei |
+| Räume | 16 Farben | Wärmere Ziegel (Rost, Sandbraun), Betonflächen in vier Graustufen, Himmel von Stahlblau nach Himmelblau, Nacht in Navy |
+
+Offen für später: Die neuen Farben stehen auch dem Spiel zur Verfügung. Damit könnte es in M5 mehr
+Dosenfarben im Laden geben.

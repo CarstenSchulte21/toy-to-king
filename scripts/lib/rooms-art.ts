@@ -79,11 +79,11 @@ function lightCone(a: Art, x: number, y: number, w: number, h: number, c: number
 
 const hinterhof: Scene = (R) => {
   const a = newArt(C.brown);
-  gradient(a, 0, 0, ART_W, 22, C.light_blue, C.cyan);
+  gradient(a, 0, 0, ART_W, 22, C.steel, C.sky);
   dither(a, 0, 14, ART_W, 8, C.cyan, C.light_grey, 0.4);
-  bricks(a, 0, 22, ART_W, 128, C.brown, C.red, C.grey, R);
-  dither(a, 0, 22, ART_W, 26, C.brown, C.black, 0.28);
-  dither(a, 0, 130, ART_W, 20, C.brown, C.black, 0.22);
+  bricks(a, 0, 22, ART_W, 128, C.tan, C.rust, C.grey_soft, R);
+  dither(a, 0, 22, ART_W, 26, C.tan, C.dark_brown, 0.35);
+  dither(a, 0, 130, ART_W, 20, C.tan, C.dark_brown, 0.3);
   for (let k = 0; k < 4; k++)
     crack(
       a,
@@ -93,7 +93,7 @@ const hinterhof: Scene = (R) => {
       C.dark_grey,
       R,
     );
-  ground(a, 150, C.dark_grey, C.grey, R);
+  ground(a, 150, C.grey_mid, C.grey_soft, R);
 
   windowAt(a, 40, 30, 14, 16, false, R);
   windowAt(a, 70, 30, 14, 16, true, R);
@@ -153,7 +153,7 @@ const hinterhof: Scene = (R) => {
   cable(a, 270, 100, 242, 70, 4, C.black);
 
   // Kiste und Kalle [150,105,30,55]
-  box(a, 142, 136, 36, 24, C.brown, C.orange, C.black);
+  box(a, 142, 136, 36, 24, C.tan, C.orange, C.dark_brown);
   hline(a, 144, 142, 32, C.black);
   hline(a, 144, 150, 32, C.black);
   character(a, 152, 100, 60, KALLE);
@@ -168,7 +168,7 @@ const hinterhof: Scene = (R) => {
 
 const strasse: Scene = (R) => {
   const a = newArt(C.grey);
-  gradient(a, 0, 0, ART_W, 34, C.light_blue, C.cyan);
+  gradient(a, 0, 0, ART_W, 34, C.steel, C.sky);
   for (let k = 0; k < 3; k++) {
     const cx = 40 + k * 110;
     const cy = 12 + (k % 2) * 5;
@@ -176,18 +176,18 @@ const strasse: Scene = (R) => {
     disc(a, cx + 8, cy + 2, 5, C.white);
     disc(a, cx - 7, cy + 2, 4, C.white);
   }
-  bricks(a, 0, 26, 150, 124, C.red, C.brown, C.grey, R);
-  dither(a, 0, 26, 150, 18, C.red, C.black, 0.25);
-  rect(a, 150, 26, 170, 124, C.light_grey);
-  dither(a, 150, 26, 170, 124, C.light_grey, C.grey, 0.3);
-  dither(a, 150, 26, 170, 14, C.grey, C.black, 0.3);
+  bricks(a, 0, 26, 150, 124, C.rust, C.dark_brown, C.grey_soft, R);
+  dither(a, 0, 26, 150, 18, C.rust, C.dark_brown, 0.3);
+  rect(a, 150, 26, 170, 124, C.grey_pale);
+  dither(a, 150, 26, 170, 124, C.grey_pale, C.grey_soft, 0.35);
+  dither(a, 150, 26, 170, 14, C.grey_soft, C.grey_mid, 0.4);
   hline(a, 150, 26, 170, C.dark_grey);
   vline(a, 150, 26, 124, C.dark_grey);
   windowAt(a, 16, 34, 14, 16, false, R);
   windowAt(a, 46, 34, 14, 16, true, R);
   windowAt(a, 240, 36, 16, 18, false, R);
   windowAt(a, 276, 36, 16, 18, true, R);
-  ground(a, 150, C.dark_grey, C.grey, R);
+  ground(a, 150, C.grey_mid, C.grey_soft, R);
   hline(a, 0, 164, ART_W, C.grey);
   hline(a, 0, 165, ART_W, C.light_grey);
   rect(a, 0, 166, ART_W, 14, C.dark_grey);
@@ -235,7 +235,7 @@ const strasse: Scene = (R) => {
       hline(a, cx, 64 + row * 14, 5, C.light_grey);
     }
   }
-  box(a, 196, 112, 22, 38, C.brown, C.orange, C.black);
+  box(a, 196, 112, 22, 38, C.tan, C.orange, C.dark_brown);
   disc(a, 213, 132, 2, C.yellow);
   rect(a, 176, 112, 20, 38, C.dark_grey);
   dither(a, 176, 112, 20, 38, C.dark_grey, C.black, 0.3);
@@ -262,8 +262,8 @@ const farbenladen: Scene = (R) => {
   const a = newArt(C.light_grey);
   rect(a, 0, 0, ART_W, 16, C.grey);
   dither(a, 0, 0, ART_W, 16, C.grey, C.dark_grey, 0.3);
-  rect(a, 0, 16, ART_W, 134, C.light_grey);
-  dither(a, 0, 100, ART_W, 50, C.light_grey, C.grey, 0.3);
+  rect(a, 0, 16, ART_W, 134, C.grey_pale);
+  dither(a, 0, 100, ART_W, 50, C.grey_pale, C.grey_soft, 0.35);
   rect(a, 0, 148, ART_W, 32, C.grey);
   dither(a, 0, 148, ART_W, 32, C.grey, C.light_grey, 0.4);
   for (let k = -4; k < 10; k++) line(a, 160 + k * 26, 148, 160 + k * 90, ART_H, C.dark_grey);
@@ -289,7 +289,7 @@ const farbenladen: Scene = (R) => {
     [8, 84, "LOW"],
     [95, 62, "HIGH"],
   ] as [number, number, string][]) {
-    box(a, x, 20, w, 122, C.brown, C.orange, C.black);
+    box(a, x, 20, w, 122, C.tan, C.orange, C.dark_brown);
     word(a, x + 6, 23, 9, label, C.white, C.black);
     for (let shelf = 0; shelf < 4; shelf++) {
       const y = 38 + shelf * 25;
@@ -307,7 +307,7 @@ const farbenladen: Scene = (R) => {
   }
 
   // Cap-Kiste [170,110,40,25]
-  box(a, 170, 110, 40, 26, C.brown, C.orange, C.black);
+  box(a, 170, 110, 40, 26, C.tan, C.orange, C.dark_brown);
   rect(a, 172, 112, 36, 4, C.dark_grey);
   for (let k = 0; k < 14; k++) {
     const cx = 174 + (k % 7) * 5;
@@ -317,7 +317,7 @@ const farbenladen: Scene = (R) => {
   }
 
   // Pinnwand [220,25,50,50]
-  box(a, 220, 25, 50, 50, C.brown, C.orange, C.black);
+  box(a, 220, 25, 50, 50, C.tan, C.orange, C.dark_brown);
   poster(a, 223, 29, 15, 18, C.white, C.dark_grey, R);
   poster(a, 241, 29, 16, 14, C.yellow, C.black, R);
   poster(a, 223, 50, 20, 20, C.white, C.dark_grey, R);
@@ -332,7 +332,7 @@ const farbenladen: Scene = (R) => {
 
   // Theke [215,120,...] und Sibel [240,85,35,70]
   character(a, 243, 82, 68, SIBEL);
-  box(a, 214, 118, 106, 26, C.brown, C.orange, C.black);
+  box(a, 214, 118, 106, 26, C.tan, C.orange, C.dark_brown);
   hline(a, 216, 123, 102, C.dark_grey);
   box(a, 286, 102, 28, 17, C.light_grey, C.white, C.grey);
   rect(a, 289, 105, 22, 6, C.dark_grey);
@@ -356,16 +356,16 @@ const unterfuehrung: Scene = (R) => {
     vline(a, x, 0, 22, C.grey);
   }
   rect(a, 0, 20, ART_W, 4, C.dark_grey);
-  rect(a, 0, 24, ART_W, 126, C.grey);
-  dither(a, 0, 24, ART_W, 40, C.grey, C.light_grey, 0.25);
-  dither(a, 0, 110, ART_W, 40, C.grey, C.dark_grey, 0.4);
+  rect(a, 0, 24, ART_W, 126, C.grey_soft);
+  dither(a, 0, 24, ART_W, 40, C.grey_soft, C.grey_pale, 0.3);
+  dither(a, 0, 110, ART_W, 40, C.grey_soft, C.grey_mid, 0.45);
   grain(a, 0, 24, ART_W, 126, C.dark_grey, 0.04, R);
   for (const x of [66, 206]) {
     rect(a, x, 16, 28, 6, C.yellow);
     frame(a, x - 1, 15, 30, 8, C.black);
     lightCone(a, x + 14, 22, 74, 50, C.yellow);
   }
-  ground(a, 150, C.dark_grey, C.grey, R);
+  ground(a, 150, C.grey_mid, C.grey_soft, R);
   puddle(a, 120, 166, 22, 5, C.black, C.grey);
   puddle(a, 250, 172, 16, 4, C.black, C.grey);
 
@@ -377,7 +377,7 @@ const unterfuehrung: Scene = (R) => {
   frame(a, 0, 40, 16, 100, C.dark_grey);
 
   character(a, 216, 82, 78, KRUX);
-  box(a, 238, 140, 12, 13, C.brown, C.orange, C.black);
+  box(a, 238, 140, 12, 13, C.tan, C.orange, C.dark_brown);
 
   // Aufgebogener Zaun [266,90,35,60]
   rect(a, 264, 88, 40, 64, C.black);
@@ -397,16 +397,16 @@ const unterfuehrung: Scene = (R) => {
 
 const jugendzentrum: Scene = (R) => {
   const a = newArt(C.grey);
-  gradient(a, 0, 0, ART_W, 26, C.light_blue, C.cyan);
+  gradient(a, 0, 0, ART_W, 26, C.steel, C.sky);
   disc(a, 250, 12, 8, C.white);
   disc(a, 262, 14, 6, C.white);
   rect(a, 0, 22, ART_W, 6, C.dark_grey);
   hline(a, 0, 22, ART_W, C.grey);
-  rect(a, 0, 28, ART_W, 122, C.light_grey);
-  dither(a, 0, 28, ART_W, 122, C.light_grey, C.grey, 0.28);
-  dither(a, 0, 120, ART_W, 30, C.light_grey, C.dark_grey, 0.3);
+  rect(a, 0, 28, ART_W, 122, C.grey_pale);
+  dither(a, 0, 28, ART_W, 122, C.grey_pale, C.grey_soft, 0.3);
+  dither(a, 0, 120, ART_W, 30, C.grey_soft, C.grey_mid, 0.35);
   grain(a, 0, 28, ART_W, 122, C.grey, 0.03, R);
-  ground(a, 150, C.dark_grey, C.grey, R);
+  ground(a, 150, C.grey_mid, C.grey_soft, R);
   for (let x = 6; x < ART_W; x += 46) rect(a, x, 170, 24, 2, C.light_grey);
 
   const fills = [C.yellow, C.light_red, C.cyan, C.light_green];
@@ -424,7 +424,7 @@ const jugendzentrum: Scene = (R) => {
   grain(a, 222, 40, 76, 60, C.light_grey, 0.3, R);
   grain(a, 222, 40, 76, 60, C.grey, 0.12, R);
 
-  box(a, 225, 120, 46, 34, C.brown, C.orange, C.black);
+  box(a, 225, 120, 46, 34, C.tan, C.orange, C.dark_brown);
   rect(a, 227, 122, 42, 4, C.dark_grey);
   for (let i = 0; i < 6; i++) {
     const cx = 228 + i * 7;
@@ -433,7 +433,7 @@ const jugendzentrum: Scene = (R) => {
     rect(a, cx + 1, 107, 3, 3, C.light_grey);
   }
   weeds(a, 300, 158, 6, C.green, R);
-  box(a, 150, 132, 46, 6, C.brown, C.orange, C.black);
+  box(a, 150, 132, 46, 6, C.tan, C.orange, C.dark_brown);
   rect(a, 154, 138, 4, 12, C.dark_grey);
   rect(a, 188, 138, 4, 12, C.dark_grey);
 
@@ -444,7 +444,7 @@ const jugendzentrum: Scene = (R) => {
 
 const bruecke: Scene = (R) => {
   const a = newArt(C.blue);
-  gradient(a, 0, 0, ART_W, 60, C.purple, C.blue);
+  gradient(a, 0, 0, ART_W, 60, C.purple, C.navy);
   dither(a, 0, 40, ART_W, 26, C.blue, C.black, 0.4);
   for (let k = 0; k < 40; k++) px(a, Math.floor(R() * ART_W), Math.floor(R() * 36), C.white);
   disc(a, 280, 20, 7, C.light_grey);
@@ -505,7 +505,7 @@ const bruecke: Scene = (R) => {
 
 const abstellgleis: Scene = (R) => {
   const a = newArt(C.black);
-  gradient(a, 0, 0, ART_W, 44, C.black, C.blue);
+  gradient(a, 0, 0, ART_W, 44, C.black, C.navy);
   for (let k = 0; k < 50; k++) px(a, Math.floor(R() * ART_W), Math.floor(R() * 40), C.white);
   rect(a, 292, 10, 3, 36, C.dark_grey);
   box(a, 286, 6, 14, 5, C.light_grey, C.white, C.grey);
@@ -514,7 +514,7 @@ const abstellgleis: Scene = (R) => {
   dither(a, 0, 44, ART_W, 20, C.dark_grey, C.black, 0.4);
   for (let x = 0; x < ART_W; x += 14) disc(a, x, 46, 5 + Math.floor(R() * 3), C.black);
   grain(a, 0, 44, ART_W, 96, C.grey, 0.03, R);
-  ground(a, 138, C.dark_grey, C.light_grey, R);
+  ground(a, 138, C.grey_mid, C.grey_soft, R);
   for (let k = 0; k < 90; k++) px(a, Math.floor(R() * ART_W), 140 + Math.floor(R() * 38), C.grey);
 
   // Waggon [40,50,200,80]

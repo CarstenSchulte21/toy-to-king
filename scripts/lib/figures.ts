@@ -1,14 +1,17 @@
-// Die Leute im Spiel. Nach dem Tester-Feedback („eher Strichfiguren") sind es richtige Sprites:
-// Gesicht, Frisur, Kleidung mit Licht und Schatten, Hände, Schuhe – und außen herum eine schwarze
-// Kontur, damit die Figur vor jeder Wand steht.
+// Die Leute im Spiel. Nach dem Tester-Feedback („zu kindlich, Gesichter sind Punkte und ein Strich")
+// sind die Sprites erwachsener gebaut: kleinerer Kopf im Verhältnis zum Körper, Gesicht mit Lidschatten,
+// Augenweiß, Braue, Nase, Lippen und Kinnpartie – in vier Hauttönen aus der erweiterten Palette.
 import { C, disc, hline, newArt, px, rect, vline, type Art } from "./art";
 
 const EMPTY = 255;
 
 type Body = {
   skin: number;
+  skinLight: number;
   skinShade: number;
+  skinDeep: number;
   hair: number;
+  hairLight: number;
   top: number; // Jacke, Pulli, Uniform
   topLight: number;
   topDark: number;
@@ -22,195 +25,271 @@ export type Pose = "stehend" | "sitzend" | "theke";
 export type Figure = Body & {
   pose?: Pose;
   cap?: number; // Mütze oder Kappe
-  hood?: boolean; // Kapuze auf
-  beard?: number;
-  apron?: number; // Schürze
-  stripes?: number; // Reflexstreifen auf der Uniform
+  capDark?: number;
+  beanie?: boolean; // Mütze ohne Schirm
+  hood?: boolean;
+  stubble?: number; // Dreitagebart
+  beard?: number; // Vollbart
+  apron?: number;
+  stripes?: number; // Reflexstreifen
   badge?: number;
   can?: number; // Dose in der Hand
   ponytail?: boolean;
   backpack?: number;
+  age?: boolean; // Falten
 };
 
-// Zeichnet die Figur in einen eigenen kleinen Puffer und setzt sie danach mit Kontur ins Bild.
 export function character(a: Art, x: number, y: number, h: number, f: Figure): void {
   const s = newArt(EMPTY);
-  const u = h / 60; // alles ist an einer 60-Pixel-Figur bemessen
-  const P = (n: number) => Math.round(n * u);
-  const cx = 40; // Mitte im Hilfspuffer
-  const top = 10;
+  const u = h / 60;
+  const P = (n: number) => Math.max(1, Math.round(n * u));
+  const cx = 40;
+  const top = 8;
   const pose = f.pose ?? "stehend";
 
-  const headR = P(7);
-  const headY = top + headR;
-  const neckY = headY + headR - P(1);
-  const shoulderY = neckY + P(3);
-  const hipY = shoulderY + P(21);
+  // Erwachsene Proportionen: Kopf gut ein Sechstel der Gesamthöhe.
+  const headW = P(11);
+  const headH = P(13);
+  const headX = cx - Math.floor(headW / 2);
+  const headY = top;
+  const chinY = headY + headH;
+  const shoulderY = chinY + P(3);
+  const hipY = shoulderY + P(20);
   const footY = top + P(60);
-  const shoulderW = P(18);
-  const waistW = P(14);
+  const shoulderW = P(20);
+  const waistW = P(15);
 
-  // ----- Beine und Schuhe -----
+  // ---------- Beine ----------
   if (pose !== "theke") {
-    const legW = P(6);
+    const legW = P(7);
     if (pose === "sitzend") {
-      // Oberschenkel waagerecht nach vorn, Unterschenkel senkrecht runter
-      for (const dy of [0, P(5)]) {
-        rect(s, cx - P(6), hipY - P(2) + dy, P(16), P(5), f.pants);
-        hline(s, cx - P(6), hipY - P(2) + dy, P(16), f.pantsDark);
+      for (let k = 0; k < 2; k++) {
+        rect(s, cx - P(7), hipY - P(2) + k * P(5), P(17), P(5), f.pants);
+        hline(s, cx - P(7), hipY - P(2) + k * P(5), P(17), f.pantsDark);
       }
-      for (const dx of [P(4), P(9)]) {
-        rect(s, cx + dx, hipY + P(6), legW - P(1), footY - hipY - P(10), f.pants);
-        vline(s, cx + dx + legW - P(2), hipY + P(6), footY - hipY - P(10), f.pantsDark);
+      for (const dx of [P(4), P(10)]) {
+        rect(s, cx + dx, hipY + P(6), legW - P(2), footY - hipY - P(10), f.pants);
+        vline(s, cx + dx + legW - P(3), hipY + P(6), footY - hipY - P(10), f.pantsDark);
       }
-      for (const dx of [P(3), P(8)]) {
+      for (const dx of [P(3), P(9)]) {
         rect(s, cx + dx, footY - P(5), P(7), P(4), f.shoes);
-        hline(s, cx + dx, footY - P(2), P(7), C.dark_grey);
+        hline(s, cx + dx, footY - P(2), P(7), C.grey_mid);
       }
     } else {
-      for (const dx of [-P(6), P(1)]) {
-        rect(s, cx + dx, hipY - P(2), legW, footY - P(6) - hipY + P(2), f.pants);
-        vline(s, cx + dx + legW - 1, hipY - P(2), footY - P(6) - hipY + P(2), f.pantsDark);
-        vline(
-          s,
-          cx + dx + 1,
-          hipY + P(2),
-          footY - P(10) - hipY,
-          f.pants === C.black ? C.dark_grey : f.pantsDark,
-        );
-      }
-      // Lücke zwischen den Beinen
-      vline(s, cx - P(1), hipY + P(2), footY - P(8) - hipY, C.black);
       for (const dx of [-P(7), P(1)]) {
-        rect(s, cx + dx, footY - P(5), P(9), P(5), f.shoes);
-        hline(s, cx + dx, footY - P(2), P(9), C.dark_grey);
-        px(s, cx + dx + P(8), footY - P(4), C.dark_grey);
+        rect(s, cx + dx, hipY - P(2), legW, footY - P(5) - hipY, f.pants);
+        vline(s, cx + dx, hipY - P(2), footY - P(5) - hipY, f.pantsDark);
+        vline(s, cx + dx + legW - 1, hipY - P(2), footY - P(5) - hipY, f.pantsDark);
+        vline(s, cx + dx + 2, hipY + P(2), footY - P(11) - hipY, f.pants);
+      }
+      vline(s, cx - P(1), hipY + P(1), footY - P(8) - hipY, C.black);
+      for (const dx of [-P(8), P(1)]) {
+        rect(s, cx + dx, footY - P(4), P(9), P(4), f.shoes);
+        hline(s, cx + dx, footY - P(1), P(9), C.grey_mid);
+        px(s, cx + dx + P(8), footY - P(3), C.grey_mid);
       }
     }
   }
 
-  // ----- Oberkörper: Schultern breiter als Taille -----
+  // ---------- Oberkörper ----------
   for (let j = shoulderY; j <= hipY; j++) {
     const t = (j - shoulderY) / Math.max(1, hipY - shoulderY);
     const w = Math.round(shoulderW - (shoulderW - waistW) * t);
     hline(s, cx - Math.floor(w / 2), j, w, f.top);
     px(s, cx - Math.floor(w / 2), j, f.topLight);
-    px(s, cx - Math.floor(w / 2) + w - 1, j, f.topDark);
-    if (j > shoulderY + P(1) && j < hipY - P(1)) px(s, cx + Math.floor(w / 4), j, f.topDark);
+    px(s, cx - Math.floor(w / 2) + 1, j, f.topLight);
+    px(s, cx + Math.floor(w / 2) - 1, j, f.topDark);
+    px(s, cx + Math.floor(w / 2) - 2, j, f.topDark);
   }
+  hline(s, cx - Math.floor(shoulderW / 2), shoulderY, shoulderW, f.topLight);
+  hline(s, cx - Math.floor(shoulderW / 2) + 1, shoulderY + 1, shoulderW - 2, f.topLight);
+  vline(s, cx, shoulderY + P(3), hipY - shoulderY - P(4), f.topDark); // Reißverschluss
   hline(s, cx - Math.floor(waistW / 2), hipY - P(1), waistW, C.black); // Gürtel
-  hline(s, cx - Math.floor(shoulderW / 2), shoulderY, shoulderW, f.topLight); // Schulterkante
-  vline(s, cx, shoulderY + P(2), hipY - shoulderY - P(3), f.topDark); // Reißverschluss
+  px(s, cx, hipY - P(1), C.grey_soft); // Schnalle
+
+  // Kragen
+  hline(s, cx - P(3), shoulderY, P(7), f.topDark);
+  px(s, cx - P(3), shoulderY + 1, f.topDark);
+  px(s, cx + P(3), shoulderY + 1, f.topDark);
 
   if (f.apron !== undefined) {
-    rect(s, cx - P(6), shoulderY + P(6), P(12), hipY - shoulderY - P(4), f.apron);
-    hline(s, cx - P(6), shoulderY + P(6), P(12), C.white);
+    rect(s, cx - P(7), shoulderY + P(6), P(14), hipY - shoulderY - P(4), f.apron);
+    hline(s, cx - P(7), shoulderY + P(6), P(14), C.white);
+    vline(s, cx - P(7), shoulderY + P(6), hipY - shoulderY - P(4), C.white);
   }
   if (f.stripes !== undefined) {
-    hline(s, cx - Math.floor(shoulderW / 2) + 1, shoulderY + P(8), shoulderW - 2, f.stripes);
-    hline(s, cx - Math.floor(shoulderW / 2) + 1, shoulderY + P(10), shoulderW - 2, f.stripes);
+    hline(s, cx - Math.floor(shoulderW / 2) + 1, shoulderY + P(7), shoulderW - 2, f.stripes);
+    hline(s, cx - Math.floor(shoulderW / 2) + 2, shoulderY + P(9), shoulderW - 4, f.stripes);
+    rect(s, cx - Math.floor(shoulderW / 2) + 1, shoulderY + P(2), P(4), P(3), C.grey_darker); // Funkgerät
   }
   if (f.backpack !== undefined) {
-    rect(s, cx + Math.floor(shoulderW / 2) - P(2), shoulderY + P(2), P(6), P(12), f.backpack);
-    hline(s, cx + Math.floor(shoulderW / 2) - P(2), shoulderY + P(2), P(6), C.dark_grey);
+    rect(s, cx + Math.floor(shoulderW / 2) - P(2), shoulderY + P(2), P(6), P(13), f.backpack);
+    hline(s, cx + Math.floor(shoulderW / 2) - P(2), shoulderY + P(2), P(6), C.dark_brown);
+    vline(s, cx + Math.floor(shoulderW / 2) - P(2), shoulderY + P(2), P(13), C.tan);
   }
 
-  // ----- Arme -----
-  const armW = P(5);
+  // ---------- Arme ----------
+  const armW = P(6);
   const armTop = shoulderY + P(1);
-  const armLen = pose === "theke" ? P(14) : P(18);
+  const armLen = pose === "theke" ? P(13) : P(19);
   for (const side of [-1, 1] as const) {
     const ax =
-      side < 0 ? cx - Math.floor(shoulderW / 2) - armW + P(1) : cx + Math.floor(shoulderW / 2) - P(1);
+      side < 0 ? cx - Math.floor(shoulderW / 2) - armW + P(2) : cx + Math.floor(shoulderW / 2) - P(2);
     rect(s, ax, armTop, armW, armLen, f.top);
     vline(s, side < 0 ? ax : ax + armW - 1, armTop, armLen, side < 0 ? f.topLight : f.topDark);
-    // Hand
-    disc(s, ax + armW / 2, armTop + armLen + P(1), P(2.2), f.skin);
-    px(s, Math.round(ax + armW / 2) + 1, armTop + armLen + P(1), f.skinShade);
+    hline(s, ax, armTop + armLen - P(3), armW, f.topDark); // Ärmelbund
+    rect(s, ax + 1, armTop + armLen, armW - 2, P(4), f.skin);
+    px(s, ax + 1, armTop + armLen + 1, f.skinLight);
+    px(s, ax + armW - 2, armTop + armLen + P(2), f.skinShade);
   }
   if (f.can !== undefined) {
     const hx = cx + Math.floor(shoulderW / 2) + P(1);
-    rect(s, hx, armTop + armLen + P(2), P(4), P(7), f.can);
-    hline(s, hx, armTop + armLen + P(2), P(4), C.light_grey);
-    px(s, hx + P(2), armTop + armLen + P(1), C.dark_grey);
+    const hy = armTop + armLen + P(1);
+    rect(s, hx, hy, P(5), P(8), f.can);
+    vline(s, hx, hy, P(8), C.grey_pale);
+    vline(s, hx + P(4), hy, P(8), C.grey_mid);
+    rect(s, hx + P(1), hy - P(2), P(3), P(2), C.grey_soft); // Cap auf der Dose
   }
 
-  // ----- Kopf -----
-  rect(s, cx - P(2), neckY - P(2), P(4), P(4), f.skinShade); // Hals
-  disc(s, cx, headY, headR, f.skin);
-  rect(s, cx - headR + P(1), headY - P(1), P(12), P(6), f.skin);
-  // Wange und Kinn schattieren
-  for (let j = headY - P(1); j < headY + headR; j++) px(s, cx + headR - P(2), j, f.skinShade);
-  // Augen, Braue, Mund, Ohr
-  const eyeY = headY - P(1);
-  px(s, cx - P(3), eyeY, C.black);
-  px(s, cx + P(2), eyeY, C.black);
-  px(s, cx - P(4), eyeY - P(2), f.hair);
-  px(s, cx - P(3), eyeY - P(2), f.hair);
-  px(s, cx + P(1), eyeY - P(2), f.hair);
-  px(s, cx + P(2), eyeY - P(2), f.hair);
-  hline(s, cx - P(2), headY + P(3), P(4), f.skinShade);
-  px(s, cx - headR + P(1), headY + P(1), f.skinShade);
+  // ---------- Kopf ----------
+  rect(s, cx - P(2), chinY - P(1), P(4), P(4), f.skinShade); // Hals
+  hline(s, cx - P(2), chinY - P(1), P(4), f.skinDeep); // Schatten unterm Kinn
+
+  for (let j = 0; j < headH; j++) {
+    const t = j / (headH - 1);
+    let w = headW;
+    if (t < 0.18) w = headW - Math.round((0.18 - t) * P(10));
+    if (t > 0.62) w = headW - Math.round((t - 0.62) * P(9));
+    const x0 = cx - Math.floor(w / 2);
+    hline(s, x0, headY + j, w, f.skin);
+    px(s, x0, headY + j, f.skinLight);
+    px(s, x0 + 1, headY + j, f.skinLight);
+    px(s, x0 + w - 1, headY + j, f.skinShade);
+    px(s, x0 + w - 2, headY + j, f.skinShade);
+  }
+  px(s, headX - 1, headY + P(6), f.skin); // Ohren
+  px(s, headX - 1, headY + P(7), f.skinShade);
+  px(s, headX + headW, headY + P(6), f.skinShade);
+
+  // Augenpartie
+  const eyeY = headY + P(6);
+  for (const ex of [cx - P(3), cx + P(1)]) {
+    hline(s, ex, eyeY - 1, P(3), f.skinShade); // Lidschatten
+    hline(s, ex, eyeY, P(3), C.white);
+    px(s, ex + 1, eyeY, C.black);
+    px(s, ex, eyeY + 1, f.skinShade);
+  }
+  hline(s, cx - P(4), eyeY - P(2), P(4), f.hair); // Brauen
+  hline(s, cx + P(1), eyeY - P(2), P(4), f.hair);
+
+  // Nase und Mund
+  vline(s, cx, eyeY + P(1), P(2), f.skinShade);
+  px(s, cx - 1, eyeY + P(2), f.skinDeep);
+  hline(s, cx - P(2), eyeY + P(4), P(4), f.skinDeep);
+  hline(s, cx - P(1), eyeY + P(5), P(3), f.skinLight); // Unterlippe
+
+  if (f.age) {
+    px(s, cx - P(4), eyeY + P(2), f.skinShade);
+    px(s, cx + P(3), eyeY + P(2), f.skinShade);
+    hline(s, cx - P(4), headY + P(3), P(3), f.skinShade);
+  }
+  if (f.stubble !== undefined) {
+    for (let j = eyeY + P(3); j < chinY; j++)
+      for (let i = cx - P(4); i < cx + P(4); i++) if ((i + j) % 2 === 0) px(s, i, j, f.stubble);
+  }
   if (f.beard !== undefined) {
-    // Nur Kinn und Wangenrand, nicht das halbe Gesicht
-    for (let j = headY + P(3); j < headY + headR; j++) {
-      const t = (j - (headY + P(3))) / Math.max(1, headR - P(3));
-      const w = Math.round(P(8) * (1 - t * 0.55));
-      hline(s, cx - Math.floor(w / 2), j, w, f.beard);
+    // Bart mit Struktur: zwei Töne im Wechsel, Mund bleibt frei
+    for (let j = eyeY + P(4); j < chinY + P(1); j++) {
+      const t = (j - (eyeY + P(4))) / Math.max(1, chinY - eyeY - P(3));
+      const w = Math.round(P(8) * (1 - t * 0.35));
+      for (let i = cx - Math.floor(w / 2); i < cx - Math.floor(w / 2) + w; i++)
+        px(s, i, j, (i + j) % 2 === 0 ? f.beard : f.skinShade);
     }
-    px(s, cx - P(5), headY + P(2), f.beard);
-    px(s, cx + P(4), headY + P(2), f.beard);
+    hline(s, cx - P(3), eyeY + P(3), P(6), f.beard); // Schnurrbart
+    hline(s, cx - P(2), eyeY + P(4), P(4), f.skinDeep); // Mund
+    px(s, cx - P(2), eyeY + P(5), f.beard);
+    px(s, cx + P(1), eyeY + P(5), f.beard);
   }
 
-  // Frisur, Mütze, Kapuze
+  // ---------- Kopfbedeckung und Haare ----------
   if (f.hood) {
-    disc(s, cx, headY - P(1), headR + P(2), f.top);
-    disc(s, cx, headY - P(1), headR + P(1), f.topDark);
-    disc(s, cx + P(1), headY + P(1), headR - P(1), f.skinShade); // Gesicht im Schatten
-    hline(s, cx - P(3), eyeY, P(2), C.black);
-    hline(s, cx + P(2), eyeY, P(2), C.black);
-    hline(s, cx - P(1), headY + P(3), P(3), C.black); // Mund
-    rect(s, cx - P(3), headY + headR - P(1), P(3), P(5), f.topLight); // Kordel
-    rect(s, cx + P(1), headY + headR - P(1), P(3), P(4), f.topLight);
+    // Kapuze: hinten hoch, vorne eine Öffnung, unten am Kragen breit
+    for (let j = headY - P(5); j < chinY + P(3); j++) {
+      const t = (j - (headY - P(5))) / (headH + P(8));
+      const w = Math.round(headW + P(3) + Math.sin(Math.min(1, t) * Math.PI) * P(7));
+      hline(s, cx - Math.floor(w / 2), j, w, f.topDark);
+      hline(s, cx - Math.floor(w / 2) + 1, j, P(2), f.top);
+      px(s, cx + Math.floor(w / 2) - 1, j, C.black);
+    }
+    // Gesichtsöffnung
+    for (let j = headY + P(1); j < chinY; j++) {
+      const t = (j - (headY + P(1))) / Math.max(1, headH - P(1));
+      const w = Math.round(headW - P(1) - Math.abs(t - 0.45) * P(5));
+      hline(s, cx - Math.floor(w / 2) + P(1), j, w, f.skinShade);
+      px(s, cx - Math.floor(w / 2) + P(1), j, f.skin);
+    }
+    for (const ex of [cx - P(2), cx + P(2)]) {
+      hline(s, ex, eyeY, P(2), C.grey_pale);
+      px(s, ex, eyeY, C.black);
+    }
+    hline(s, cx - P(3), eyeY - P(2), P(3), C.black); // Brauen im Schatten
+    hline(s, cx + P(1), eyeY - P(2), P(3), C.black);
+    hline(s, cx - P(1), eyeY + P(4), P(3), f.skinDeep);
+    rect(s, cx - P(4), chinY + P(2), P(3), P(5), f.topLight); // Kordeln
+    rect(s, cx + P(2), chinY + P(2), P(3), P(4), f.topLight);
   } else if (f.cap !== undefined) {
-    for (let j = headY - headR - P(1); j <= headY - P(2); j++) {
-      const t = (j - (headY - headR - P(1))) / Math.max(1, headR);
-      const w = Math.round((headR * 2 - P(1)) * Math.min(1, 0.6 + t));
-      hline(s, cx - Math.floor(w / 2), j, w, f.cap);
+    const capDark = f.capDark ?? f.cap;
+    if (f.beanie) {
+      // Mütze: sitzt eng, unten ein umgeschlagener Rand
+      for (let j = headY - P(4); j <= headY + P(4); j++) {
+        const t = (j - (headY - P(4))) / P(8);
+        const w = Math.round(headW * Math.min(1, 0.5 + t * 0.9) + P(1));
+        hline(s, cx - Math.floor(w / 2), j, w, f.cap);
+        px(s, cx - Math.floor(w / 2), j, capDark);
+        px(s, cx + Math.floor(w / 2) - 1, j, capDark);
+      }
+      hline(s, headX - P(1), headY + P(3), headW + P(2), f.cap);
+      hline(s, headX - P(1), headY + P(4), headW + P(2), capDark);
+      for (let i = headX; i < headX + headW; i += 3) px(s, i, headY - P(2), capDark); // Strickmuster
+    } else {
+      for (let j = headY - P(3); j <= headY + P(4); j++) {
+        const t = (j - (headY - P(3))) / P(7);
+        const w = Math.round(headW * Math.min(1, 0.55 + t * 0.8) + P(1));
+        hline(s, cx - Math.floor(w / 2), j, w, f.cap);
+        px(s, cx - Math.floor(w / 2), j, capDark);
+        px(s, cx + Math.floor(w / 2) - 1, j, capDark);
+      }
+      hline(s, headX - P(3), headY + P(4), headW + P(5), f.cap); // Schirm
+      hline(s, headX - P(3), headY + P(5), headW + P(5), capDark);
     }
-    hline(s, cx - headR - P(2), headY - P(3), headR * 2 + P(3), f.cap); // Schirm
-    hline(s, cx - headR - P(2), headY - P(2), headR * 2 + P(3), C.dark_grey);
-    px(s, cx - P(3), eyeY, C.black);
-    px(s, cx + P(2), eyeY, C.black);
-    if (f.badge !== undefined) rect(s, cx - P(1), headY - headR + P(1), P(3), P(3), f.badge);
+    if (f.badge !== undefined) {
+      rect(s, cx - P(2), headY - P(1), P(4), P(3), f.badge);
+      px(s, cx, headY, C.black);
+    }
   } else {
-    for (let j = headY - headR - P(1); j <= headY + P(1); j++) {
-      const dy = (j - headY) / headR;
-      const w = Math.round(headR * 2 * Math.sqrt(Math.max(0, 1 - dy * dy)) + P(1));
-      if (j < headY - P(2) || true) hline(s, cx - Math.floor(w / 2), j, w, f.hair);
+    for (let j = headY - P(2); j < headY + P(5); j++) {
+      const t = (j - (headY - P(2))) / P(7);
+      const w = Math.round(headW * Math.min(1, 0.6 + t * 0.7) + P(1));
+      hline(s, cx - Math.floor(w / 2), j, w, f.hair);
     }
-    disc(s, cx, headY + P(1), headR - P(1), f.skin); // Gesicht wieder frei
-    rect(s, cx - headR, headY - P(3), P(3), P(6), f.hair); // Seitenpartie
-    rect(s, cx + headR - P(3), headY - P(3), P(3), P(6), f.hair);
-    px(s, cx - P(3), eyeY, C.black);
-    px(s, cx + P(2), eyeY, C.black);
-    hline(s, cx - P(2), headY + P(3), P(4), f.skinShade);
+    hline(s, cx - P(3), headY - P(1), P(5), f.hairLight); // Lichtkante im Haar
+    vline(s, headX, headY + P(3), P(5), f.hair); // Koteletten
+    vline(s, headX + headW - 1, headY + P(3), P(5), f.hair);
     if (f.ponytail) {
-      rect(s, cx + headR - P(1), headY - P(1), P(4), P(12), f.hair);
-      disc(s, cx + headR + P(1), headY + P(10), P(2), f.hair);
+      rect(s, headX + headW - P(1), headY + P(2), P(4), P(13), f.hair);
+      vline(s, headX + headW - P(1), headY + P(2), P(13), f.hairLight);
+      disc(s, headX + headW + P(1), headY + P(15), P(2), f.hair);
     }
   }
 
-  // ----- Mit Kontur ins Bild setzen -----
+  // ---------- Mit schwarzer Kontur ins Bild ----------
   const W = 80;
-  const H = 90;
+  const H = 96;
   const ox = x - Math.round(cx - h * 0.15);
   const oy = y - top;
   for (let j = 0; j < H; j++) {
     for (let i = 0; i < W; i++) {
-      const v = s[j * 320 + i]!;
-      if (v === EMPTY) continue;
-      // Kontur: leere Nachbarn schwarz färben
+      if (s[j * 320 + i]! === EMPTY) continue;
       for (const [dx, dy] of [
         [-1, 0],
         [1, 0],
@@ -231,30 +310,40 @@ export function character(a: Art, x: number, y: number, h: number, f: Figure): v
 
 // Die vier Leute aus dem Spiel.
 export const KALLE: Figure = {
-  skin: C.orange,
-  skinShade: C.brown,
-  hair: C.dark_grey,
-  beard: C.dark_grey,
-  top: C.blue,
+  skin: C.skin,
+  skinLight: C.skin_light,
+  skinShade: C.skin_dark,
+  skinDeep: C.skin_deep,
+  hair: C.grey_mid,
+  hairLight: C.grey_soft,
+  top: C.steel,
   topLight: C.light_blue,
-  topDark: C.black,
-  pants: C.dark_grey,
-  pantsDark: C.black,
-  shoes: C.black,
-  cap: C.dark_grey,
+  topDark: C.navy,
+  pants: C.grey_mid,
+  pantsDark: C.grey_darker,
+  shoes: C.grey_darker,
+  cap: C.grey_darker,
+  capDark: C.black,
+  beanie: true,
+  beard: C.grey_soft,
+  stubble: undefined,
+  age: true,
   can: C.light_grey,
   pose: "sitzend",
 };
 
 export const SIBEL: Figure = {
-  skin: C.orange,
-  skinShade: C.brown,
-  hair: C.black,
+  skin: C.skin,
+  skinLight: C.skin_light,
+  skinShade: C.skin_dark,
+  skinDeep: C.skin_deep,
+  hair: C.grey_darker,
+  hairLight: C.grey_mid,
   top: C.light_red,
   topLight: C.white,
   topDark: C.red,
-  pants: C.blue,
-  pantsDark: C.black,
+  pants: C.navy,
+  pantsDark: C.grey_darker,
   shoes: C.black,
   apron: C.purple,
   ponytail: true,
@@ -262,31 +351,38 @@ export const SIBEL: Figure = {
 };
 
 export const KRUX: Figure = {
-  skin: C.orange,
-  skinShade: C.brown,
+  skin: C.skin_dark,
+  skinLight: C.skin,
+  skinShade: C.skin_deep,
+  skinDeep: C.dark_brown,
   hair: C.black,
-  top: C.dark_grey,
-  topLight: C.grey,
-  topDark: C.black,
-  pants: C.black,
+  hairLight: C.grey_darker,
+  top: C.grey_mid,
+  topLight: C.grey_soft,
+  topDark: C.grey_darker,
+  pants: C.grey_darker,
   pantsDark: C.black,
-  shoes: C.dark_grey,
+  shoes: C.black,
   hood: true,
-  backpack: C.brown,
+  backpack: C.dark_brown,
   can: C.purple,
 };
 
 export const BRANDT: Figure = {
-  skin: C.orange,
-  skinShade: C.brown,
-  hair: C.brown,
-  top: C.blue,
-  topLight: C.light_blue,
+  skin: C.skin_light,
+  skinLight: C.white,
+  skinShade: C.skin,
+  skinDeep: C.skin_dark,
+  hair: C.dark_brown,
+  hairLight: C.tan,
+  top: C.navy,
+  topLight: C.steel,
   topDark: C.black,
-  pants: C.blue,
-  pantsDark: C.black,
+  pants: C.navy,
+  pantsDark: C.grey_darker,
   shoes: C.black,
-  cap: C.blue,
+  cap: C.navy,
+  capDark: C.black,
   badge: C.yellow,
-  stripes: C.light_grey,
+  stripes: C.grey_soft,
 };
