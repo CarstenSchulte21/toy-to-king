@@ -147,55 +147,6 @@ export function shutter(
   }
 }
 
-// Eine Figur als Silhouette: Kopf, Körper, Beine. Klein genug für die Bühne, erkennbar genug fürs Antippen.
-export function person(
-  a: Art,
-  x: number,
-  y: number,
-  h: number,
-  body: number,
-  skin: number,
-  hair: number,
-  opts: { sitting?: boolean; hood?: boolean } = {},
-): void {
-  const headR = Math.max(2, Math.round(h * 0.1));
-  const cx = x + Math.round(h * 0.16);
-  const headY = y + headR;
-  disc(a, cx, headY, headR, skin);
-  // Haare oder Kapuze
-  for (let j = headY - headR; j <= headY; j++)
-    for (let i = cx - headR; i <= cx + headR; i++)
-      if (
-        (i + 0.5 - cx) ** 2 + (j + 0.5 - headY) ** 2 <= headR * headR &&
-        (opts.hood || j < headY - headR * 0.2)
-      )
-        px(a, i, j, hair);
-  if (opts.hood) {
-    disc(a, cx, headY - 1, headR + 1, hair);
-    disc(a, cx, headY + 1, headR - 1, skin);
-  }
-  const torsoTop = headY + headR;
-  const torsoH = Math.round(h * (opts.sitting ? 0.42 : 0.4));
-  const torsoW = Math.max(4, Math.round(h * 0.26));
-  rect(a, cx - Math.floor(torsoW / 2), torsoTop, torsoW, torsoH, body);
-  // Beine
-  const legTop = torsoTop + torsoH;
-  const legH = y + h - legTop;
-  if (opts.sitting) {
-    rect(
-      a,
-      cx - Math.floor(torsoW / 2),
-      legTop,
-      torsoW + Math.round(h * 0.18),
-      Math.max(2, Math.round(legH * 0.45)),
-      body,
-    );
-  } else {
-    rect(a, cx - Math.floor(torsoW / 2), legTop, Math.max(2, Math.floor(torsoW / 2) - 1), legH, C.dark_grey);
-    rect(a, cx + 1, legTop, Math.max(2, Math.floor(torsoW / 2) - 1), legH, C.dark_grey);
-  }
-}
-
 // Ein Schriftzug aus den Buchstaben-Skeletten der Engine – für fremde Werke an den Wänden.
 // Erst dicker in der Outline-Farbe, dann dünner in der Füllfarbe: das ergibt eine Outline.
 export function word(
@@ -207,6 +158,7 @@ export function word(
   fill: number,
   outline: number,
   slant = 0,
+  thin = false,
 ): number {
   const chars = letteringChars(text);
   const u = h / 6;
@@ -235,8 +187,8 @@ export function word(
       }
     });
   };
-  draw(r + 1.3, outline);
-  draw(r, fill);
+  if (!thin) draw(r + 1.3, outline);
+  draw(thin ? Math.max(0.6, r * 0.55) : r, fill);
   return chars.length * adv;
 }
 
@@ -254,8 +206,15 @@ export function piece(
   background?: number,
 ): void {
   if (background !== undefined) {
-    rect(a, x, y, w, h, background);
-    frame(a, x, y, w, h, outline);
+    rect(a, x + 3, y, w - 6, h, background);
+    rect(a, x, y + 3, w, h - 6, background);
+    for (const [cx, cy] of [
+      [x + 3, y + 3],
+      [x + w - 4, y + 3],
+      [x + 3, y + h - 4],
+      [x + w - 4, y + h - 4],
+    ] as [number, number][])
+      disc(a, cx, cy, 3.5, background);
     for (let k = 0; k < 4; k++) {
       const sx = x + 4 + Math.floor(R() * (w - 8));
       const sy = y + 4 + Math.floor(R() * (h - 8));
@@ -295,7 +254,7 @@ export function tags(
     const slot = w / perRow;
     const tx = x + col * slot + R() * Math.max(1, slot - used);
     const ty = y + row * rowH + R() * Math.max(1, rowH - size - 2);
-    word(a, tx, ty, size, text, c, c, 0.3 + R() * 0.2);
+    word(a, tx, ty, size, text, c, c, 0.3 + R() * 0.2, true);
     if (R() < 0.5) line(a, tx - 2, ty + size + 1, tx + used, ty + size - 1, c);
   }
 }
@@ -310,4 +269,128 @@ export function toRgba(art: Art): Uint8Array {
     out[i * 4 + 3] = 255;
   }
   return out;
+}
+
+// ---------- Werkzeuge für detailliertere Szenen (nach Tester-Feedback) ----------
+
+// Zwei Farben mischen (Bayer 4×4). ratio 0 = nur a, 1 = nur b. So entstehen Zwischentöne,
+// die es in der Palette nicht gibt – wie in den Adventures der 80er.
+export function dither(
+  a: Art,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  c1: number,
+  c2: number,
+  ratio: number,
+): void {
+  for (let j = y; j < y + h; j++)
+    for (let i = x; i < x + w; i++) {
+      const thr = (BAYER[(j % 4) * 4 + (i % 4)]! + 0.5) / 16;
+      px(a, i, j, ratio > thr ? c2 : c1);
+    }
+}
+
+// Ein Körper mit Licht oben/links, Schatten unten/rechts und schwarzer Kontur.
+export function box(
+  a: Art,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  base: number,
+  light: number,
+  dark: number,
+  outline = C.black,
+): void {
+  rect(a, x, y, w, h, base);
+  hline(a, x + 1, y + 1, w - 2, light);
+  vline(a, x + 1, y + 1, h - 2, light);
+  hline(a, x + 1, y + h - 2, w - 2, dark);
+  vline(a, x + w - 2, y + 1, h - 2, dark);
+  frame(a, x, y, w, h, outline);
+}
+
+// Hängendes Kabel zwischen zwei Punkten.
+export function cable(a: Art, x0: number, y0: number, x1: number, y1: number, sag: number, c: number): void {
+  const steps = Math.max(2, Math.abs(x1 - x0));
+  for (let k = 0; k <= steps; k++) {
+    const t = k / steps;
+    const x = x0 + (x1 - x0) * t;
+    const y = y0 + (y1 - y0) * t + Math.sin(Math.PI * t) * sag;
+    px(a, Math.round(x), Math.round(y), c);
+    px(a, Math.round(x), Math.round(y) + 1, c);
+  }
+}
+
+// Fallrohr an einer Wand.
+export function pipe(
+  a: Art,
+  x: number,
+  y: number,
+  h: number,
+  base: number,
+  light: number,
+  dark: number,
+): void {
+  rect(a, x, y, 5, h, base);
+  vline(a, x + 1, y, h, light);
+  vline(a, x + 4, y, h, dark);
+  for (let j = y + 12; j < y + h; j += 26) {
+    hline(a, x - 1, j, 7, dark);
+    hline(a, x - 1, j + 1, 7, base);
+  }
+}
+
+// Plakat oder Aushang mit angedeuteten Textzeilen.
+export function poster(
+  a: Art,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  paper: number,
+  ink: number,
+  R: () => number,
+): void {
+  box(a, x, y, w, h, paper, C.white, C.grey);
+  for (let j = y + 4; j < y + h - 3; j += 3)
+    hline(a, x + 3, j, Math.max(3, Math.floor((w - 6) * (0.4 + R() * 0.6))), ink);
+  if (R() < 0.5) px(a, x + w - 2, y + h - 2, C.grey);
+}
+
+// Pfütze mit Spiegelung.
+export function puddle(
+  a: Art,
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  c: number,
+  glint: number,
+): void {
+  for (let j = -ry; j <= ry; j++)
+    for (let i = -rx; i <= rx; i++) if ((i / rx) ** 2 + (j / ry) ** 2 <= 1) px(a, cx + i, cy + j, c);
+  hline(a, cx - Math.floor(rx / 2), cy - Math.floor(ry / 3), Math.max(2, rx), glint);
+}
+
+// Unkraut, Gras, Gestrüpp.
+export function weeds(a: Art, x: number, y: number, count: number, c: number, R: () => number): void {
+  for (let k = 0; k < count; k++) {
+    const bx = x + Math.floor(R() * 10) - 5;
+    const h = 3 + Math.floor(R() * 5);
+    for (let j = 0; j < h; j++) px(a, bx + Math.round(Math.sin(j * 0.8) * 1.5), y - j, c);
+  }
+}
+
+// Riss in Wand oder Boden.
+export function crack(a: Art, x: number, y: number, len: number, c: number, R: () => number): void {
+  let cx = x;
+  let cy = y;
+  for (let k = 0; k < len; k++) {
+    px(a, cx, cy, c);
+    cy += 1;
+    cx += R() < 0.5 ? -1 : R() < 0.5 ? 0 : 1;
+  }
 }

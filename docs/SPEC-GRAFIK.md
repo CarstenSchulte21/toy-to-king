@@ -44,3 +44,17 @@ Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M
 - Die Figuren sind einfache Silhouetten. Reicht das, oder brauchen Kalle, Sibel, KRUX und Frau Brandt mehr Eigenheiten?
 - Die Brücke ist bewusst leer, damit das eigene Werk wirkt. Vielleicht wirkt sie dadurch zu leer.
 - Später: Tag und Nacht (M4b) braucht je Szene eine dunkle Fassung.
+
+## 6. Runde 2 nach Tester-Feedback
+
+Der Tester hat Runde 1 klar abgelehnt: zu wenig Details, die Leute waren Strichmännchen. Vorbild sind die
+Adventures der späten 80er (Zak McKracken). Geändert:
+
+| Thema | Vorher | Jetzt |
+|-------|--------|-------|
+| Figuren | Kopf, Rechteck, zwei Beine | Eigene Sprites in `scripts/lib/figures.ts`: Gesicht mit Augen und Mund, Frisur, Kappe oder Kapuze, Jacke mit Licht- und Schattenkante, Gürtel, Hände, Schuhe, schwarze Kontur. Kalle sitzt mit Dose, Sibel steht mit Schürze hinter der Theke, KRUX hat Kapuze und Rucksack, Frau Brandt Uniform mit Reflexstreifen. |
+| Flächen | Einfarbig mit etwas Körnung | Verläufe und Dithering, oben und unten abgedunkelt, Risse, Flecken |
+| Objekte | Rechtecke | Körper mit Lichtkante, Schattenkante und Kontur (`box`), dazu Kleinkram: Fallrohr, Kabel, Plakate, Pfützen, Unkraut, Müllsack, Gully, Fahrwerk, Nieten |
+| Licht | Keins | Lichtkegel unter Laterne, Deckenlampen, Flutlicht |
+| Fremde Werke | Farbige Kästen | Schriftzüge aus den Buchstaben der Engine, Tags als kleine Handstyles statt Kritzelwürmer |
+| Boden | Flach | Fluchtlinien im Laden, Schotter mit Streuung, Bordstein, Fahrbahnmarkierung |
