@@ -1,4 +1,4 @@
-# MEILENSTEINE – M1 bis M3
+# MEILENSTEINE – M1 bis M3.5
 
 ## Rollen
 
@@ -329,4 +329,27 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 
 - [ ] Kriterien aus SPEC-M3 auf dem Handy bestätigt.
 - [ ] Playtest-Feedback als Issues erfasst.
-- [ ] **Vor M4:** Heat, Wanted, XP und Ränge bauen auf dieser Sprüh-Regel auf. Wenn sie sich unecht anfühlt, jetzt ändern – später wird es teuer.
+- [x] **Vor M4:** Heat, Wanted, XP und Ränge bauen auf dieser Sprüh-Regel auf. Wenn sie sich unecht anfühlt, jetzt ändern – später wird es teuer. → Entscheidung: Sie fühlte sich wie ein Quiz an, deshalb kommt M3.5.
+
+## M3.5 – Sprühen 2.0
+
+**Stand 22.09.2026:** umgesetzt auf Branch `m3-5`, Details in `SPEC-M3.5.md`. Grundlage sind 3 Runden Style-Check mit dem Tester (Artifact „Style-Check Wand").
+
+**Spielbar am Ende:** Sketch mit Vorschau wählen (Style, Farben aus der Tasche, Dose). Dann Fill-in und Outline mit dem Finger nachfahren, jeweils mit eigenem Cap. Fehler sieht man im Bild: Lücken, fette Outline, Overspray, Drips. Das Werk bleibt als Bild am Spot.
+
+**Tester-Fokus:** Fühlt sich das Nachfahren wie Sprühen an? Sind Zeit und Tempo machbar? Sind die Fehler fair?
+
+### M3.5 – Playtest (auf dem Handy)
+
+- [ ] Ist das Nachfahren mit dem Finger machbar, oder zu fummelig? Reicht die Zeit?
+- [ ] Merkt man den Unterschied zwischen Low und High Pressure?
+- [ ] Merkt man, dass Skinny fürs Fill-in und NY Fat für die Outline falsch sind? Ohne dass es einem jemand sagt?
+- [ ] Sehen Drips und Overspray echt aus?
+- [ ] Sieht das eigene Werk im Raum gut aus, oder ist es zu klein?
+- [ ] Welche Farben fehlen am meisten?
+
+### M3.5 – Abnahme
+
+- [ ] Kriterien aus SPEC-M3.5 auf dem Handy bestätigt.
+- [ ] Toleranz, Tempo und Zeit nach dem Playtest nachgestellt.
+- [ ] Danach: M4 mit Rängen. Die Ränge schalten die Style-Leiter frei (Bombing → Piece → Wildstyle).

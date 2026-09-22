@@ -24,13 +24,15 @@
 | [ ] | Tag | Signatur, schnell, meist einfarbig. | Einstieg |
 | [ ] | Handstyle | Die persönliche Schrift beim Taggen. | |
 | [ ] | Oneliner | Tag in einer durchgehenden Linie, ohne abzusetzen. | |
-| [ ] | Throw-up | Schnell gemalte Buchstaben, oft rund, ein bis zwei Farben. | |
-| [ ] | Hollow | Buchstaben nur als Outline, ohne Füllung. | |
-| [ ] | Piece | Aufwendiges, mehrfarbiges Bild mit Buchstaben (von „Masterpiece"). | |
+| [ ] | Throw-up | Schnell gemalte Buchstaben, oft rund, ein bis zwei Farben. | Oberbegriff für Straight Letter und Bubble |
+| [x] | Straight Letter | Throw-up mit geraden, kantigen Buchstaben. (Tester) | Style ab M3.5 |
+| [x] | Bubble | Throw-up mit runden, aufgeblasenen, sich überlappenden Buchstaben. (Tester) | Style ab M3.5 |
+| [x] | Hollow | Buchstaben nur als Outline, ohne Füllung. | Gestrichen – laut Tester unrealistisch |
+| [x] | Piece | Aufwendiges, mehrfarbiges Bild mit Buchstaben (von „Masterpiece"). | Nur an der Hall |
 | [ ] | Burner | Besonders starkes Piece. | |
 | [ ] | Blockbuster | Große, eckige, gut lesbare Blockbuchstaben. | |
 | [ ] | Bubble Style | Runde, aufgeblasene Buchstaben. | |
-| [ ] | Wildstyle | Komplex verschachtelte Buchstaben mit Arrows und Connections, schwer lesbar. | |
+| [x] | Wildstyle | Komplex verschachtelte Buchstaben mit Arrows und Connections, schwer lesbar. | Königsklasse, nur an der Hall |
 | [ ] | Character | Figur neben den Buchstaben. | |
 
 ### Aufbau eines Pieces
@@ -62,6 +64,7 @@
 | [ ] | NY Fat | Sehr breiter Strahl, schnelles Füllen, Bombing |
 | [ ] | Low Pressure | Dose mit wenig Druck: kontrollierter, verzeiht mehr, gut für Details |
 | [ ] | High Pressure | Dose mit viel Druck: deckt schnell, tropft leichter, gut für Bombing |
+| [ ] | Chrom | Silberne Farbe, Klassiker fürs Fill-in bei Throw-ups |
 
 ### Orte und Handlungen
 
@@ -77,7 +80,7 @@
 | [ ] | Layup | Nachts abgestellte Züge, z. B. auf Nebengleisen |
 | [ ] | Panel | Piece unterhalb der Fenster eines Waggons |
 | [ ] | Whole Car | Kompletter Waggon bemalt |
-| [ ] | Bombing | Viele schnelle Tags und Throw-ups an vielen Orten |
+| [x] | Bombing | Viele schnelle Tags und Throw-ups an vielen Orten. Laut Tester auch ein Style: dicke Buchstaben mit etwas Style und Background. |
 | [ ] | Crossen | Über das Werk eines anderen malen – Respektlosigkeit, Kampfansage |
 | [ ] | Buff / gebufft | Entfernt oder übermalt durch Stadt, Reinigung oder Eigentümer |
 
@@ -114,3 +117,4 @@
 - Keine Dosenmarken, nur echte Kategorien.
 - Polizei heißt „Streife".
 - Vertrauensstufen: Fremder, Gesehen, Bekannt, Respekt, Vertraut, Family.
+- Style-Leiter (Tester, Style-Check 09/2026): Tag → Straight Letter → Bubble → Bombing → Piece → Wildstyle. Piece und Wildstyle nur an der Hall. Keine Hollows.

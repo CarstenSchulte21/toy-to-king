@@ -1,4 +1,4 @@
-# CONTENT – Spielinhalte M1 bis M3
+# CONTENT – Spielinhalte M1 bis M3.5
 
 **Status:** Inhalte von Claude geschrieben, nach `GLOSSAR.md` und Tonalitäts-Leitfaden. Sie gelten als Entwurf, bis der Tester sie gespielt hat. Überarbeitet wird ausschließlich auf Basis von Tester-Feedback (siehe `MEILENSTEINE.md`, Feedback-Schleife).
 
@@ -35,6 +35,8 @@ empty_category_text: "Noch nichts. Rede mit Leuten."
 start_items:
   standard_cap: 1
   low_pressure: 1
+  farbe_schwarz: 1
+  farbe_chrom: 1
 ```
 
 ---
@@ -450,7 +452,7 @@ dialogue:
     blackbook:
       text:
         - "Zeig her."
-        - "Deine Buchstaben stehen zu eng. Gib ihnen Luft, dann wird das auch als Hollow lesbar."
+        - "Deine Buchstaben stehen zu eng. Gib ihnen Luft, dann liest man das auch von drüben."
         - "Die Connection hier ist gut. Bleib dabei."
         - "Und nimm den Fat Cap. Deine Fill-ins brauchen das."
       effects:
@@ -540,6 +542,16 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "Über Kunden redet Sibel nicht mit jedem."
           next: kunden
+        - text: "Hast du Farben für mich?"
+          id: farben
+          once: true
+          next: farben
+        - text: "Ich brauch noch mehr Farben."
+          id: mehr_farben
+          once: true
+          if: [{trust_min: 2}]
+          show_locked: "Mehr Farben rückt Sibel nicht einfach so raus."
+          next: mehr_farben
         - text: "Danke, bis dann."
           end: true
 
@@ -600,6 +612,23 @@ dialogue:
         - "KRUX kam früher auch. Seit Monaten nicht mehr. Keiner weiß, woher er seine Farbe hat."
       effects:
         - learn: krux_kauft_nicht
+      next: hub
+
+    farben:
+      text:
+        - "Rot und Weiß. Die sind aus der Restekiste, aber voll."
+        - "Mit Chrom und Schwarz hast du dann schon was zum Arbeiten."
+      effects:
+        - give: farbe_rot
+        - give: farbe_weiss
+      next: hub
+
+    mehr_farben:
+      text:
+        - "Gelb und Hellblau. Beim Gelb klemmt das Ventil, den Cap also fest draufdrücken."
+      effects:
+        - give: farbe_gelb
+        - give: farbe_hellblau
       next: hub
 ```
 
@@ -831,7 +860,7 @@ dialogue:
 
 ---
 
-## 5. M3 – Material, Spots, Karte
+## 5. M3 – Material, Spots, Karte (Stand M3.5: Farben, Sprühen 2.0)
 
 **Wer gibt was:** Start mit Standard-Cap und Low Pressure. Sibel gibt den Skinny Cap zu ihren Cap-Tipps und eine verbeulte High Pressure, wenn man sich mit ihr über die Kamera ärgert. Kalle gibt einen Fat Cap, wenn man ihm das Blackbook zeigt. KRUX gibt den NY Fat zusammen mit der Brücke. Die Änderungen stehen direkt in den Dialogen oben.
 
@@ -840,41 +869,87 @@ dialogue:
 ### 5.1 items.yaml
 
 ```yaml
+# Caps: width = Strahlbreite (1 Skinny … 4 NY Fat). Dosen: flow = Farbe pro Sekunde.
+# Farben: color = Palettenname (C64-Palette).
 - id: standard_cap
   name: Standard-Cap
   kind: cap
+  width: 2
   text: "Der Cap, der auf der Dose steckt. Geht für alles, ist für nichts richtig gut."
 
 - id: skinny_cap
   name: Skinny Cap
   kind: cap
+  width: 1
   text: "Dünner, präziser Strahl. Für Tags und Outlines."
 
 - id: fat_cap
   name: Fat Cap
   kind: cap
+  width: 3
   text: "Breiter Strahl. Für Fill-ins."
 
 - id: ny_fat
   name: NY Fat
   kind: cap
+  width: 4
   text: "Sehr breit. Füllt schnell, verzeiht nichts."
 
 - id: low_pressure
   name: Low Pressure
   kind: dose
+  flow: 4
   text: "Wenig Druck, viel Kontrolle. Gut für Details und Fades."
 
 - id: high_pressure
   name: High Pressure
   kind: dose
+  flow: 10
   text: "Viel Druck, deckt schnell. Tropft aber leichter."
+
+- id: farbe_schwarz
+  name: Schwarz
+  kind: color
+  color: black
+  text: "Für Outlines und Tags. Hat jeder dabei."
+
+- id: farbe_chrom
+  name: Chrom
+  kind: color
+  color: light_grey
+  text: "Silber. Der Klassiker fürs Fill-in bei Throw-ups."
+
+- id: farbe_weiss
+  name: Weiß
+  kind: color
+  color: white
+  text: "Für Highlights, Second Outlines und alles, was knallen soll."
+
+- id: farbe_rot
+  name: Rot
+  kind: color
+  color: red
+  text: "Dunkles Rot. Deckt gut."
+
+- id: farbe_gelb
+  name: Gelb
+  kind: color
+  color: yellow
+  text: "Hell und laut. Mit schwarzer Outline sieht man das von weit weg."
+
+- id: farbe_hellblau
+  name: Hellblau
+  kind: color
+  color: cyan
+  text: "Kühl. Gut für Fades nach Weiß."
 ```
 
 ### 5.2 spray.yaml
 
 ```yaml
-# Qualität: +1 passender Cap, +1 passende Dose, +1 Style passt zum Spot → 0 bis 3.
+# Sprühen 2.0 (M3.5): Sketch wählen, dann Ebene für Ebene nachfahren.
+# look bestimmt die Form und die Ebenen: tag → line; alle anderen → fill, outline.
+# caps: ideale Caps je Ebene. Die Qualität ergibt sich aus Deckung, Cap, Drips und Spot.
 quality_labels:
   - wackelig
   - geht so
@@ -883,34 +958,65 @@ quality_labels:
 
 result: "{style} an {spot}: {quality}."
 
+hints:
+  gaps: "Da sind Lücken. Näher an der Linie bleiben."
+  gaps_low: "Low Pressure braucht Zeit. Langsamer fahren, dann deckt das."
+  reach: "Mit dem Cap kommst du nicht bis an den Rand. Fürs Fill-in Fat Cap oder NY Fat."
+  fat_line: "Die Linie ist zu fett. Dafür Skinny oder Standard-Cap."
+  drips: "Das läuft. Mit High Pressure nicht stehen bleiben."
+
 styles:
   - id: tag
     name: Tag
-    ideal_caps: [skinny_cap, standard_cap]
-    ideal_dose: egal
-    cap_hint: "Für einen sauberen Tag ist der Strahl zu breit. Skinny oder Standard-Cap."
+    look: tag
+    caps:
+      line: [skinny_cap, standard_cap]
 
-  - id: throwup
-    name: Throw-up
-    ideal_caps: [fat_cap, ny_fat]
-    ideal_dose: high_pressure
-    cap_hint: "Mit dem Cap dauert das Fill-in ewig. Fat Cap oder NY Fat."
-    dose_hint: "Mit Low Pressure deckt das Fill-in zu langsam."
+  - id: straight
+    name: Straight Letter
+    look: straight
+    caps:
+      fill: [fat_cap, ny_fat]
+      outline: [skinny_cap, standard_cap]
 
-  - id: hollow
-    name: Hollow
-    ideal_caps: [skinny_cap]
-    ideal_dose: egal
-    cap_hint: "Ein Hollow lebt von der Outline. Mit Skinny wird die sauberer."
+  - id: bubble
+    name: Bubble
+    look: bubble
+    caps:
+      fill: [fat_cap, ny_fat]
+      outline: [skinny_cap, standard_cap]
+
+  - id: bombing
+    name: Bombing
+    look: bombing
+    caps:
+      fill: [ny_fat, fat_cap]
+      outline: [standard_cap, skinny_cap]
+    if: [{flag: rang_bomber}]
+    locked_hint: "Bombing kommt, wenn dein Name in der Stadt was zählt."
 
   - id: piece
     name: Piece
-    ideal_caps: [fat_cap]
-    ideal_dose: low_pressure
-    requires: [skinny_cap]
-    requires_hint: "Für die Outline brauchst du einen Skinny Cap."
-    cap_hint: "Fürs Fill-in brauchst du einen Fat Cap."
-    dose_hint: "Für Fades und Highlights ist High Pressure zu hart."
+    look: piece
+    caps:
+      fill: [fat_cap]
+      outline: [skinny_cap]
+    if: [{flag: rang_piece}]
+    locked_hint: "Für ein Piece bist du noch nicht so weit."
+    only_at: [hall]
+    only_at_hint: "Ein Piece malst du nicht zwischen Tür und Angel. Dafür gibt's die Hall."
+    top_label: Burner
+
+  - id: wildstyle
+    name: Wildstyle
+    look: wildstyle
+    caps:
+      fill: [fat_cap]
+      outline: [skinny_cap]
+    if: [{flag: rang_king}]
+    locked_hint: "Wildstyle ist was für Leute, die jeder kennt."
+    only_at: [hall]
+    only_at_hint: "Wildstyle nur an der Hall. Da hast du die Zeit dafür."
     top_label: Burner
 ```
 
@@ -922,7 +1028,7 @@ styles:
   type: rolltor
   room: strasse
   hotspot: rolltore
-  fits: [tag, throwup]
+  fits: [tag, straight, bubble]
   fit_hint: "Die Rolltore sind für schnelle Sachen. Für mehr hast du hier keine Ruhe."
   risk: mittel
 
@@ -931,8 +1037,8 @@ styles:
   type: legale_wand
   room: jugendzentrum
   hotspot: hall_wand
-  fits: [piece, hollow]
-  fit_hint: "An der Hall zählen Pieces. Alles andere geht hier unter."
+  fits: [straight, bubble, bombing, piece, wildstyle]
+  fit_hint: "An der Hall taggt man nicht. Da zählt, was Style hat."
   risk: kein
   if: [{fact: hall}]
 
@@ -941,7 +1047,7 @@ styles:
   type: hauswand
   room: unterfuehrung
   hotspot: linke_wand
-  fits: [throwup, piece]
+  fits: [straight, bubble, bombing]
   fit_hint: "Neben KRUX' Piece wirkt das zu klein."
   risk: niedrig
   if: [{fact: krux_frage}]
@@ -951,7 +1057,7 @@ styles:
   type: heaven_spot
   room: bruecke
   hotspot: brueckenwand
-  fits: [throwup, hollow]
+  fits: [straight, bubble, bombing]
   fit_hint: "Da oben zählt, was man von unten lesen kann. Groß und schnell."
   risk: hoch
   if: [{fact: bruecke}]
@@ -961,7 +1067,7 @@ styles:
   type: zug
   room: abstellgleis
   hotspot: waggon
-  fits: [throwup, piece]
+  fits: [straight, bubble, bombing]
   fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
   risk: hoch
   if: [{fact: zaun}]
