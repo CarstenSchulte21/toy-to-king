@@ -353,3 +353,4 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 - [ ] Kriterien aus SPEC-M3.5 auf dem Handy bestätigt.
 - [ ] Toleranz, Tempo und Zeit nach dem Playtest nachgestellt.
 - [ ] Danach: M4 mit Rängen. Die Ränge schalten die Style-Leiter frei (Bombing → Piece → Wildstyle).
+- [ ] M4 vorgemerkt (Tester-Idee): Tempo-Bonus auf XP für schnelles, sauberes Sprühen. Später wirkt die Zeit an der Wand auch auf Heat.

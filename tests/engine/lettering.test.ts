@@ -104,6 +104,12 @@ describe("Nachfahren", () => {
     expect(render("KRAZE", "tag", late).stats[0]!.coverage).toBe(0);
   });
 
+  it("lange Namen bekommen mehr Zeit – pro Buchstabe", () => {
+    const short = passTimeLimit(buildLettering("TREN", "bubble", 5), 10);
+    const long = passTimeLimit(buildLettering("KALLEMANN12345", "bubble", 5), 10);
+    expect(long - short).toBeGreaterThanOrEqual(10 * 1000);
+  });
+
   it("Low Pressure hat mehr Zeit als High Pressure", () => {
     const l = buildLettering("KRAZE", "bubble", 5);
     expect(passTimeLimit(l, 4)).toBeGreaterThan(passTimeLimit(l, 10));

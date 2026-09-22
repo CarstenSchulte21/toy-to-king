@@ -57,14 +57,19 @@ export type PassStats = {
 export type RenderResult = { pixels: Uint8Array; stats: PassStats[] };
 
 // Zeit pro Ebene. Angenehmes Tempo ist 7 × Flow in px/s (High Pressure ≈ 70, Low Pressure ≈ 28) –
-// dabei bekommt jede Stelle etwa doppelt so viel Farbe wie nötig. Dazu 40 % Luft und 3 s Anlauf.
+// dabei bekommt jede Stelle etwa doppelt so viel Farbe wie nötig. Dazu 50 % Luft, 3 s Anlauf und
+// 1,2 s je Buchstabe: Jeder Buchstabe heißt neu ansetzen, und lange Namen werden klein und fummelig
+// (Tester-Feedback: auf dem Handy wurde es bei langen Namen zu knapp).
 export function comfortableSpeed(flow: number): number {
   return 7 * flow;
 }
 
+export const SECONDS_PER_LETTER = 1.2;
+
 export function passTimeLimit(l: Lettering, flow: number): number {
-  const seconds = (l.guideLength / comfortableSpeed(Math.max(1, flow))) * 1.4 + 3;
-  return Math.round(Math.min(45, Math.max(6, seconds)) * 1000);
+  const seconds =
+    (l.guideLength / comfortableSpeed(Math.max(1, flow))) * 1.5 + 3 + SECONDS_PER_LETTER * l.chars.length;
+  return Math.round(Math.min(60, Math.max(8, seconds)) * 1000);
 }
 
 function nearestNode(l: Lettering, x: number, y: number, radius: number): number {
