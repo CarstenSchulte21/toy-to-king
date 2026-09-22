@@ -1,0 +1,20 @@
+# Ein Ort steht auf der Karte, sobald man dort war – oder die Bedingung erfüllt ist.
+title: Dein Bezirk
+places:
+  - room: hinterhof
+    pos: [60, 125]
+  - room: strasse
+    pos: [140, 110]
+  - room: farbenladen
+    pos: [150, 70]
+  - room: unterfuehrung
+    pos: [220, 125]
+  - room: jugendzentrum
+    pos: [80, 55]
+    if: [{fact: hall}]
+  - room: bruecke
+    pos: [235, 55]
+    if: [{fact: bruecke}]
+  - room: abstellgleis
+    pos: [285, 145]
+    if: [{fact: zaun}]

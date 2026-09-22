@@ -46,7 +46,7 @@ export async function loadGame(store: SaveStore, slot: string, content: GameCont
   try {
     const raw = await store.load(slot);
     if (raw === null) return { state: null };
-    return { state: fitToContent(migrate(raw), content) };
+    return { state: fitToContent(migrate(raw, content), content) };
   } catch (error) {
     const warning = `Spielstand konnte nicht geladen werden und wird ignoriert: ${(error as Error).message}`;
     console.warn(warning);

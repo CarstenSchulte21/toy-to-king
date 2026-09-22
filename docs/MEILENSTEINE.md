@@ -1,4 +1,4 @@
-# MEILENSTEINE – M1 & M2
+# MEILENSTEINE – M1 bis M3.5
 
 ## Rollen
 
@@ -39,7 +39,7 @@ content:check muss grün bleiben. Committe mit Verweis auf das Issue.
 
 ## M1 – Hinterhof
 
-**Stand 21.09.2026:** M1-1 und M1-3 bis M1-6 umgesetzt (62 Tests grün, Build grün). Offen: M1-0 und M1-2 (Einrichtung GitHub/Vercel, Product Owner), M1-7 (erster Test).
+**Stand 21.09.2026:** M1 umgesetzt und auf GitHub. Offen: M1-7 (erster Test durch den Tester).
 
 **Spielbar am Ende:** Mit eigenem Writer-Namen starten, den Hinterhof auf dem Handy erkunden, Spielstand bleibt erhalten.
 **Tester-Fokus:** Ist die Schrift lesbar? Sind die Tap-Flächen treffbar? Klingen die Hinterhof-Texte echt?
@@ -176,6 +176,8 @@ Fertig, wenn es über die Preview-URL auf einem Handy im Querformat bedienbar is
 
 ## M2 – NPCs, Vertrauen, Blackbook
 
+**Stand 21.09.2026:** M2-1 bis M2-7 umgesetzt auf Branch `m2` (93 Tests grün, Build grün). Offen: Preview prüfen und mergen (Product Owner), M2-8 (Playtest).
+
 **Spielbar am Ende:** Vier Rooms, vier NPCs, Infos erarbeiten, Infos öffnen neue Stellen.
 **Tester-Fokus:** Machen die Gespräche Spaß? Fühlen sich die Infos nützlich an? Klingt jede Figur echt – vor allem KRUX?
 
@@ -305,3 +307,49 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 - [ ] Alle Kriterien aus SPEC 7, M2 erfüllt.
 - [ ] Alle `cringe`-Issues vom Tester geschlossen.
 - [ ] **Go/No-Go für M3:** Macht das Reden mit NPCs Spaß? Wenn nicht, wird vor M3 umgesteuert, nicht weitergebaut.
+
+---
+
+## M3 – Karte, Spots, Sprühen
+
+**Stand 21.09.2026:** umgesetzt auf Branch `m3`, Details in `SPEC-M3.md`. Offen: Preview prüfen, mergen, Playtest.
+
+**Spielbar am Ende:** Karte öffnen, zu einem Spot gehen, mit Style, Cap und Dose sprühen, das eigene Werk an der Wand und auf der Karte sehen.
+**Tester-Fokus:** Fühlt sich die Wahl von Style, Cap und Dose echt an – oder wie ein Quiz? Stimmen die Hinweise nach dem Sprühen? Stimmen die Spots (Heaven Spot, Zug, Hall) mit dem, was man aus der Szene kennt?
+
+### M3 – Playtest
+
+- [ ] Alle fünf Spots finden – ohne Hilfe?
+- [ ] Ist klar, woher man Skinny Cap, Fat Cap, NY Fat und High Pressure bekommt?
+- [ ] Welche Kombinationen fühlen sich falsch bewertet an? (z. B. „Das würde in echt anders laufen")
+- [ ] Wirkt der eigene Name an der Wand gut – oder zu klein, zu gleich?
+- [ ] Fehlt etwas, das beim Sprühen unbedingt dazugehört?
+
+### M3 – Abnahme und Entscheidungspunkt
+
+- [ ] Kriterien aus SPEC-M3 auf dem Handy bestätigt.
+- [ ] Playtest-Feedback als Issues erfasst.
+- [x] **Vor M4:** Heat, Wanted, XP und Ränge bauen auf dieser Sprüh-Regel auf. Wenn sie sich unecht anfühlt, jetzt ändern – später wird es teuer. → Entscheidung: Sie fühlte sich wie ein Quiz an, deshalb kommt M3.5.
+
+## M3.5 – Sprühen 2.0
+
+**Stand 22.09.2026:** umgesetzt auf Branch `m3-5`, Details in `SPEC-M3.5.md`. Grundlage sind 3 Runden Style-Check mit dem Tester (Artifact „Style-Check Wand").
+
+**Spielbar am Ende:** Sketch mit Vorschau wählen (Style, Farben aus der Tasche, Dose). Dann Fill-in und Outline mit dem Finger nachfahren, jeweils mit eigenem Cap. Fehler sieht man im Bild: Lücken, fette Outline, Overspray, Drips. Das Werk bleibt als Bild am Spot.
+
+**Tester-Fokus:** Fühlt sich das Nachfahren wie Sprühen an? Sind Zeit und Tempo machbar? Sind die Fehler fair?
+
+### M3.5 – Playtest (auf dem Handy)
+
+- [ ] Ist das Nachfahren mit dem Finger machbar, oder zu fummelig? Reicht die Zeit?
+- [ ] Merkt man den Unterschied zwischen Low und High Pressure?
+- [ ] Merkt man, dass Skinny fürs Fill-in und NY Fat für die Outline falsch sind? Ohne dass es einem jemand sagt?
+- [ ] Sehen Drips und Overspray echt aus?
+- [ ] Sieht das eigene Werk im Raum gut aus, oder ist es zu klein?
+- [ ] Welche Farben fehlen am meisten?
+
+### M3.5 – Abnahme
+
+- [ ] Kriterien aus SPEC-M3.5 auf dem Handy bestätigt.
+- [ ] Toleranz, Tempo und Zeit nach dem Playtest nachgestellt.
+- [ ] Danach: M4 mit Rängen. Die Ränge schalten die Style-Leiter frei (Bombing → Piece → Wildstyle).

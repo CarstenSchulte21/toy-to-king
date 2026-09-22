@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readContentFiles } from "../helpers/content-files";
 import { describe, expect, it } from "vitest";
 import { validateContent, type ContentFile } from "../../scripts/lib/validate-content";
 
@@ -22,12 +22,7 @@ describe("validateContent", () => {
   });
 
   it("akzeptiert die echten Inhalte aus content/", () => {
-    const read = (p: string) => ({ path: p, text: readFileSync(p, "utf8") });
-    const files = [
-      read("content/config.yaml"),
-      ...readdirSync("content/rooms").map((f) => read(`content/rooms/${f}`)),
-    ];
-    const r = validateContent(files);
+    const r = validateContent(readContentFiles());
     expect(r.errors).toEqual([]);
     expect(r.warnings).toEqual([]);
   });
@@ -128,7 +123,7 @@ describe("validateContent", () => {
         `  - id: tonne\n    label: Tonne\n    rect: [10, 10, 30, 30]\n    if: [{visited: strase}]\n    untersuchen: "x"\n`,
       ),
     );
-    expect(r.errors.join("\n")).toContain('Bedingung "visited"');
+    expect(r.errors.join("\n")).toContain('"visited" zeigt auf "strase"');
   });
 
   it("meldet unbekannte Bedingungen", () => {

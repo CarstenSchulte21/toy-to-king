@@ -2,18 +2,21 @@
 // Zeigt einen Room mit seinen Hotspots und dem Verbmenü.
 // Ohne Hintergrundbild (M1/M2) werden Hotspots als beschriftete Platzhalter-Kästen gezeichnet,
 // sonst wäre auf einem leeren Bildschirm nichts zu finden.
-import { useState, type PointerEvent } from "react";
+import { useEffect, useState, type PointerEvent } from "react";
 import {
   STAGE_HEIGHT,
   STAGE_WIDTH,
   VERB_LABELS,
   availableVerbs,
   visibleHotspots,
+  type GameContent,
   type GameState,
   type Hotspot,
   type Room,
   type Verb,
 } from "@/engine";
+import { Pips } from "./MapView";
+import { WorkImage } from "./WorkImage";
 
 type Menu = { hotspot: Hotspot; x: number; y: number } | null;
 
@@ -21,23 +24,36 @@ const MENU_WIDTH = 84;
 const MENU_ITEM_HEIGHT = 18;
 
 export function RoomView(props: {
+  content: GameContent;
   room: Room;
   state: GameState;
   scale: number;
   outlines: boolean;
+  // Solange ein Gespräch oder Menü offen ist, wird nichts als „gesehen" markiert.
+  active: boolean;
   onVerb: (hotspot: Hotspot, verb: Verb) => void;
+  onSeenHotspots: (keys: string[]) => void;
 }) {
-  const { room, state, scale, outlines, onVerb } = props;
+  const { content, room, state, scale, outlines, active, onVerb, onSeenHotspots } = props;
   const [menu, setMenu] = useState<Menu>(null);
   const placeholder = !room.background;
-  const hotspots = visibleHotspots(room, state);
+  const hotspots = visibleHotspots(room, state, content);
+
+  // Neu freigeschaltete Hotspots glitzern einmal kurz auf (F2.8), danach gelten sie als gesehen.
+  const fresh = hotspots.map((h) => `${room.id}.${h.id}`).filter((k) => state.newlyVisible.includes(k));
+  const freshKey = fresh.join(",");
+  useEffect(() => {
+    if (!active || !freshKey) return;
+    const id = setTimeout(() => onSeenHotspots(freshKey.split(",")), 2400);
+    return () => clearTimeout(id);
+  }, [active, freshKey, onSeenHotspots]);
 
   const openMenu = (event: PointerEvent, hotspot: Hotspot) => {
     event.stopPropagation();
     const stage = (event.currentTarget as HTMLElement).closest(".stage")!.getBoundingClientRect();
     const x = (event.clientX - stage.left) / scale;
     const y = (event.clientY - stage.top) / scale;
-    const verbs = availableVerbs(hotspot);
+    const verbs = availableVerbs(hotspot, state, content);
     const height = (verbs.length + 1) * MENU_ITEM_HEIGHT + 4;
     setMenu({
       hotspot,
@@ -63,6 +79,7 @@ export function RoomView(props: {
           "hotspot",
           placeholder ? "hotspot-placeholder" : "",
           outlines ? "hotspot-outline" : "",
+          active && fresh.includes(`${room.id}.${h.id}`) ? "hotspot-new" : "",
         ];
         return (
           <button
@@ -73,6 +90,12 @@ export function RoomView(props: {
             aria-label={h.label}
           >
             {(placeholder || outlines) && <span className="hotspot-label">{h.label}</span>}
+            {h.sprühen && state.works[h.sprühen] && (
+              <span className="work">
+                <WorkImage content={content} name={state.player.name} work={state.works[h.sprühen]!} />
+                <Pips value={state.works[h.sprühen]!.quality} />
+              </span>
+            )}
           </button>
         );
       })}
@@ -84,7 +107,7 @@ export function RoomView(props: {
           onPointerUp={(e) => e.stopPropagation()}
         >
           <div className="verb-menu-title">{menu.hotspot.label}</div>
-          {availableVerbs(menu.hotspot).map((verb) => (
+          {availableVerbs(menu.hotspot, state, content).map((verb) => (
             <button
               key={verb}
               className="verb"

@@ -1,21 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   SaveFormatError,
-  applyEffect,
   availableVerbs,
   createNewGame,
-  evaluateAll,
-  evaluateCondition,
   fitToContent,
   migrate,
   reduce,
   renderText,
-  resolveText,
   validatePlayerName,
-  visibleHotspots,
   type GameContent,
   type GameState,
 } from "@/engine";
+import * as E from "@/engine";
 
 const NOW = "2026-01-01T00:00:00.000Z";
 const LATER = "2026-01-01T00:05:00.000Z";
@@ -55,7 +51,21 @@ const content: GameContent = {
     },
     strasse: { id: "strasse", name: "Straße", hotspots: [] },
   },
+  npcs: {},
+  facts: {},
+  items: {},
+  spray: null,
+  spots: {},
+  map: null,
 };
+
+// Kurzformen mit festem Kontext für die Tests ohne Gespräch.
+const ctx = { content };
+const evaluateCondition = (c: E.Condition, s: GameState) => E.evaluateCondition(c, s, ctx);
+const evaluateAll = (c: E.Condition[] | undefined, s: GameState) => E.evaluateAll(c, s, ctx);
+const applyEffect = (s: GameState, e: E.Effect) => E.applyEffect(s, e, ctx);
+const resolveText = (v: E.TextVariants | undefined, s: GameState) => E.resolveText(v, s, ctx);
+const visibleHotspots = (r: E.Room, s: GameState) => E.visibleHotspots(r, s, content);
 
 function game(overrides: Partial<GameState> = {}): GameState {
   return { ...createNewGame(content, "KRAZE", NOW), ...overrides };
@@ -86,7 +96,8 @@ describe("createNewGame", () => {
     expect(s.room).toBe("hof");
     expect(s.player).toEqual({ name: "KRAZE", crew: null });
     expect(s.visited).toEqual([]);
-    expect(s.schemaVersion).toBe(1);
+    expect(s.schemaVersion).toBe(3);
+    expect(s.works).toEqual({});
   });
 });
 
@@ -254,6 +265,51 @@ describe("migrate", () => {
     expect(() => migrate({ foo: 1 })).toThrow(SaveFormatError);
     expect(() => migrate({ ...game(), schemaVersion: 99 })).toThrow(/Version 99/);
     expect(() => migrate({ ...game(), visited: "hof" })).toThrow(/beschädigt/);
+  });
+  it("bringt Spielstände aus M1/M2 (v1) auf den neuesten Stand – mit Startausrüstung, ohne Werke", () => {
+    const v1: Record<string, unknown> = { ...game(), schemaVersion: 1 };
+    delete v1.items;
+    delete v1.works;
+    const withStart = { ...content, config: { ...content.config, start_items: { standard_cap: 1 } } };
+    const migrated = migrate(v1, withStart);
+    expect(migrated.schemaVersion).toBe(3);
+    expect(migrated.items).toEqual({ standard_cap: 1 });
+    expect(migrated.works).toEqual({});
+    expect(migrated.player.name).toBe("KRAZE");
+  });
+  it("bringt Spielstände aus M3 (v2) auf v3 – alte Werke fehlerfrei, Start-Farben in die Tasche", () => {
+    const withColors: GameContent = {
+      ...content,
+      config: { ...content.config, start_items: { standard_cap: 1, schwarz: 1, chrom: 1 } },
+      items: {
+        standard_cap: { id: "standard_cap", name: "Standard-Cap", kind: "cap", width: 2, text: "." },
+        schwarz: { id: "schwarz", name: "Schwarz", kind: "color", color: "black", text: "." },
+        chrom: { id: "chrom", name: "Chrom", kind: "color", color: "light_grey", text: "." },
+      },
+    };
+    const v2 = {
+      ...game(),
+      schemaVersion: 2,
+      items: { standard_cap: 1, low_pressure: 1 },
+      works: {
+        rolltore: { style: "throwup", cap: "fat_cap", dose: "high_pressure", quality: 3, at: "2026-01-01" },
+        hall: { style: "hollow", cap: "skinny_cap", dose: "low_pressure", quality: 2, at: "2026-01-02" },
+      },
+    };
+    const m = migrate(JSON.parse(JSON.stringify(v2)), withColors);
+    expect(m.schemaVersion).toBe(3);
+    expect(m.items).toEqual({ standard_cap: 1, low_pressure: 1, schwarz: 1, chrom: 1 });
+    expect(m.works.rolltore).toEqual({
+      style: "bubble",
+      colors: { line: "schwarz", fill: ["chrom"], outline: "schwarz" },
+      dose: "high_pressure",
+      passes: [],
+      seed: 1,
+      quality: 3,
+      at: "2026-01-01",
+      ideal: true,
+    });
+    expect(m.works.hall?.style).toBe("bubble");
   });
   it("setzt auf den Start-Room zurück, wenn es den Room nicht mehr gibt", () => {
     expect(fitToContent(game({ room: "weg" }), content).room).toBe("hof");

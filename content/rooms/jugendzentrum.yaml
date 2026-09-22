@@ -1,0 +1,31 @@
+id: jugendzentrum
+name: Jugendzentrum
+description: "Hinter dem Jugendzentrum: eine lange Wand, Stück für Stück bemalt. Legal. Hier hat man Zeit."
+hotspots:
+  - id: hall_wand
+    label: Die Hall
+    rect: [20, 30, 190, 110]
+    sprühen: hall
+    untersuchen:
+      - if: [{sprayed: hall}]
+        text: "Dein Werk hängt zwischen den anderen. Hier sieht jeder, was du kannst."
+      - text:
+          - "Piece an Piece, manche frisch, manche schon verblasst."
+          - "Ganz rechts ist noch ein Stück frei."
+
+  - id: altes_piece
+    label: Altes Piece
+    rect: [220, 35, 80, 70]
+    untersuchen:
+      - "Ein altes Piece, klassische Buchstaben, sauberes 3D."
+      - "Unten rechts ein Tag, den du aus Kalles Blackbook kennst."
+
+  - id: dosen
+    label: Karton
+    rect: [225, 120, 45, 35]
+    untersuchen: "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
+
+  - id: zur_strasse
+    label: Zur Straße
+    rect: [0, 60, 16, 100]
+    gehen: strasse

@@ -1,4 +1,4 @@
-# CONTENT – Spielinhalte M1 & M2
+# CONTENT – Spielinhalte M1 bis M3.5
 
 **Status:** Inhalte von Claude geschrieben, nach `GLOSSAR.md` und Tonalitäts-Leitfaden. Sie gelten als Entwurf, bis der Tester sie gespielt hat. Überarbeitet wird ausschließlich auf Basis von Tester-Feedback (siehe `MEILENSTEINE.md`, Feedback-Schleife).
 
@@ -31,6 +31,12 @@ categories:
   szene: Szene
 
 empty_category_text: "Noch nichts. Rede mit Leuten."
+
+start_items:
+  standard_cap: 1
+  low_pressure: 1
+  farbe_schwarz: 1
+  farbe_chrom: 1
 ```
 
 ---
@@ -99,7 +105,10 @@ hotspots:
   - id: rolltore
     label: Rolltore
     rect: [40, 60, 90, 80]
+    sprühen: rolltore
     untersuchen:
+      - if: [{sprayed: rolltore}]
+        text: "Zwischen all den Tags: deiner. Mal sehen, wie lange er hält."
       - if: [{fact: buff_montag}]
         text: "Alle drei Rolltore frisch grau. Montag war Buff-Tag."
       - text:
@@ -108,12 +117,12 @@ hotspots:
 
   - id: laterne
     label: Laternenmast
-    rect: [140, 20, 15, 130]
+    rect: [140, 20, 16, 130]
     untersuchen: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
 
   - id: kamera
     label: Kamera
-    rect: [200, 30, 20, 15]
+    rect: [200, 28, 20, 16]
     if: [{fact: kamera}]
     untersuchen: "Die neue Kamera über dem Farbenladen. Sie zeigt genau auf die Rolltore."
 
@@ -191,7 +200,7 @@ description: "Jeder Zentimeter bemalt, bis unter die Decke. Das Licht flackert."
 hotspots:
   - id: tagwand
     label: Wand voller Tags
-    rect: [10, 30, 70, 110]
+    rect: [20, 30, 65, 110]
     untersuchen:
       - "Tags über Tags über Tags. Einige kennst du von den Stickern."
       - "Hier malt nur, wer was kann."
@@ -205,8 +214,11 @@ hotspots:
 
   - id: linke_wand
     label: Linke Wand
-    rect: [0, 40, 10, 100]
+    rect: [0, 40, 16, 100]
+    sprühen: linke_wand
     untersuchen:
+      - if: [{sprayed: linke_wand}]
+        text: "Dein Werk, direkt neben KRUX. Jetzt muss es sich halten."
       - if: [{fact: krux_frage}]
         text: "Die linke Wand. Mit KRUX' Okay. Jetzt fehlt nur noch Farbe."
       - text: "Die linke Wand ist fast leer. Seltsam, bei so viel Platz."
@@ -219,15 +231,16 @@ hotspots:
 
   - id: zaunloch
     label: Aufgebogener Zaun
-    rect: [270, 90, 35, 60]
+    rect: [266, 90, 35, 60]
     if: [{fact: zaun}]
     untersuchen:
       - "Der Zaun ist unten aufgebogen, gerade breit genug."
-      - "Dahinter Schotter, Gleise, abgestellte Waggons. Nicht heute."
+      - "Dahinter Schotter, Gleise, abgestellte Waggons."
+    gehen: abstellgleis
 
   - id: raus
     label: Zur Straße
-    rect: [305, 50, 15, 110]
+    rect: [304, 50, 16, 110]
     gehen: strasse
 ```
 
@@ -439,8 +452,11 @@ dialogue:
     blackbook:
       text:
         - "Zeig her."
-        - "Deine Buchstaben stehen zu eng. Gib ihnen Luft, dann wird das auch als Hollow lesbar."
+        - "Deine Buchstaben stehen zu eng. Gib ihnen Luft, dann liest man das auch von drüben."
         - "Die Connection hier ist gut. Bleib dabei."
+        - "Und nimm den Fat Cap. Deine Fill-ins brauchen das."
+      effects:
+        - give: fat_cap
       next: hub
 
     zaun:
@@ -526,6 +542,16 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "Über Kunden redet Sibel nicht mit jedem."
           next: kunden
+        - text: "Hast du Farben für mich?"
+          id: farben
+          once: true
+          next: farben
+        - text: "Ich brauch noch mehr Farben."
+          id: mehr_farben
+          once: true
+          if: [{trust_min: 2}]
+          show_locked: "Mehr Farben rückt Sibel nicht einfach so raus."
+          next: mehr_farben
         - text: "Danke, bis dann."
           end: true
 
@@ -533,8 +559,10 @@ dialogue:
       text:
         - "Für saubere Outlines Skinny Cap. Für Fill-ins Fat Cap."
         - "NY Fat nur, wenn's schnell gehen muss. Damit malst du keine Details."
+        - "Hier, nimm einen Skinny mit. Geht aufs Haus."
       effects:
         - learn: caps
+        - give: skinny_cap
       next: hub
 
     druck:
@@ -558,9 +586,12 @@ dialogue:
           next: kamera_frage
 
     kamera_nervt:
-      text: "Und wie. Die Hälfte meiner Kunden kommt jetzt lieber hinten rum."
+      text:
+        - "Und wie. Die Hälfte meiner Kunden kommt jetzt lieber hinten rum."
+        - "Hier, die High Pressure ist verbeult. Verkaufen kann ich die eh nicht mehr."
       effects:
         - trust: 1
+        - give: high_pressure
       next: hub
 
     kamera_frage:
@@ -581,6 +612,23 @@ dialogue:
         - "KRUX kam früher auch. Seit Monaten nicht mehr. Keiner weiß, woher er seine Farbe hat."
       effects:
         - learn: krux_kauft_nicht
+      next: hub
+
+    farben:
+      text:
+        - "Rot und Weiß. Die sind aus der Restekiste, aber voll."
+        - "Mit Chrom und Schwarz hast du dann schon was zum Arbeiten."
+      effects:
+        - give: farbe_rot
+        - give: farbe_weiss
+      next: hub
+
+    mehr_farben:
+      text:
+        - "Gelb und Hellblau. Beim Gelb klemmt das Ventil, den Cap also fest draufdrücken."
+      effects:
+        - give: farbe_gelb
+        - give: farbe_hellblau
       next: hub
 ```
 
@@ -655,6 +703,8 @@ dialogue:
             - trust: -1
           next: angeben
         - text: "Kennst du gute Spots?"
+          id: spots
+          once: true
           if: [{trust_min: 2}]
           show_locked: "KRUX erzählt dir sowas nicht. Noch nicht."
           next: bruecke
@@ -702,8 +752,10 @@ dialogue:
       text:
         - "Die Eisenbahnbrücke. Da war seit Jahren keiner oben."
         - "Wer da oben steht, ist kein Toy mehr. Runterfallen solltest du halt nicht."
+        - "Nimm den NY Fat. Da oben musst du schnell sein."
       effects:
         - learn: bruecke
+        - give: ny_fat
       next: hub
 ```
 
@@ -804,4 +856,334 @@ dialogue:
       - text:
           - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
           - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
+```
+
+---
+
+## 5. M3 – Material, Spots, Karte (Stand M3.5: Farben, Sprühen 2.0)
+
+**Wer gibt was:** Start mit Standard-Cap und Low Pressure. Sibel gibt den Skinny Cap zu ihren Cap-Tipps und eine verbeulte High Pressure, wenn man sich mit ihr über die Kamera ärgert. Kalle gibt einen Fat Cap, wenn man ihm das Blackbook zeigt. KRUX gibt den NY Fat zusammen mit der Brücke. Die Änderungen stehen direkt in den Dialogen oben.
+
+**Qualitätsregel:** +1 passender Cap, +1 passende Dose, +1 Style passt zum Spot → 0 bis 3 („wackelig", „geht so", „sauber", „sitzt"; beim Piece heißt die beste Stufe „Burner").
+
+### 5.1 items.yaml
+
+```yaml
+# Caps: width = Strahlbreite (1 Skinny … 4 NY Fat). Dosen: flow = Farbe pro Sekunde.
+# Farben: color = Palettenname (C64-Palette).
+- id: standard_cap
+  name: Standard-Cap
+  kind: cap
+  width: 2
+  text: "Der Cap, der auf der Dose steckt. Geht für alles, ist für nichts richtig gut."
+
+- id: skinny_cap
+  name: Skinny Cap
+  kind: cap
+  width: 1
+  text: "Dünner, präziser Strahl. Für Tags und Outlines."
+
+- id: fat_cap
+  name: Fat Cap
+  kind: cap
+  width: 3
+  text: "Breiter Strahl. Für Fill-ins."
+
+- id: ny_fat
+  name: NY Fat
+  kind: cap
+  width: 4
+  text: "Sehr breit. Füllt schnell, verzeiht nichts."
+
+- id: low_pressure
+  name: Low Pressure
+  kind: dose
+  flow: 4
+  text: "Wenig Druck, viel Kontrolle. Gut für Details und Fades."
+
+- id: high_pressure
+  name: High Pressure
+  kind: dose
+  flow: 10
+  text: "Viel Druck, deckt schnell. Tropft aber leichter."
+
+- id: farbe_schwarz
+  name: Schwarz
+  kind: color
+  color: black
+  text: "Für Outlines und Tags. Hat jeder dabei."
+
+- id: farbe_chrom
+  name: Chrom
+  kind: color
+  color: light_grey
+  text: "Silber. Der Klassiker fürs Fill-in bei Throw-ups."
+
+- id: farbe_weiss
+  name: Weiß
+  kind: color
+  color: white
+  text: "Für Highlights, Second Outlines und alles, was knallen soll."
+
+- id: farbe_rot
+  name: Rot
+  kind: color
+  color: red
+  text: "Dunkles Rot. Deckt gut."
+
+- id: farbe_gelb
+  name: Gelb
+  kind: color
+  color: yellow
+  text: "Hell und laut. Mit schwarzer Outline sieht man das von weit weg."
+
+- id: farbe_hellblau
+  name: Hellblau
+  kind: color
+  color: cyan
+  text: "Kühl. Gut für Fades nach Weiß."
+```
+
+### 5.2 spray.yaml
+
+```yaml
+# Sprühen 2.0 (M3.5): Sketch wählen, dann Ebene für Ebene nachfahren.
+# look bestimmt die Form und die Ebenen: tag → line; alle anderen → fill, outline.
+# caps: ideale Caps je Ebene. Die Qualität ergibt sich aus Deckung, Cap, Drips und Spot.
+quality_labels:
+  - wackelig
+  - geht so
+  - sauber
+  - sitzt
+
+result: "{style} an {spot}: {quality}."
+
+hints:
+  gaps: "Da sind Lücken. Näher an der Linie bleiben."
+  gaps_low: "Low Pressure braucht Zeit. Langsamer fahren, dann deckt das."
+  reach: "Mit dem Cap kommst du nicht bis an den Rand. Fürs Fill-in Fat Cap oder NY Fat."
+  fat_line: "Die Linie ist zu fett. Dafür Skinny oder Standard-Cap."
+  drips: "Das läuft. Mit High Pressure nicht stehen bleiben."
+
+styles:
+  - id: tag
+    name: Tag
+    look: tag
+    caps:
+      line: [skinny_cap, standard_cap]
+
+  - id: straight
+    name: Straight Letter
+    look: straight
+    caps:
+      fill: [fat_cap, ny_fat]
+      outline: [skinny_cap, standard_cap]
+
+  - id: bubble
+    name: Bubble
+    look: bubble
+    caps:
+      fill: [fat_cap, ny_fat]
+      outline: [skinny_cap, standard_cap]
+
+  - id: bombing
+    name: Bombing
+    look: bombing
+    caps:
+      fill: [ny_fat, fat_cap]
+      outline: [standard_cap, skinny_cap]
+    if: [{flag: rang_bomber}]
+    locked_hint: "Bombing kommt, wenn dein Name in der Stadt was zählt."
+
+  - id: piece
+    name: Piece
+    look: piece
+    caps:
+      fill: [fat_cap]
+      outline: [skinny_cap]
+    if: [{flag: rang_piece}]
+    locked_hint: "Für ein Piece bist du noch nicht so weit."
+    only_at: [hall]
+    only_at_hint: "Ein Piece malst du nicht zwischen Tür und Angel. Dafür gibt's die Hall."
+    top_label: Burner
+
+  - id: wildstyle
+    name: Wildstyle
+    look: wildstyle
+    caps:
+      fill: [fat_cap]
+      outline: [skinny_cap]
+    if: [{flag: rang_king}]
+    locked_hint: "Wildstyle ist was für Leute, die jeder kennt."
+    only_at: [hall]
+    only_at_hint: "Wildstyle nur an der Hall. Da hast du die Zeit dafür."
+    top_label: Burner
+```
+
+### 5.3 spots.yaml
+
+```yaml
+- id: rolltore
+  name: den Rolltoren
+  type: rolltor
+  room: strasse
+  hotspot: rolltore
+  fits: [tag, straight, bubble]
+  fit_hint: "Die Rolltore sind für schnelle Sachen. Für mehr hast du hier keine Ruhe."
+  risk: mittel
+
+- id: hall
+  name: der Hall
+  type: legale_wand
+  room: jugendzentrum
+  hotspot: hall_wand
+  fits: [straight, bubble, bombing, piece, wildstyle]
+  fit_hint: "An der Hall taggt man nicht. Da zählt, was Style hat."
+  risk: kein
+  if: [{fact: hall}]
+
+- id: linke_wand
+  name: der linken Wand
+  type: hauswand
+  room: unterfuehrung
+  hotspot: linke_wand
+  fits: [straight, bubble, bombing]
+  fit_hint: "Neben KRUX' Piece wirkt das zu klein."
+  risk: niedrig
+  if: [{fact: krux_frage}]
+
+- id: bruecke
+  name: der Brücke
+  type: heaven_spot
+  room: bruecke
+  hotspot: brueckenwand
+  fits: [straight, bubble, bombing]
+  fit_hint: "Da oben zählt, was man von unten lesen kann. Groß und schnell."
+  risk: hoch
+  if: [{fact: bruecke}]
+
+- id: abstellgleis
+  name: einem Waggon
+  type: zug
+  room: abstellgleis
+  hotspot: waggon
+  fits: [straight, bubble, bombing]
+  fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
+  risk: hoch
+  if: [{fact: zaun}]
+```
+
+### 5.4 map.yaml
+
+```yaml
+# Ein Ort steht auf der Karte, sobald man dort war – oder die Bedingung erfüllt ist.
+title: Dein Bezirk
+places:
+  - room: hinterhof
+    pos: [60, 125]
+  - room: strasse
+    pos: [140, 110]
+  - room: farbenladen
+    pos: [150, 70]
+  - room: unterfuehrung
+    pos: [220, 125]
+  - room: jugendzentrum
+    pos: [80, 55]
+    if: [{fact: hall}]
+  - room: bruecke
+    pos: [235, 55]
+    if: [{fact: bruecke}]
+  - room: abstellgleis
+    pos: [285, 145]
+    if: [{fact: zaun}]
+```
+
+### 5.5 Neue Orte
+
+```yaml
+id: jugendzentrum
+name: Jugendzentrum
+description: "Hinter dem Jugendzentrum: eine lange Wand, Stück für Stück bemalt. Legal. Hier hat man Zeit."
+hotspots:
+  - id: hall_wand
+    label: Die Hall
+    rect: [20, 30, 190, 110]
+    sprühen: hall
+    untersuchen:
+      - if: [{sprayed: hall}]
+        text: "Dein Werk hängt zwischen den anderen. Hier sieht jeder, was du kannst."
+      - text:
+          - "Piece an Piece, manche frisch, manche schon verblasst."
+          - "Ganz rechts ist noch ein Stück frei."
+
+  - id: altes_piece
+    label: Altes Piece
+    rect: [220, 35, 80, 70]
+    untersuchen:
+      - "Ein altes Piece, klassische Buchstaben, sauberes 3D."
+      - "Unten rechts ein Tag, den du aus Kalles Blackbook kennst."
+
+  - id: dosen
+    label: Karton
+    rect: [225, 120, 45, 35]
+    untersuchen: "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
+
+  - id: zur_strasse
+    label: Zur Straße
+    rect: [0, 60, 16, 100]
+    gehen: strasse
+```
+
+```yaml
+id: bruecke
+name: Eisenbahnbrücke
+description: "Oben auf der Eisenbahnbrücke. Der Wind zieht, unten fahren die Autos."
+hotspots:
+  - id: brueckenwand
+    label: Brückenblech
+    rect: [60, 40, 180, 60]
+    sprühen: bruecke
+    untersuchen:
+      - if: [{sprayed: bruecke}]
+        text: "Dein Name über der Straße. Den sieht jetzt jeder, der unten langfährt."
+      - text:
+          - "Das Blech an der Brücke. Seit Jahren hat hier keiner gemalt."
+          - "Von unten sieht man das von der ganzen Straße aus."
+
+  - id: aussicht
+    label: Aussicht
+    rect: [250, 20, 60, 50]
+    untersuchen: "Von hier siehst du den ganzen Bezirk. Die Unterführung, die Ladenzeile, das Abstellgleis."
+
+  - id: runter
+    label: Runter zur Straße
+    rect: [0, 110, 40, 70]
+    gehen: strasse
+```
+
+```yaml
+id: abstellgleis
+name: Abstellgleis
+description: "Hinter dem Zaun. Schotter, abgestellte Waggons, kein Mensch zu sehen."
+hotspots:
+  - id: waggon
+    label: Waggon
+    rect: [40, 50, 200, 80]
+    sprühen: abstellgleis
+    untersuchen:
+      - if: [{sprayed: abstellgleis}]
+        text: "Dein Werk auf dem Waggon. Wenn der losfährt, fährt dein Name mit."
+      - text:
+          - "Ein abgestellter Waggon. Die Seite ist fast leer."
+          - "Nur ein paar alte Tags, halb abgewaschen."
+
+  - id: gleise
+    label: Gleise
+    rect: [250, 120, 60, 50]
+    untersuchen: "Die Gleise glänzen. Hier fährt nachts noch was."
+
+  - id: zurueck
+    label: Zurück durch den Zaun
+    rect: [0, 60, 20, 110]
+    gehen: unterfuehrung
 ```

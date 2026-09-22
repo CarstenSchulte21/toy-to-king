@@ -8,7 +8,7 @@ Rollen: **Product Owner** (Priorisierung, Abnahme, Issues), **Claude** (Code und
 
 ## Maßgebliche Dokumente
 
-- `docs/SPEC.md` – technische Spezifikation. Bei Widersprüchen gilt sie.
+- `docs/SPEC.md` – technische Spezifikation M1/M2, `docs/SPEC-M3.md` – Ergänzungen für M3, `docs/SPEC-M3.5.md` – Sprühen 2.0. Bei Widersprüchen gilt die jeweils neuere SPEC.
 - `docs/MEILENSTEINE.md` – aktueller Meilenstein und Aufgaben.
 - `docs/GLOSSAR.md` – verbindliche Begriffe und Tonalität.
 - `docs/CONTENT.md` – die Spielinhalte, Quelle für `content/`.
