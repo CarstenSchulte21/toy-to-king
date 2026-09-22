@@ -30,6 +30,7 @@ import {
   type SprayRules,
   type TextVariants,
 } from "../../src/engine/content-schema";
+import { passesFor, type PassKind } from "../../src/engine/lettering/layout";
 
 export type ContentFile = { path: string; text: string };
 export type ValidationResult = { content: GameContent | null; errors: string[]; warnings: string[] };
@@ -258,15 +259,45 @@ export function validateContent(files: ContentFile[]): ValidationResult {
       const where = `${SPRAY_PATH}, Style "${s.id}"`;
       if (seenStyles.has(s.id)) errors.push(`${where}: Diesen Style gibt es zweimal.`);
       seenStyles.add(s.id);
-      for (const c of s.ideal_caps) refs.item(where, "ideal_caps", c);
-      if (s.ideal_dose !== "egal") refs.item(where, "ideal_dose", s.ideal_dose);
+      const expected = passesFor(s.look);
+      for (const kind of expected) {
+        if (!s.caps[kind])
+          errors.push(
+            `${where}: "caps" braucht einen Eintrag für "${kind}" (Ebenen: ${expected.join(", ")}).`,
+          );
+      }
+      for (const [kind, caps] of Object.entries(s.caps)) {
+        if (!expected.includes(kind as PassKind)) {
+          errors.push(
+            `${where}: "caps.${kind}" gibt es bei look "${s.look}" nicht. Ebenen: ${expected.join(", ")}.`,
+          );
+        }
+        for (const c of caps ?? []) {
+          refs.item(where, `caps.${kind}`, c);
+          if (items[c] && items[c].kind !== "cap")
+            errors.push(`${where}: "${c}" in caps.${kind} ist kein Cap.`);
+        }
+      }
       for (const r of s.requires ?? []) refs.item(where, "requires", r);
+      for (const spot of s.only_at ?? []) refs.spot(where, "only_at", spot);
+      refs.conditions(where, s.if);
       if (s.requires && !s.requires_hint) {
         warnings.push(`${where}: "requires" ohne "requires_hint" – der Spieler erfährt nicht, was fehlt.`);
       }
-      const texts = [s.name, s.cap_hint, s.dose_hint, s.requires_hint].filter((x): x is string => !!x);
+      if (s.if && !s.locked_hint) {
+        warnings.push(
+          `${where}: "if" ohne "locked_hint" – der Spieler erfährt nicht, warum der Style gesperrt ist.`,
+        );
+      }
+      if (s.only_at && !s.only_at_hint) {
+        warnings.push(`${where}: "only_at" ohne "only_at_hint" – der Spieler erfährt nicht, wo es geht.`);
+      }
+      const texts = [s.name, s.locked_hint, s.requires_hint, s.only_at_hint, s.top_label].filter(
+        (x): x is string => !!x,
+      );
       checkTexts(where, texts, warnings, errors);
     }
+    checkTexts(`${SPRAY_PATH}, hints`, Object.values(rules.hints), warnings, errors);
     checkTexts(`${SPRAY_PATH}, quality_labels`, rules.quality_labels, warnings, errors);
     const unknown = [...rules.result.matchAll(/\{([^}]*)\}/g)]
       .map((m) => m[1]!)

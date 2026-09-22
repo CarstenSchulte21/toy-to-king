@@ -3,7 +3,35 @@
 import { z } from "zod";
 import type { GameContent } from "./content-schema";
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
+
+const passKind = z.enum(["line", "fill", "outline"]);
+
+// Farben eines Werks: Gegenstands-IDs der Dosen (kind "color").
+export const workColorsSchema = z.object({
+  line: z.string().optional(),
+  fill: z.array(z.string()).max(2).optional(),
+  outline: z.string().optional(),
+});
+
+// Ein Werk (ab v3): Sketch, Material und die Fingerbahnen je Ebene. Das Bild wird daraus berechnet.
+export const workSchema = z.object({
+  style: z.string(),
+  colors: workColorsSchema,
+  dose: z.string(),
+  passes: z.array(z.object({ kind: passKind, cap: z.string(), strokes: z.array(z.array(z.number())) })),
+  seed: z.number().int(),
+  quality: z.number().int().min(0).max(3),
+  at: z.string(),
+  ideal: z.literal(true).optional(), // aus einem alten Spielstand übernommen: ohne Fehler zeichnen
+});
+
+export const sketchSchema = z.object({
+  style: z.string(),
+  colors: workColorsSchema,
+  dose: z.string(),
+  caps: z.record(z.string(), z.string()),
+});
 
 export const gameStateSchema = z.object({
   schemaVersion: z.literal(SCHEMA_VERSION),
@@ -16,21 +44,15 @@ export const gameStateSchema = z.object({
   usedOnce: z.array(z.string()),
   newlyVisible: z.array(z.string()),
   items: z.record(z.string(), z.number()), // Tasche: Caps und Dosen (ab v2)
-  works: z.record(
-    z.string(),
-    z.object({
-      style: z.string(),
-      cap: z.string(),
-      dose: z.string(),
-      quality: z.number().int().min(0).max(3),
-      at: z.string(),
-    }),
-  ), // eigene Werke je Spot (ab v2)
+  works: z.record(z.string(), workSchema), // eigene Werke je Spot (ab v2, neues Format ab v3)
+  lastSketch: sketchSchema.optional(), // zuletzt benutzter Sketch (ab v3)
   meta: z.object({ createdAt: z.string(), updatedAt: z.string(), playSeconds: z.number() }),
 });
 
 export type GameState = z.infer<typeof gameStateSchema>;
-export type Work = GameState["works"][string];
+export type Work = z.infer<typeof workSchema>;
+export type WorkColors = z.infer<typeof workColorsSchema>;
+export type Sketch = z.infer<typeof sketchSchema>;
 
 export type NameCheck = { ok: true; name: string } | { ok: false; error: string };
 

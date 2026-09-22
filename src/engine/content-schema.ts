@@ -2,6 +2,8 @@
 // Die TypeScript-Typen werden direkt aus den Schemas abgeleitet – so können Inhalt und Code nicht auseinanderlaufen.
 // M1: Rooms und Hotspots. M2: NPCs, Dialoge und Infos.
 import { z } from "zod";
+import { LOOKS, PASS_KINDS } from "./lettering/layout";
+import { PALETTE_KEYS } from "./lettering/palette";
 
 z.config(z.locales.de());
 
@@ -141,30 +143,66 @@ export const configSchema = z.strictObject({
 
 // ---------- M3: Material, Sprühen, Spots, Karte ----------
 
-export const itemSchema = z.strictObject({
-  id,
-  name: text,
-  kind: z.enum(["cap", "dose"], { error: 'kind ist "cap" oder "dose".' }),
-  text,
-});
+export const ITEM_KINDS = ["cap", "dose", "color"] as const;
+
+export const itemSchema = z
+  .strictObject({
+    id,
+    name: text,
+    kind: z.enum(ITEM_KINDS, { error: 'kind ist "cap", "dose" oder "color".' }),
+    text,
+    width: z.number().int().min(1).max(4).optional(), // Caps: 1 Skinny … 4 NY Fat (M3.5)
+    flow: z.number().positive().max(30).optional(), // Dosen: Farbe pro Sekunde (M3.5)
+    color: z.enum(PALETTE_KEYS, { error: `color muss eine von ${PALETTE_KEYS.join(", ")} sein.` }).optional(),
+  })
+  .superRefine((item, ctx) => {
+    const need = { cap: "width", dose: "flow", color: "color" } as const;
+    const field = need[item.kind];
+    if (item[field] === undefined) {
+      ctx.addIssue({
+        code: "custom",
+        path: [field],
+        message: `Ein Gegenstand mit kind "${item.kind}" braucht "${field}".`,
+      });
+    }
+    for (const other of Object.values(need)) {
+      if (other !== field && item[other] !== undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: [other],
+          message: `"${other}" gibt es nur bei kind "${Object.entries(need).find(([, f]) => f === other)![0]}".`,
+        });
+      }
+    }
+  });
 export const itemsFileSchema = z.array(itemSchema);
 
+// M3.5: Styles mit eigener Form. Die Ebenen ergeben sich aus der Form (Tag: line; sonst fill, outline).
 export const styleSchema = z.strictObject({
   id,
   name: text,
-  ideal_caps: z.array(id).min(1),
-  ideal_dose: z.union([id, z.literal("egal")]),
-  requires: z.array(id).optional(), // Gegenstände, ohne die der Style nicht geht (Piece: Skinny für die Outline)
+  look: z.enum(LOOKS, { error: `look muss eine von ${LOOKS.join(", ")} sein.` }),
+  caps: z.partialRecord(z.enum(PASS_KINDS), z.array(id).min(1)), // ideale Caps je Ebene
+  if: z.array(conditionSchema).optional(), // ohne erfüllte Bedingung gesperrt
+  locked_hint: text.optional(),
+  requires: z.array(id).optional(), // Gegenstände, ohne die der Style nicht geht
   requires_hint: text.optional(),
-  cap_hint: text,
-  dose_hint: text.optional(),
-  top_label: text.optional(), // eigener Name für die beste Stufe, z. B. "Burner" beim Piece
+  only_at: z.array(id).optional(), // nur an diesen Spots
+  only_at_hint: text.optional(),
+  top_label: text.optional(), // eigener Name für die beste Stufe, z. B. "Burner"
 });
 
 export const spraySchema = z.strictObject({
   styles: z.array(styleSchema).min(1),
   quality_labels: z.array(text).length(4, "quality_labels braucht genau 4 Stufen (0–3)."),
   result: text, // Ergebnissatz mit {style}, {spot} und {quality}
+  hints: z.strictObject({
+    gaps: text, // Lücken trotz passendem Cap
+    gaps_low: text, // Lücken mit Low Pressure
+    reach: text, // Cap fürs Fill-in zu dünn
+    fat_line: text, // Cap für Outline oder Tag zu breit
+    drips: text,
+  }),
 });
 
 export const SPOT_TYPES = ["zug", "heaven_spot", "legale_wand", "rolltor", "hauswand"] as const;

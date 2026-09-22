@@ -14,6 +14,43 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
       items: { ...(content?.config.start_items ?? {}) },
       works: {},
     }),
+    // v2 → v3 (M3.5): Werke bekommen Farben und Fingerbahnen. Alte Werke werden fehlerfrei übernommen,
+    // aus Throw-up und Hollow wird Bubble. Die Start-Farben kommen in die Tasche.
+    2: (s, content) => {
+      const oldWorks = (s.works ?? {}) as Record<
+        string,
+        { style?: string; dose?: string; quality?: number; at?: string }
+      >;
+      const styleMap: Record<string, string> = { throwup: "bubble", hollow: "bubble" };
+      const colors = Object.entries(content?.config.start_items ?? {})
+        .filter(([id]) => content?.items[id]?.kind === "color")
+        .map(([id]) => id);
+      const works = Object.fromEntries(
+        Object.entries(oldWorks).map(([spot, w]) => {
+          const style = styleMap[w.style ?? ""] ?? w.style ?? "tag";
+          return [
+            spot,
+            {
+              style,
+              colors: {
+                line: colors[0],
+                fill: colors.length > 1 ? [colors[1]!] : colors.slice(0, 1),
+                outline: colors[0],
+              },
+              dose: w.dose ?? "low_pressure",
+              passes: [],
+              seed: 1,
+              quality: w.quality ?? 0,
+              at: w.at ?? "",
+              ideal: true,
+            },
+          ];
+        }),
+      );
+      const items = { ...((s.items ?? {}) as Record<string, number>) };
+      for (const c of colors) items[c] = Math.max(items[c] ?? 0, content!.config.start_items![c]!);
+      return { ...s, schemaVersion: 3, works, items };
+    },
   };
 
 export function migrate(saved: unknown, content?: GameContent): GameState {
@@ -43,7 +80,8 @@ export function fitToContent(state: GameState, content: GameContent): GameState 
     next = { ...next, facts: Object.fromEntries(known.map((f) => [f, next.facts[f]!])) };
   }
   // Dasselbe für Werke an Spots, die es nicht mehr gibt.
-  const spots = Object.keys(next.works).filter((s) => content.spots[s]);
+  const styles = new Set(content.spray?.styles.map((s) => s.id) ?? []);
+  const spots = Object.keys(next.works).filter((s) => content.spots[s] && styles.has(next.works[s]!.style));
   if (spots.length !== Object.keys(next.works).length) {
     next = { ...next, works: Object.fromEntries(spots.map((s) => [s, next.works[s]!])) };
   }

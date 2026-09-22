@@ -14,8 +14,18 @@ import {
   visibleHotspotKeys,
   type Verb,
 } from "./logic";
-import { isSpotKnown, mapPlaces, rateSpray, sprayChoices, sprayResultText } from "./spray";
-import { createNewGame, validatePlayerName, type GameState } from "./state";
+import { passesFor, type PassKind, type Stroke } from "./lettering";
+import {
+  isSpotKnown,
+  mapPlaces,
+  rateWork,
+  renderWork,
+  sprayChoices,
+  sprayResultText,
+  styleOf,
+  type WorkDraft,
+} from "./spray";
+import { createNewGame, validatePlayerName, type GameState, type WorkColors } from "./state";
 
 export type Action =
   | { type: "NEW_GAME"; playerName: string }
@@ -26,7 +36,15 @@ export type Action =
   | { type: "MARK_FACTS_SEEN"; facts: string[] }
   | { type: "SEEN_HOTSPOTS"; keys: string[] }
   | { type: "TRAVEL"; room: string }
-  | { type: "SPRAY"; spot: string; style: string; cap: string; dose: string }
+  | {
+      type: "SPRAY";
+      spot: string;
+      style: string;
+      colors: WorkColors;
+      dose: string;
+      passes: { kind: PassKind; cap: string; strokes: Stroke[] }[];
+      seed: number;
+    }
   | { type: "TICK"; seconds: number };
 
 export type GameEvent =
@@ -38,7 +56,7 @@ export type GameEvent =
   | { type: "TRUST_CHANGED"; npc: string; from: number; to: number }
   | { type: "ITEM_GAINED"; item: string; name: string }
   | { type: "SPRAY_OPEN"; spot: string }
-  | { type: "SPRAYED"; spot: string; quality: number; label: string }
+  | { type: "SPRAYED"; spot: string; quality: number; label: string; text: string; hints: string[] }
   | { type: "WARNING"; message: string };
 
 export type ReduceResult = { state: GameState; events: GameEvent[] };
@@ -233,6 +251,8 @@ function chooseOption(
   return goToNode(next, content, action.npc, option.next);
 }
 
+const MAX_SAMPLES = 12000; // Zahlen je Werk – schützt den Spielstand vor riesigen Fingerbahnen
+
 function spray(
   state: GameState,
   action: Extract<Action, { type: "SPRAY" }>,
@@ -246,25 +266,72 @@ function spray(
   if (!isSpotKnown(spot, state, content)) return unchanged(state, `"${spot.name}" kennst du noch nicht.`);
   const styleChoice = choices.styles.find((s) => s.id === action.style);
   if (!styleChoice?.available) return unchanged(state, `Style "${action.style}" geht gerade nicht.`);
-  if (!choices.caps.some((c) => c.id === action.cap))
-    return unchanged(state, `Cap "${action.cap}" hast du nicht.`);
+  const style = styleOf(content, action.style)!;
+
+  const hasColor = (id: string | undefined) => id !== undefined && choices.colors.some((c) => c.id === id);
+  const { colors } = action;
+  if (style.look === "tag") {
+    if (!hasColor(colors.line)) return unchanged(state, "Für den Tag fehlt eine Farbe, die du hast.");
+  } else {
+    const fill = colors.fill ?? [];
+    if (fill.length < 1 || fill.length > 2 || !fill.every(hasColor))
+      return unchanged(state, "Fürs Fill-in braucht es 1–2 Farben aus deiner Tasche.");
+    if (!hasColor(colors.outline)) return unchanged(state, "Für die Outline fehlt eine Farbe, die du hast.");
+  }
   if (!choices.doses.some((d) => d.id === action.dose))
     return unchanged(state, `Dose "${action.dose}" hast du nicht.`);
+  const expected = passesFor(style.look);
+  if (action.passes.length !== expected.length || action.passes.some((p, i) => p.kind !== expected[i]))
+    return unchanged(state, `Ebenen passen nicht zum Style: erwartet ${expected.join(", ")}.`);
+  for (const p of action.passes) {
+    if (!choices.caps.some((c) => c.id === p.cap)) return unchanged(state, `Cap "${p.cap}" hast du nicht.`);
+  }
+  const numbers = action.passes.reduce((sum, p) => sum + p.strokes.reduce((n, s) => n + s.length, 0), 0);
+  const badStroke = action.passes.some((p) =>
+    p.strokes.some((s) => s.length % 3 !== 0 || s.some((v) => !Number.isFinite(v))),
+  );
+  if (badStroke || numbers > MAX_SAMPLES) return unchanged(state, "Die Fingerbahnen sind ungültig.");
+  if (!Number.isInteger(action.seed)) return unchanged(state, "Ungültige Saat.");
 
-  const style = content.spray!.styles.find((s) => s.id === action.style)!;
-  const rating = rateSpray(content, spot, style, action.cap, action.dose);
+  const draft: WorkDraft = {
+    style: style.id,
+    colors: {
+      ...(style.look === "tag" ? { line: colors.line } : { fill: colors.fill, outline: colors.outline }),
+    },
+    dose: action.dose,
+    passes: action.passes.map((p) => ({
+      kind: p.kind,
+      cap: p.cap,
+      strokes: p.strokes.map((s) => s.map((v, i) => (i % 3 === 2 ? Math.round(v) : Math.round(v * 2) / 2))),
+    })),
+    seed: action.seed,
+  };
+  const result = renderWork(content, state.player.name, draft)!;
+  const rating = rateWork(content, spot, style, draft, result.stats);
   const next: GameState = {
     ...state,
-    works: {
-      ...state.works,
-      [spot.id]: { style: style.id, cap: action.cap, dose: action.dose, quality: rating.quality, at: now },
+    works: { ...state.works, [spot.id]: { ...draft, quality: rating.quality, at: now } },
+    lastSketch: {
+      style: style.id,
+      colors: draft.colors,
+      dose: action.dose,
+      caps: {
+        ...(state.lastSketch?.caps ?? {}),
+        ...Object.fromEntries(action.passes.map((p) => [p.kind, p.cap])),
+      },
     },
   };
   return {
     state: next,
     events: [
-      { type: "SPRAYED", spot: spot.id, quality: rating.quality, label: rating.label },
-      { type: "TEXT", lines: [sprayResultText(content, next, spot, style, rating.label), ...rating.hints] },
+      {
+        type: "SPRAYED",
+        spot: spot.id,
+        quality: rating.quality,
+        label: rating.label,
+        text: sprayResultText(content, next, spot, style, rating.label),
+        hints: rating.hints,
+      },
     ],
   };
 }
