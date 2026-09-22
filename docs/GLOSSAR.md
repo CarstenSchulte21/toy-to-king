@@ -118,3 +118,4 @@
 - Polizei heißt „Streife".
 - Vertrauensstufen: Fremder, Gesehen, Bekannt, Respekt, Vertraut, Family.
 - Style-Leiter (Tester, Style-Check 09/2026): Tag → Straight Letter → Bubble → Bombing → Piece → Wildstyle. Piece und Wildstyle nur an der Hall. Keine Hollows.
+- Ränge (M4a): Toy, Tagger, Bomber, Piece-Writer, King. Jeder Rang schaltet den nächsten Style frei, Wildstyle lernt man von KRUX.

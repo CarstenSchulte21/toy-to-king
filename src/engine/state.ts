@@ -3,7 +3,7 @@
 import { z } from "zod";
 import type { GameContent } from "./content-schema";
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 const passKind = z.enum(["line", "fill", "outline"]);
 
@@ -12,6 +12,8 @@ export const workColorsSchema = z.object({
   line: z.string().optional(),
   fill: z.array(z.string()).max(2).optional(),
   outline: z.string().optional(),
+  second: z.string().optional(), // Second Outline (Piece, Wildstyle)
+  background: z.string().optional(), // Background hinter dem Schriftzug
 });
 
 // Ein Werk (ab v3): Sketch, Material und die Fingerbahnen je Ebene. Das Bild wird daraus berechnet.
@@ -46,6 +48,8 @@ export const gameStateSchema = z.object({
   items: z.record(z.string(), z.number()), // Tasche: Caps und Dosen (ab v2)
   works: z.record(z.string(), workSchema), // eigene Werke je Spot (ab v2, neues Format ab v3)
   lastSketch: sketchSchema.optional(), // zuletzt benutzter Sketch (ab v3)
+  xp: z.number().int().min(0), // Erfahrung, daraus folgt der Rang (ab v4)
+  best: z.record(z.string(), z.number().int().min(0)), // bestes Werk je Spot in XP (ab v4)
   meta: z.object({ createdAt: z.string(), updatedAt: z.string(), playSeconds: z.number() }),
 });
 
@@ -81,6 +85,8 @@ export function createNewGame(content: GameContent, playerName: string, now: str
     newlyVisible: [],
     items: { ...(content.config.start_items ?? {}) },
     works: {},
+    xp: 0,
+    best: {},
     meta: { createdAt: now, updatedAt: now, playSeconds: 0 },
   };
 }

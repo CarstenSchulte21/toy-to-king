@@ -9,6 +9,7 @@
 import {
   buildLettering,
   cached,
+  decorFor,
   nodesNear,
   passesFor,
   ringOf,
@@ -18,7 +19,23 @@ import {
   type PassKind,
 } from "./layout";
 import { TRANSPARENT } from "./palette";
-import { N, WORK_H, WORK_W, dilate, erode, minus, pixelNoise, type Mask } from "./raster";
+import {
+  N,
+  WORK_H,
+  WORK_W,
+  bbox,
+  dilate,
+  emptyMask,
+  erode,
+  minus,
+  pixelNoise,
+  rng,
+  shift,
+  stampDisc,
+  union,
+  type Box,
+  type Mask,
+} from "./raster";
 
 export const TOLERANCE = 7;
 // Drips: Bleibt der Finger innerhalb von DWELL_RADIUS px, gilt er als stehend. Nach
@@ -41,7 +58,7 @@ export type Stroke = number[]; // x, y, t, x, y, t … (t in ms seit Start der E
 export type Drip = { node: number; strength: number };
 export type PassInput = { kind: PassKind; width: number; strokes: Stroke[] };
 export type RenderInput = {
-  colors: { line?: number; fill?: number[]; outline?: number };
+  colors: { line?: number; fill?: number[]; outline?: number; second?: number; background?: number };
   flow: number;
   passes: PassInput[];
   ideal?: boolean;
@@ -150,6 +167,20 @@ function dedupeDrips(l: Lettering, drips: Drip[]): Drip[] {
   return kept;
 }
 
+// Wolke hinter dem Schriftzug: Rechteck mit runden Beulen an den Rändern.
+function cloudMask(b: Box, R: () => number): Mask {
+  const m = emptyMask();
+  const pad = 10;
+  for (let y = Math.max(0, b.y0 - pad / 2); y <= Math.min(WORK_H - 1, b.y1 + pad / 2); y++) {
+    for (let x = Math.max(0, b.x0 - pad); x <= Math.min(WORK_W - 1, b.x1 + pad); x++) m[y * WORK_W + x] = 1;
+  }
+  for (let x = b.x0 - pad; x <= b.x1 + pad; x += 11) {
+    for (const y of [b.y0 - pad / 2, b.y1 + pad / 2]) stampDisc(m, [x, y], 8 + R() * 8);
+  }
+  for (const x of [b.x0 - pad, b.x1 + pad]) stampDisc(m, [x, (b.y0 + b.y1) / 2], 12 + R() * 8);
+  return m;
+}
+
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
 const WHITE = 1;
 const BLACK = 0;
@@ -166,6 +197,9 @@ export function renderLettering(l: Lettering, input: RenderInput): RenderResult 
   const px = new Uint8Array(N).fill(TRANSPARENT);
   const put = (i: number, c: number) => {
     px[i] = c;
+  };
+  const paint = (m: Mask, color: number) => {
+    for (let i = 0; i < N; i++) if (m[i]) put(i, color);
   };
   const passes = input.passes.map((p) => {
     const limit = passTimeLimit(l, input.flow);
@@ -281,17 +315,54 @@ export function renderLettering(l: Lettering, input: RenderInput): RenderResult 
     return { g, gi, fillCov, ringCov, bodyTotal, bodyHit, ringTotal, ringHit };
   });
 
-  // Shadow unter allem, was gesprüht ist.
+  // Was schon an der Wand ist – darauf bauen Background, Second Outline, 3D und Shadow auf.
   const outer = new Uint8Array(N);
   for (const p of perGroup)
     forBox(p.g.scan, (i) => {
       if (p.fillCov[i] || p.ringCov[i]) outer[i] = 1;
     });
-  const off = l.shape === "bubble" ? 3 : 2;
-  for (let y = 0; y + off < WORK_H; y++) {
-    for (let x = 0; x + off < WORK_W; x++) {
-      const i = y * WORK_W + x;
-      if (outer[i]) put((y + off) * WORK_W + x + off, shadowColor);
+  const decor = decorFor(l.look);
+  const anything = outer.some((v) => v === 1);
+
+  // Background: Wolke hinter dem Schriftzug, mit ein paar Sternen (Bombing, Piece, Wildstyle)
+  if (decor.background && input.colors.background !== undefined && anything) {
+    const box = bbox(dilate(outer, 2 + decor.depth));
+    if (box) {
+      const cloud = cached(l, `cloud:${decor.depth}`, () => cloudMask(box, rng(input.seed + 3)));
+      paint(minus(dilate(cloud, 1), cloud), BLACK);
+      paint(cloud, input.colors.background);
+      const R = rng(input.seed + 11);
+      for (let k = 0; k < 7; k++) {
+        const sx = Math.floor(box.x0 - 12 + R() * (box.x1 - box.x0 + 24));
+        const sy = Math.floor(box.y0 - 10 + R() * (box.y1 - box.y0 + 20));
+        for (let d = -2; d <= 2; d++) {
+          if (sx + d >= 0 && sx + d < WORK_W && sy >= 0 && sy < WORK_H) put(sy * WORK_W + sx + d, WHITE);
+          if (sy + d >= 0 && sy + d < WORK_H && sx >= 0 && sx < WORK_W) put((sy + d) * WORK_W + sx, WHITE);
+        }
+      }
+    }
+  }
+
+  // Second Outline: heller Rand um alles
+  if (decor.second && input.colors.second !== undefined && anything) {
+    paint(dilate(outer, 3), BLACK);
+    paint(dilate(outer, 2), input.colors.second);
+  }
+
+  // 3D-Block oder einfacher Shadow
+  if (decor.depth > 0 && anything) {
+    let ext: Mask = emptyMask();
+    for (let k = 1; k <= decor.depth; k++) ext = union(ext, shift(outer, k, k));
+    ext = minus(ext, outer);
+    paint(minus(dilate(ext, 1), outer), outlineColor);
+    paint(ext, shadowColor);
+  } else {
+    const off = l.shape === "bubble" ? 3 : 2;
+    for (let y = 0; y + off < WORK_H; y++) {
+      for (let x = 0; x + off < WORK_W; x++) {
+        const i = y * WORK_W + x;
+        if (outer[i]) put((y + off) * WORK_W + x + off, shadowColor);
+      }
     }
   }
 
@@ -327,9 +398,13 @@ export function renderLettering(l: Lettering, input: RenderInput): RenderResult 
           put(i, outlineColor);
       });
     }
-    // Fill-in mit Fade
+    // Fill-in mit Fade, bei Piece und Wildstyle mit Splits
+    const splitColor = input.colors.second ?? WHITE;
     forBox(g.scan, (i) => {
-      if (p.fillCov[i]) put(i, fadeColor(i));
+      if (!p.fillCov[i]) return;
+      const x = i % WORK_W;
+      const y = (i / WORK_W) | 0;
+      put(i, decor.splits && (x + y * 2) % 26 < 2 ? splitColor : fadeColor(i));
     });
     // Highlights: Lichtkante oben links im Buchstaben
     const inner = cached(l, `inner:${gi}`, () => erode(g.body, 2));

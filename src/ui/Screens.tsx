@@ -110,3 +110,24 @@ export function PauseMenu(props: { onResume: () => void; onFeedback: () => void;
     </div>
   );
 }
+
+// Aufstieg (M4a): kurzer Bildschirm mit neuem Rang und dem, was jetzt neu ist.
+export function RankUp(props: {
+  title: string;
+  name: string;
+  text?: string;
+  unlocks?: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="screen overlay rank-up">
+      <p className="rank-up-title">{props.title}</p>
+      <p className="title">{props.name}</p>
+      {props.text && <p className="menu-text">{props.text}</p>}
+      {props.unlocks && <p className="rank-up-unlocks">Neu: {props.unlocks}</p>}
+      <button className="btn" onPointerUp={props.onClose}>
+        Weiter
+      </button>
+    </div>
+  );
+}

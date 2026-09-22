@@ -11,6 +11,7 @@ const content: GameContent = {
   spray: null,
   spots: {},
   map: null,
+  progress: null,
 };
 const state = createNewGame(content, "KRAZE", "2026-01-01T00:00:00.000Z");
 

@@ -1,4 +1,4 @@
-# CONTENT – Spielinhalte M1 bis M3.5
+# CONTENT – Spielinhalte M1 bis M4a
 
 **Status:** Inhalte von Claude geschrieben, nach `GLOSSAR.md` und Tonalitäts-Leitfaden. Sie gelten als Entwurf, bis der Tester sie gespielt hat. Überarbeitet wird ausschließlich auf Basis von Tester-Feedback (siehe `MEILENSTEINE.md`, Feedback-Schleife).
 
@@ -430,6 +430,21 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "Dafür kennt Kalle dich noch nicht gut genug."
           next: zaun
+        - text: "Guck mal, wie weit ich bin."
+          id: rang_tagger
+          once: true
+          if: [{rank_min: tagger}]
+          next: rang_tagger
+        - text: "Hast du gesehen, was im Bezirk hängt?"
+          id: rang_bomber
+          once: true
+          if: [{rank_min: bomber}]
+          next: rang_bomber
+        - text: "Ich war an der Hall."
+          id: rang_piece
+          once: true
+          if: [{rank_min: piece_writer}]
+          next: rang_piece
         - text: "Ich bin raus."
           end: true
 
@@ -465,6 +480,28 @@ dialogue:
         - "Dahinter stehen nachts die Züge. Da gehst du erst hin, wenn du weißt, was du tust."
       effects:
         - learn: zaun
+      next: hub
+
+    rang_tagger:
+      text:
+        - "Hab dein Tag an den Rolltoren gesehen. Sitzt sauber."
+        - "Jetzt mach es größer. Ein Tag ist eine Unterschrift, kein Bild."
+      effects:
+        - trust: 1
+      next: hub
+
+    rang_bomber:
+      text:
+        - "Halbe Straße voll, ja. Dein Name steht öfter da als meiner."
+        - "Pass trotzdem auf, wo du malst. Nicht jede Wand verzeiht das."
+      next: hub
+
+    rang_piece:
+      text:
+        - "Ich weiß. Steht gut da."
+        - "An der Hall hast du Zeit. Nutz sie für die Details, nicht für mehr Fläche."
+      effects:
+        - trust: 1
       next: hub
 ```
 
@@ -708,6 +745,12 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "KRUX erzählt dir sowas nicht. Noch nicht."
           next: bruecke
+        - text: "Dein Wildstyle. Wie kriegt man die Buchstaben so ineinander?"
+          id: wildstyle
+          once: true
+          if: [{rank_min: piece_writer}, {sprayed: hall}]
+          show_locked: "Danach fragst du ihn besser erst, wenn du selbst was an der Hall stehen hast."
+          next: wildstyle
         - text: "Bin weg."
           end: true
 
@@ -756,6 +799,16 @@ dialogue:
       effects:
         - learn: bruecke
         - give: ny_fat
+      next: hub
+
+    wildstyle:
+      text:
+        - "Dein Piece an der Hall. Hab ich gesehen."
+        - "Wildstyle ist kein Trick. Du verschränkst die Buchstaben, bis nur noch Writer sie lesen."
+        - "Arrows an die Enden, Connections dazwischen. Skizzier das zehnmal, bevor du an eine Wand gehst."
+      effects:
+        - set_flag: wildstyle_gelernt
+        - trust: 1
       next: hub
 ```
 
@@ -969,22 +1022,29 @@ styles:
   - id: tag
     name: Tag
     look: tag
+    xp: 10
     caps:
       line: [skinny_cap, standard_cap]
 
   - id: straight
     name: Straight Letter
     look: straight
+    xp: 20
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
+    if: [{rank_min: tagger}]
+    locked_hint: "Erst der Handstyle. Straight Letter gibt's ab Tagger."
 
   - id: bubble
     name: Bubble
     look: bubble
+    xp: 30
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
+    if: [{rank_min: tagger}]
+    locked_hint: "Bubbles gibt's ab Tagger. Tag erst mal weiter."
 
   - id: bombing
     name: Bombing
@@ -992,8 +1052,9 @@ styles:
     caps:
       fill: [ny_fat, fat_cap]
       outline: [standard_cap, skinny_cap]
-    if: [{flag: rang_bomber}]
-    locked_hint: "Bombing kommt, wenn dein Name in der Stadt was zählt."
+    xp: 50
+    if: [{rank_min: bomber}]
+    locked_hint: "Bombing kommt, wenn dein Name im Bezirk was zählt. Ab Bomber."
 
   - id: piece
     name: Piece
@@ -1001,8 +1062,9 @@ styles:
     caps:
       fill: [fat_cap]
       outline: [skinny_cap]
-    if: [{flag: rang_piece}]
-    locked_hint: "Für ein Piece bist du noch nicht so weit."
+    xp: 120
+    if: [{rank_min: piece_writer}]
+    locked_hint: "Für ein Piece bist du noch nicht so weit. Ab Piece-Writer."
     only_at: [hall]
     only_at_hint: "Ein Piece malst du nicht zwischen Tür und Angel. Dafür gibt's die Hall."
     top_label: Burner
@@ -1013,8 +1075,9 @@ styles:
     caps:
       fill: [fat_cap]
       outline: [skinny_cap]
-    if: [{flag: rang_king}]
-    locked_hint: "Wildstyle ist was für Leute, die jeder kennt."
+    xp: 200
+    if: [{rank_min: piece_writer}, {flag: wildstyle_gelernt}]
+    locked_hint: "Wildstyle zeigt dir keiner umsonst. Frag jemanden, der ihn kann."
     only_at: [hall]
     only_at_hint: "Wildstyle nur an der Hall. Da hast du die Zeit dafür."
     top_label: Burner
@@ -1186,4 +1249,55 @@ hotspots:
     label: Zurück durch den Zaun
     rect: [0, 60, 20, 110]
     gehen: unterfuehrung
+```
+
+## 6. M4a – Aufstieg
+
+### 6.1 progress.yaml
+
+```yaml
+# Aufstieg (M4a): XP eines Werks = Style-Wert × Qualitätsfaktor × Spot-Faktor × (1 + Tempo-Bonus).
+# Angerechnet wird die Verbesserung gegenüber dem besten eigenen Werk am Spot,
+# sonst repeat_share als Übung.
+rank_up_title: "Neuer Rang"
+
+ranks:
+  - id: toy
+    name: Toy
+    xp: 0
+    text: "Du hast eine Dose und einen Namen. Mehr nicht."
+    unlocks: "Tag"
+  - id: tagger
+    name: Tagger
+    xp: 50
+    text: "Dein Handstyle steht. Jetzt wird es größer."
+    unlocks: "Straight Letter und Bubble"
+  - id: bomber
+    name: Bomber
+    xp: 250
+    text: "Dein Name hängt im halben Bezirk."
+    unlocks: "Bombing"
+  - id: piece_writer
+    name: Piece-Writer
+    xp: 450
+    text: "Zeit für die Hall. Da schaut die Szene hin."
+    unlocks: "Piece an der Hall"
+  - id: king
+    name: King
+    xp: 700
+    text: "Jeder hier kennt deinen Namen."
+
+# Qualität: wackelig, geht so, sauber, sitzt
+quality_factors: [0, 0.5, 1, 1.5]
+
+spot_factors:
+  rolltor: 1
+  legale_wand: 1
+  hauswand: 1.2
+  heaven_spot: 1.6
+  zug: 1.6
+
+tempo_bonus_max: 0.3
+tempo_min_quality: 2
+repeat_share: 0.2
 ```

@@ -92,6 +92,7 @@ const content: GameContent = {
   spray: null,
   spots: {},
   map: null,
+  progress: null,
 };
 
 function run(state: GameState, ...actions: Action[]): { state: GameState; events: GameEvent[] } {

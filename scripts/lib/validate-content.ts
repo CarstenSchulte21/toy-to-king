@@ -17,6 +17,9 @@ import {
   roomSchema,
   spotsFileSchema,
   spraySchema,
+  progressSchema,
+  SPOT_TYPES,
+  type Progress,
   type Condition,
   type Effect,
   type Fact,
@@ -41,6 +44,7 @@ const ITEMS_PATH = "content/items.yaml";
 const SPRAY_PATH = "content/spray.yaml";
 const SPOTS_PATH = "content/spots.yaml";
 const MAP_PATH = "content/map.yaml";
+const PROGRESS_PATH = "content/progress.yaml";
 
 export function validateContent(files: ContentFile[]): ValidationResult {
   const errors: string[] = [];
@@ -54,6 +58,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   const spots: Record<string, Spot> = {};
   let spray: SprayRules | null = null;
   let map: MapConfig | null = null;
+  let progress: Progress | null = null;
   const fileOf: Record<string, string> = {};
   // Dateien mit Fehlern – Verweise darauf nicht zusätzlich als „fehlt" melden.
   const broken: Broken = {
@@ -63,6 +68,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     items: false,
     spots: false,
     spray: false,
+    progress: false,
   };
 
   if (!files.some((f) => f.path === CONFIG_PATH)) {
@@ -111,6 +117,13 @@ export function validateContent(files: ContentFile[]): ValidationResult {
         pushIssues(file.path, data, parsed.error.issues, errors);
         broken.spray = true;
       }
+    } else if (kind === "progress") {
+      const parsed = progressSchema.safeParse(data);
+      if (parsed.success) progress = parsed.data;
+      else {
+        pushIssues(file.path, data, parsed.error.issues, errors);
+        broken.progress = true;
+      }
     } else if (kind === "map") {
       const parsed = mapSchema.safeParse(data);
       if (parsed.success) map = parsed.data;
@@ -152,6 +165,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     items: Object.keys(items),
     spots: Object.keys(spots),
     styles: rules ? rules.styles.map((s) => s.id) : [],
+    ranks: progress ? progress.ranks.map((r) => r.id) : [],
   };
   const refs = new RefChecker(ids, broken, errors);
 
@@ -333,6 +347,45 @@ export function validateContent(files: ContentFile[]): ValidationResult {
       );
     }
   }
+  // --- Aufstieg (M4a) ---
+  if (progress) {
+    const seen = new Set<string>();
+    let last = -1;
+    for (const rank of progress.ranks) {
+      const where = `${PROGRESS_PATH}, Rang "${rank.id}"`;
+      if (seen.has(rank.id)) errors.push(`${where}: Diesen Rang gibt es zweimal.`);
+      seen.add(rank.id);
+      if (rank.xp <= last && last >= 0) {
+        warnings.push(`${where}: Die Ränge stehen nicht aufsteigend nach XP – das liest sich schlecht.`);
+      }
+      last = rank.xp;
+      checkTexts(
+        where,
+        [rank.name, rank.text, rank.unlocks].filter((x): x is string => !!x),
+        warnings,
+        errors,
+      );
+    }
+    if (progress.ranks[0] && progress.ranks[0].xp !== 0) {
+      errors.push(`${PROGRESS_PATH}: Der erste Rang muss bei 0 XP anfangen.`);
+    }
+    for (const type of SPOT_TYPES) {
+      if (progress.spot_factors[type] === undefined) {
+        warnings.push(
+          `${PROGRESS_PATH}, spot_factors: Für "${type}" fehlt ein Faktor – gerechnet wird mit 1.`,
+        );
+      }
+    }
+    checkTexts(`${PROGRESS_PATH}, rank_up_title`, [progress.rank_up_title], warnings, errors);
+    for (const style of rules?.styles ?? []) {
+      if (style.xp === undefined) {
+        warnings.push(`${SPRAY_PATH}, Style "${style.id}": Ohne "xp" bringt dieser Style keine Erfahrung.`);
+      }
+    }
+  } else if (!broken.progress && rules) {
+    warnings.push(`${PROGRESS_PATH} fehlt – ohne Ränge gibt es keinen Aufstieg.`);
+  }
+
   for (const place of mapConfig?.places ?? []) {
     const where = `${MAP_PATH}, Ort "${place.room}"`;
     refs.room(where, "room", place.room);
@@ -363,7 +416,9 @@ export function validateContent(files: ContentFile[]): ValidationResult {
 
   const ok = errors.length === 0 && config !== null;
   return {
-    content: ok ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig } : null,
+    content: ok
+      ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig, progress }
+      : null,
     errors,
     warnings,
   };
@@ -371,7 +426,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
 
 // ---------------------------------------------------------------------------
 
-type Kind = "config" | "facts" | "items" | "spray" | "spots" | "map" | "room" | "npc" | "other";
+type Kind = "config" | "facts" | "items" | "spray" | "spots" | "map" | "progress" | "room" | "npc" | "other";
 
 function kindOf(path: string): Kind {
   if (path === CONFIG_PATH) return "config";
@@ -380,6 +435,7 @@ function kindOf(path: string): Kind {
   if (path === SPRAY_PATH) return "spray";
   if (path === SPOTS_PATH) return "spots";
   if (path === MAP_PATH) return "map";
+  if (path === PROGRESS_PATH) return "progress";
   if (path.startsWith("content/rooms/")) return "room";
   if (path.startsWith("content/npcs/")) return "npc";
   return "other";
@@ -392,6 +448,7 @@ type Broken = {
   items: boolean;
   spots: boolean;
   spray: boolean;
+  progress: boolean;
 };
 
 function collectGives(npcs: Record<string, Npc>, obtainable: Set<string>) {
@@ -423,6 +480,7 @@ class RefChecker {
       items: string[];
       spots: string[];
       styles: string[];
+      ranks: string[];
     },
     private broken: Broken,
     private errors: string[],
@@ -470,6 +528,13 @@ class RefChecker {
     );
   }
 
+  rank(where: string, field: string, id: string) {
+    if (this.ids.ranks.includes(id) || this.broken.progress) return;
+    this.errors.push(
+      `${where}: "${field}" zeigt auf "${id}" – diesen Rang gibt es nicht in ${PROGRESS_PATH}.${suggest(id, this.ids.ranks)}`,
+    );
+  }
+
   conditions(where: string, conditions: Condition[] | undefined, npc?: Npc) {
     for (const c of conditions ?? []) {
       if ("visited" in c) this.room(where, "visited", c.visited);
@@ -477,6 +542,7 @@ class RefChecker {
       if ("not_fact" in c) this.fact(where, "not_fact", c.not_fact);
       if ("has" in c) this.item(where, "has", c.has);
       if ("sprayed" in c) this.spot(where, "sprayed", c.sprayed);
+      if ("rank_min" in c) this.rank(where, "rank_min", c.rank_min);
       if ("trust_min" in c) {
         if (typeof c.trust_min === "number") {
           if (!npc)

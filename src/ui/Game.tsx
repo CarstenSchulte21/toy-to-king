@@ -6,6 +6,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import contentJson from "@/generated/content.json";
 import {
   createNewGame,
+  nextRank,
+  rankOf,
   reduce,
   viewDialogue,
   type Action,
@@ -22,7 +24,7 @@ import { buildVersion, type FeedbackContext } from "./feedback";
 import { FeedbackPanel } from "./FeedbackPanel";
 import { MapView } from "./MapView";
 import { RoomView } from "./RoomView";
-import { ConfirmNewGame, MainMenu, NameEntry, PauseMenu, TextBox } from "./Screens";
+import { ConfirmNewGame, MainMenu, NameEntry, PauseMenu, RankUp, TextBox } from "./Screens";
 import { SprayScene } from "./SprayScene";
 import { Stage, useStageScale } from "./Stage";
 
@@ -51,6 +53,7 @@ export function Game() {
   const [mapOpen, setMapOpen] = useState(false);
   const [bagOpen, setBagOpen] = useState(false);
   const [spraySpot, setSpraySpot] = useState<{ spot: string; title: string } | null>(null);
+  const [rankUp, setRankUp] = useState<Extract<GameEvent, { type: "RANK_UP" }> | null>(null);
   const [feedback, setFeedback] = useState<FeedbackContext | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [debug, setDebug] = useState(false);
@@ -101,6 +104,11 @@ export function Game() {
             setSpraySpot({ spot: e.spot, title: hotspot?.label ?? e.spot });
             break;
           }
+          case "RANK_UP":
+            setRankUp(e);
+            break;
+          case "XP_GAINED":
+            break;
           case "SPRAYED":
             // Das Ergebnis zeigt die Sprüh-Szene selbst.
             break;
@@ -171,6 +179,7 @@ export function Game() {
     setMapOpen(false);
     setBagOpen(false);
     setSpraySpot(null);
+    setRankUp(null);
   };
 
   const startNewGame = (name: string) => {
@@ -215,6 +224,12 @@ export function Game() {
   };
 
   const room = state ? content.rooms[state.room] : undefined;
+  const rank = state ? rankOf(state, content) : null;
+  const upcoming = state ? nextRank(content, state.xp) : null;
+  const rankProgress =
+    state && rank && upcoming
+      ? Math.max(0, Math.min(1, (state.xp - rank.xp) / Math.max(1, upcoming.xp - rank.xp)))
+      : 1;
   const dialogue = state && cursor ? viewDialogue(state, content, cursor.npc, cursor.node) : null;
   const hasNewFacts = state ? Object.values(state.facts).some((f) => f.new) : false;
   const materialTips = state
@@ -230,6 +245,7 @@ export function Game() {
     mapOpen ||
     bagOpen ||
     spraySpot !== null ||
+    rankUp !== null ||
     feedback !== null;
 
   return (
@@ -285,7 +301,17 @@ export function Game() {
                     Tasche
                   </button>
                 </div>
-                <span className="hud-name">{state.player.name}</span>
+                <span className="hud-name">
+                  {state.player.name}
+                  {rank && (
+                    <span className="hud-rank">
+                      {rank.name}
+                      <i className="hud-xp">
+                        <i style={{ width: `${Math.round(rankProgress * 100)}%` }} />
+                      </i>
+                    </span>
+                  )}
+                </span>
               </div>
             )}
             {dialogue && cursor && (
@@ -334,6 +360,16 @@ export function Game() {
                 tips={materialTips}
                 onSpray={(action) => dispatch(action)}
                 onClose={() => setSpraySpot(null)}
+              />
+            )}
+            {/* Der Aufstieg wartet, bis das Ergebnis an der Wand weggeklickt ist. */}
+            {rankUp && !spraySpot && content.progress && (
+              <RankUp
+                title={content.progress.rank_up_title}
+                name={rankUp.name}
+                {...(rankUp.text ? { text: rankUp.text } : {})}
+                {...(rankUp.unlocks ? { unlocks: rankUp.unlocks } : {})}
+                onClose={() => setRankUp(null)}
               />
             )}
             {paused && (

@@ -5,6 +5,7 @@ import {
   createNewGame,
   fitToContent,
   migrate,
+  rankOf,
   reduce,
   renderText,
   validatePlayerName,
@@ -57,6 +58,7 @@ const content: GameContent = {
   spray: null,
   spots: {},
   map: null,
+  progress: null,
 };
 
 // Kurzformen mit festem Kontext für die Tests ohne Gespräch.
@@ -96,7 +98,7 @@ describe("createNewGame", () => {
     expect(s.room).toBe("hof");
     expect(s.player).toEqual({ name: "KRAZE", crew: null });
     expect(s.visited).toEqual([]);
-    expect(s.schemaVersion).toBe(3);
+    expect(s.schemaVersion).toBe(4);
     expect(s.works).toEqual({});
   });
 });
@@ -272,7 +274,7 @@ describe("migrate", () => {
     delete v1.works;
     const withStart = { ...content, config: { ...content.config, start_items: { standard_cap: 1 } } };
     const migrated = migrate(v1, withStart);
-    expect(migrated.schemaVersion).toBe(3);
+    expect(migrated.schemaVersion).toBe(4);
     expect(migrated.items).toEqual({ standard_cap: 1 });
     expect(migrated.works).toEqual({});
     expect(migrated.player.name).toBe("KRAZE");
@@ -297,7 +299,7 @@ describe("migrate", () => {
       },
     };
     const m = migrate(JSON.parse(JSON.stringify(v2)), withColors);
-    expect(m.schemaVersion).toBe(3);
+    expect(m.schemaVersion).toBe(4);
     expect(m.items).toEqual({ standard_cap: 1, low_pressure: 1, schwarz: 1, chrom: 1 });
     expect(m.works.rolltore).toEqual({
       style: "bubble",
@@ -311,6 +313,67 @@ describe("migrate", () => {
     });
     expect(m.works.hall?.style).toBe("bubble");
   });
+  it("bringt Spielstände aus M3.5 (v3) auf v4 – XP für vorhandene Werke", () => {
+    const withProgress: GameContent = {
+      ...content,
+      spray: {
+        quality_labels: ["a", "b", "c", "d"],
+        result: "{style}",
+        hints: { gaps: ".", gaps_low: ".", reach: ".", fat_line: ".", drips: "." },
+        styles: [
+          { id: "bubble", name: "Bubble", look: "bubble", caps: { fill: ["f"], outline: ["o"] }, xp: 30 },
+        ],
+      },
+      spots: {
+        wand: {
+          id: "wand",
+          name: "der Wand",
+          type: "hauswand",
+          room: "hof",
+          hotspot: "tor",
+          fits: ["bubble"],
+          fit_hint: ".",
+          risk: "kein",
+        },
+      },
+      progress: {
+        rank_up_title: "Neuer Rang",
+        ranks: [
+          { id: "toy", name: "Toy", xp: 0 },
+          { id: "tagger", name: "Tagger", xp: 30 },
+        ],
+        quality_factors: [0, 0.5, 1, 1.5],
+        spot_factors: { hauswand: 1.2 },
+        tempo_bonus_max: 0.3,
+        tempo_min_quality: 2,
+        repeat_share: 0.2,
+      },
+    };
+    const v3: Record<string, unknown> = {
+      ...game(),
+      schemaVersion: 3,
+      works: {
+        wand: {
+          style: "bubble",
+          colors: { fill: ["chrom"], outline: "schwarz" },
+          dose: "low_pressure",
+          passes: [],
+          seed: 1,
+          quality: 3,
+          at: "2026-01-01",
+          ideal: true,
+        },
+      },
+    };
+    delete v3.xp;
+    delete v3.best;
+    const m = migrate(v3, withProgress);
+    expect(m.schemaVersion).toBe(4);
+    expect(m.xp).toBe(54); // 30 × 1,5 × 1,2
+    expect(m.best.wand).toBe(54);
+    expect(rankOf(m, withProgress)?.id).toBe("tagger");
+  });
+
   it("setzt auf den Start-Room zurück, wenn es den Room nicht mehr gibt", () => {
     expect(fitToContent(game({ room: "weg" }), content).room).toBe("hof");
     const s = game();

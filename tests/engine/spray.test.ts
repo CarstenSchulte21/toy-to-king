@@ -137,6 +137,19 @@ const content: GameContent = {
       if: [{ fact: "hall" }],
     },
   },
+  progress: {
+    rank_up_title: "Neuer Rang",
+    ranks: [
+      { id: "toy", name: "Toy", xp: 0 },
+      { id: "tagger", name: "Tagger", xp: 40, text: "Weiter so.", unlocks: "Bubble" },
+      { id: "king", name: "King", xp: 500 },
+    ],
+    quality_factors: [0, 0.5, 1, 1.5],
+    spot_factors: { rolltor: 1, legale_wand: 1, hauswand: 1.2, heaven_spot: 1.6, zug: 1.6 },
+    tempo_bonus_max: 0.3,
+    tempo_min_quality: 2,
+    repeat_share: 0.2,
+  },
   map: {
     title: "Bezirk",
     places: [
