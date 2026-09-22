@@ -66,6 +66,16 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "Über Kunden redet Sibel nicht mit jedem."
           next: kunden
+        - text: "Hast du Farben für mich?"
+          id: farben
+          once: true
+          next: farben
+        - text: "Ich brauch noch mehr Farben."
+          id: mehr_farben
+          once: true
+          if: [{trust_min: 2}]
+          show_locked: "Mehr Farben rückt Sibel nicht einfach so raus."
+          next: mehr_farben
         - text: "Danke, bis dann."
           end: true
 
@@ -126,4 +136,21 @@ dialogue:
         - "KRUX kam früher auch. Seit Monaten nicht mehr. Keiner weiß, woher er seine Farbe hat."
       effects:
         - learn: krux_kauft_nicht
+      next: hub
+
+    farben:
+      text:
+        - "Rot und Weiß. Die sind aus der Restekiste, aber voll."
+        - "Mit Chrom und Schwarz hast du dann schon was zum Arbeiten."
+      effects:
+        - give: farbe_rot
+        - give: farbe_weiss
+      next: hub
+
+    mehr_farben:
+      text:
+        - "Gelb und Hellblau. Beim Gelb klemmt das Ventil, den Cap also fest draufdrücken."
+      effects:
+        - give: farbe_gelb
+        - give: farbe_hellblau
       next: hub

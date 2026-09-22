@@ -1,4 +1,6 @@
-# Qualität: +1 passender Cap, +1 passende Dose, +1 Style passt zum Spot → 0 bis 3.
+# Sprühen 2.0 (M3.5): Sketch wählen, dann Ebene für Ebene nachfahren.
+# look bestimmt die Form und die Ebenen: tag → line; alle anderen → fill, outline.
+# caps: ideale Caps je Ebene. Die Qualität ergibt sich aus Deckung, Cap, Drips und Spot.
 quality_labels:
   - wackelig
   - geht so
@@ -7,32 +9,63 @@ quality_labels:
 
 result: "{style} an {spot}: {quality}."
 
+hints:
+  gaps: "Da sind Lücken. Näher an der Linie bleiben."
+  gaps_low: "Low Pressure braucht Zeit. Langsamer fahren, dann deckt das."
+  reach: "Mit dem Cap kommst du nicht bis an den Rand. Fürs Fill-in Fat Cap oder NY Fat."
+  fat_line: "Die Linie ist zu fett. Dafür Skinny oder Standard-Cap."
+  drips: "Das läuft. Mit High Pressure nicht stehen bleiben."
+
 styles:
   - id: tag
     name: Tag
-    ideal_caps: [skinny_cap, standard_cap]
-    ideal_dose: egal
-    cap_hint: "Für einen sauberen Tag ist der Strahl zu breit. Skinny oder Standard-Cap."
+    look: tag
+    caps:
+      line: [skinny_cap, standard_cap]
 
-  - id: throwup
-    name: Throw-up
-    ideal_caps: [fat_cap, ny_fat]
-    ideal_dose: high_pressure
-    cap_hint: "Mit dem Cap dauert das Fill-in ewig. Fat Cap oder NY Fat."
-    dose_hint: "Mit Low Pressure deckt das Fill-in zu langsam."
+  - id: straight
+    name: Straight Letter
+    look: straight
+    caps:
+      fill: [fat_cap, ny_fat]
+      outline: [skinny_cap, standard_cap]
 
-  - id: hollow
-    name: Hollow
-    ideal_caps: [skinny_cap]
-    ideal_dose: egal
-    cap_hint: "Ein Hollow lebt von der Outline. Mit Skinny wird die sauberer."
+  - id: bubble
+    name: Bubble
+    look: bubble
+    caps:
+      fill: [fat_cap, ny_fat]
+      outline: [skinny_cap, standard_cap]
+
+  - id: bombing
+    name: Bombing
+    look: bombing
+    caps:
+      fill: [ny_fat, fat_cap]
+      outline: [standard_cap, skinny_cap]
+    if: [{flag: rang_bomber}]
+    locked_hint: "Bombing kommt, wenn dein Name in der Stadt was zählt."
 
   - id: piece
     name: Piece
-    ideal_caps: [fat_cap]
-    ideal_dose: low_pressure
-    requires: [skinny_cap]
-    requires_hint: "Für die Outline brauchst du einen Skinny Cap."
-    cap_hint: "Fürs Fill-in brauchst du einen Fat Cap."
-    dose_hint: "Für Fades und Highlights ist High Pressure zu hart."
+    look: piece
+    caps:
+      fill: [fat_cap]
+      outline: [skinny_cap]
+    if: [{flag: rang_piece}]
+    locked_hint: "Für ein Piece bist du noch nicht so weit."
+    only_at: [hall]
+    only_at_hint: "Ein Piece malst du nicht zwischen Tür und Angel. Dafür gibt's die Hall."
+    top_label: Burner
+
+  - id: wildstyle
+    name: Wildstyle
+    look: wildstyle
+    caps:
+      fill: [fat_cap]
+      outline: [skinny_cap]
+    if: [{flag: rang_king}]
+    locked_hint: "Wildstyle ist was für Leute, die jeder kennt."
+    only_at: [hall]
+    only_at_hint: "Wildstyle nur an der Hall. Da hast du die Zeit dafür."
     top_label: Burner

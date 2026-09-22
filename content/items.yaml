@@ -1,29 +1,73 @@
+# Caps: width = Strahlbreite (1 Skinny … 4 NY Fat). Dosen: flow = Farbe pro Sekunde.
+# Farben: color = Palettenname (C64-Palette).
 - id: standard_cap
   name: Standard-Cap
   kind: cap
+  width: 2
   text: "Der Cap, der auf der Dose steckt. Geht für alles, ist für nichts richtig gut."
 
 - id: skinny_cap
   name: Skinny Cap
   kind: cap
+  width: 1
   text: "Dünner, präziser Strahl. Für Tags und Outlines."
 
 - id: fat_cap
   name: Fat Cap
   kind: cap
+  width: 3
   text: "Breiter Strahl. Für Fill-ins."
 
 - id: ny_fat
   name: NY Fat
   kind: cap
+  width: 4
   text: "Sehr breit. Füllt schnell, verzeiht nichts."
 
 - id: low_pressure
   name: Low Pressure
   kind: dose
+  flow: 4
   text: "Wenig Druck, viel Kontrolle. Gut für Details und Fades."
 
 - id: high_pressure
   name: High Pressure
   kind: dose
+  flow: 10
   text: "Viel Druck, deckt schnell. Tropft aber leichter."
+
+- id: farbe_schwarz
+  name: Schwarz
+  kind: color
+  color: black
+  text: "Für Outlines und Tags. Hat jeder dabei."
+
+- id: farbe_chrom
+  name: Chrom
+  kind: color
+  color: light_grey
+  text: "Silber. Der Klassiker fürs Fill-in bei Throw-ups."
+
+- id: farbe_weiss
+  name: Weiß
+  kind: color
+  color: white
+  text: "Für Highlights, Second Outlines und alles, was knallen soll."
+
+- id: farbe_rot
+  name: Rot
+  kind: color
+  color: red
+  text: "Dunkles Rot. Deckt gut."
+
+- id: farbe_gelb
+  name: Gelb
+  kind: color
+  color: yellow
+  text: "Hell und laut. Mit schwarzer Outline sieht man das von weit weg."
+
+- id: farbe_hellblau
+  name: Hellblau
+  kind: color
+  color: cyan
+  text: "Kühl. Gut für Fades nach Weiß."

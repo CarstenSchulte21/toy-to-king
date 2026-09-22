@@ -6,7 +6,12 @@ import { describe, expect, it } from "vitest";
 import { validateContent } from "../../scripts/lib/validate-content";
 import {
   createNewGame,
-  rateSpray,
+  buildLettering,
+  comfortableSpeed,
+  passesFor,
+  rateWork,
+  renderWork,
+  traceGuide,
   reduce,
   trustOf,
   viewDialogue,
@@ -176,18 +181,35 @@ describe("Durchlauf durch die echten Inhalte", () => {
     expect([...result.items].sort()).toEqual(Object.keys(content.items).sort());
   });
 
-  it("an jedem Spot ist mit erreichbarem Material Qualität 3 möglich", () => {
+  it("an jedem Spot ist mit erreichbarem Material Qualität 3 möglich (sauber nachgefahren)", () => {
     const has = (id: string) => result.items.has(id);
-    const caps = Object.values(content.items).filter((i) => i.kind === "cap" && has(i.id));
     const doses = Object.values(content.items).filter((i) => i.kind === "dose" && has(i.id));
+    const colors = Object.values(content.items).filter((i) => i.kind === "color" && has(i.id));
     for (const spot of Object.values(content.spots)) {
-      const best = Math.max(
-        ...content
-          .spray!.styles.filter((s) => (s.requires ?? []).every(has))
-          .flatMap((s) =>
-            caps.flatMap((c) => doses.map((d) => rateSpray(content, spot, s, c.id, d.id).quality)),
-          ),
+      let best = 0;
+      // Gesperrte Styles (Ränge ab M4) zählen hier nicht.
+      const styles = content.spray!.styles.filter(
+        (s) => !s.if && (s.requires ?? []).every(has) && (!s.only_at || s.only_at.includes(spot.id)),
       );
+      for (const style of styles) {
+        for (const dose of doses) {
+          const passes = passesFor(style.look).map((kind) => {
+            const cap = (style.caps[kind] ?? []).find(has);
+            const l = buildLettering("PLAYER", style.look, 3);
+            return cap ? { kind, cap, strokes: traceGuide(l, comfortableSpeed(dose.flow!)) } : null;
+          });
+          if (passes.some((p) => p === null)) continue;
+          const work = {
+            style: style.id,
+            colors: { line: colors[0]!.id, fill: [colors[1]!.id], outline: colors[0]!.id },
+            dose: dose.id,
+            passes: passes.map((p) => p!),
+            seed: 3,
+          };
+          const stats = renderWork(content, "PLAYER", work)!.stats;
+          best = Math.max(best, rateWork(content, spot, style, work, stats).quality);
+        }
+      }
       expect(best, spot.id).toBe(3);
     }
   });
