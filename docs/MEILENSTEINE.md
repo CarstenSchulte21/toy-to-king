@@ -362,8 +362,8 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 |----|--------|------------------|
 | **M4a – Aufstieg** | XP (Style × Qualität × Spot × Tempo), Ränge Toy → King, Style-Leiter freischalten, Wildstyle von KRUX lernen, eigene Formen für Bombing, Piece, Wildstyle. Details: `SPEC-M4a.md`. | Man steigt auf und arbeitet sich zum ersten Piece an der Hall hoch. |
 | **G – Grafik** | Umgesetzt auf Branch `grafik` (22.09.2026), Details in `SPEC-GRAFIK.md`. Bilder für alle sieben Räume, neuer Knopf „Blick“. Offen: Bewertung durch den Tester (Artifact „Raum-Check“). | Das Spiel sieht überall wie ein Spiel aus. |
-| **M4b – Risiko** | Heat je Spot (Zeit an der Wand, Risikostufe), Wanted-Stufen, Tag/Nacht, Buff und Crossen, Ruf, erwischt werden (knapp, keine Moralpredigt) | Die Kernschleife ist komplett. |
-| **M5 – Crew und Material** | Crew gründen, rekrutieren, anleiten, Sidequests, Geld und Graffitistore, Verbrauch, **Marker**, Fluchtszene | Die Aufbau-Ebene steht. |
+| **M4b – Risiko** | Heat je Spot (Zeit an der Wand, Risikostufe), Wanted-Stufen, Tag/Nacht, Buff und Crossen, Ruf, erwischt werden (knapp, keine Moralpredigt). Neu: **Polizeistation** (F3.9) und **Nowak vom Buff-Trupp** (F7.6) | Die Kernschleife ist komplett. |
+| **M5 – Crew und Material** | Crew gründen, rekrutieren, anleiten, Sidequests, Geld und Graffitistore, Verbrauch, **Marker**, Fluchtszene. Neue Orte: **Dönerladen** (F3.7) und der **Jam** an der Hall (F3.8). Neue Leute: **YARE, TEAR, CRES** als Crew-Kandidaten (F6.6) und **Hakan** vom Döner (F2.9) | Die Aufbau-Ebene steht. |
 | **M6 – Rund machen** | King-Ende, Content-Ausbau, echte Handstyles (Skizzen des Testers), Hilfen, Polish | Rundes Spiel von Toy bis King |
 
 **Warum M4 geteilt ist:** Aufstieg und Risiko auf einmal wäre schwer zu testen. Und wenn es sich falsch anfühlt, weiß niemand, woran es liegt.
@@ -371,3 +371,25 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 **Warum der Grafik-Schritt kommt:** Beim Sprühen sieht das Spiel inzwischen gut aus, die Räume sind aber noch Platzhalter. Mit jedem Meilenstein wird der Unterschied auffälliger.
 
 **Risiko Grafik:** Die Hintergründe entstehen per Code als Pixelgrafik. Ob das echt genug aussieht, klärt ein Bilder-Prototyp vorab, genau wie beim Style-Check.
+
+## Welt ab M4b: Räume und Leute (Stand 23.09.2026, vom Product Owner bestätigt)
+
+Bis einschließlich des Grafik-Schritts hat das Spiel sieben Räume und vier Leute. Für M4b und M5 kommen
+drei Räume und fünf Leute dazu. Die Reihenfolge ist bewusst: erst die bestehenden Räume dichter machen,
+dann neue bauen.
+
+| Neu | Wo | Wofür | MS |
+|-----|-----|-------|-----|
+| Polizeistation | eigener Raum | Man wacht dort auf, nachdem man erwischt wurde. Material weg, Zeit weg, drei Sätze, raus. Nie länger als ein Bildschirm. | M4b |
+| Nowak | an den Rolltoren, montags | Der Buff bekommt ein Gesicht. Macht nur seine Arbeit, ist nicht der Feind. | M4b |
+| Dönerladen | eigener Raum | Treffpunkt. Sicherer Raum ohne Heat, kostet Geld und Zeit. Marker-Spots auf Klotür und Kühlschrank. | M5 |
+| Hakan | Dönerladen | Sieht alles, redet gern, Graffiti ist ihm egal. Günstigste Quelle für Insider-Infos. | M5 |
+| Jam | die Hall, an einem Abend | Kein neuer Raum, sondern ein Zustand: Die Hall ist voll. Wie man behandelt wird, hängt am Rang – bei Toy redet keiner mit dir. Hier trifft man die Crew-Kandidaten. | M5 |
+| YARE | Jam, später Dönerladen | Zeichnet ständig, volles Blackbook, traut sich nicht an die Wand. Bringt die Skizzenphase (F4.4). | M5 |
+| TEAR | Abstellgleis | Schnell, nervös, kennt jeden Fluchtweg und jeden Zaun. Steht Schmiere, senkt das Risiko. | M5 |
+| CRES | Dönerladen | Der Älteste, war schon da, bevor es die Hall gab. Kommt an Material (F8.4). | M5 |
+
+**Die Namen an den Wänden sind die Leute.** RUBIX, TEAR, REMS, YARE und CRES stehen seit dem
+Grafik-Schritt in allen Räumen. Drei davon lernt man in M5 persönlich kennen – man kennt den Namen
+also längst, bevor man das Gesicht sieht. Genau so läuft es in echt. RUBIX und REMS bleiben
+unerreichbar: Sie gehören zu NOX, der Crew an den Wänden, und werden in v1.1 die Rivalen-Crew (F6.5).
