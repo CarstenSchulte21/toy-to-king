@@ -589,11 +589,14 @@ const jugendzentrum: Scene = (R) => {
   ] as [number, number][])
     grain(a, rx, 128, 28, 12, rc, 0.16, R);
 
-  // Schild über dem Tor: mittwochs wird gemalt
-  box(a, 142, 52, 54, 15, C.dark_grey, C.grey, C.black);
-  word(a, 143, 56, 7, "MITTWOCHS", C.yellow, C.black);
-  vline(a, 148, 49, 3, C.grey);
-  vline(a, 190, 49, 3, C.grey);
+  // Hoflaterne über dem Tor
+  rect(a, 168, 48, 3, 7, C.dark_grey);
+  hline(a, 168, 48, 3, C.grey);
+  rect(a, 161, 55, 17, 3, C.dark_grey);
+  hline(a, 161, 55, 17, C.grey);
+  box(a, 163, 58, 13, 9, C.yellow, C.white, C.orange, C.black);
+  vline(a, 169, 58, 9, C.white);
+  lightCone(a, 169, 67, 44, 24, C.yellow);
 
   // Das rote Hallentor [142,70,54,82]
   arch(a, 142, 70, 54, 82, C.tan);

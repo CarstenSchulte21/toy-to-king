@@ -110,6 +110,9 @@ mit Ziegelgewände) in `scripts/lib/rooms-art.ts`.
 rechts vom Tor (`hall_wand` [204,58,104,72]), die fremden Werke links (`altes_piece` [26,50,112,92]).
 Neu ist der Hotspot `hallentor`.
 
-**Mittwochsmaler:** Über dem Tor hängt ein Schild „MITTWOCHS", und am Tor hängt ein Zettel mit der
-Workshop-Zeit. Das ist eine Verbeugung vor einem echten Kölner Graffiti-Projekt, kein Abbild: Unser
-Jugendzentrum ist ein erfundener Ort.
+**Keine echten Vereinsnamen im Spiel.** Kurz stand ein Schild „MITTWOCHS" über dem Tor und am Tor ein
+Zettel, der ein echtes Kölner Graffiti-Projekt nannte. Beides ist wieder raus: Es sah aus wie ein Aushang
+im Bürgerzentrum und passte nicht zum Ton („Hier wird gemalt, nicht geredet"), und ein real existierender
+Jugendhilfeträger gehört nicht ungefragt in eine Welt, in der es später um Heat und Erwischtwerden geht.
+Über dem Tor hängt jetzt eine Hoflaterne. Gebäude und Orte dürfen echten Kölner Vorbildern nachempfunden
+sein, Namen von Personen, Vereinen und Projekten nicht.

@@ -1200,7 +1200,7 @@ hotspots:
     rect: [142, 70, 54, 82]
     untersuchen:
       - "Das rote Hallentor. Dahinter standen früher die Löschzüge, heute proben da Bands."
-      - "Am Tor hängt ein Zettel: mittwochs von vier bis sieben, Workshop von den Mittwochsmalern. Dosen gibt es vor Ort."
+      - "Zu. Aber der Hof ist offen, und die Wand daneben gehört allen."
 
   - id: dosen
     label: Karton
