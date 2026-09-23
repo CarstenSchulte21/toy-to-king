@@ -19,6 +19,8 @@ import {
   traceGuide,
   reduce,
   trustOf,
+  visibleHotspots,
+  mapPlaces,
   viewDialogue,
   type Action,
   type GameContent,
@@ -362,6 +364,22 @@ describe("Risiko (M4b)", () => {
       return;
     }
     throw new Error("keine Saat mit Erwischtwerden gefunden");
+  });
+
+  it("nachts ist der Graffitistore zu – weder über die Straße noch über die Karte", () => {
+    const tag: GameState = { ...withFacts(), room: "strasse", phase: 0 };
+    const night: GameState = { ...tag, phase: 2 };
+    const strasse = content.rooms.strasse!;
+    const ids = (s: GameState) => visibleHotspots(strasse, s, content).map((h) => h.id);
+    expect(ids(tag)).toContain("zum_laden");
+    expect(ids(tag)).not.toContain("laden_zu");
+    expect(ids(night)).not.toContain("zum_laden");
+    expect(ids(night)).toContain("laden_zu");
+    expect(mapPlaces(night, content).map((p) => p.room)).not.toContain("farbenladen");
+    expect(mapPlaces(tag, content).map((p) => p.room)).toContain("farbenladen");
+    // Und wer es trotzdem versucht, kommt nicht rein.
+    const r = reduce(night, { type: "TRAVEL", room: "farbenladen" }, content, NOW);
+    expect(r.state.room).toBe("strasse");
   });
 
   it("ein Werk an der Hall senkt das Wanted", () => {

@@ -1451,6 +1451,9 @@ dialogue:
 ### 8.3 Ergänzungen an bestehenden Inhalten
 
 - `content/rooms/strasse.yaml`: neuer Hotspot `nowak`, sichtbar nur `if: [{weekday: mo}]`.
+- `content/rooms/strasse.yaml`: `zum_laden` gilt jetzt nur `if: [{not_phase: nacht}]`. Nachts steht
+  dort stattdessen `laden_zu` – Rollladen runter, kein Weg hinein.
+- `content/map.yaml`: der Graffitistore steht nachts nicht auf der Karte.
 - `content/spots.yaml`: der Waggon am Abstellgleis geht nur nachts (`{phase: nacht}`).
 - `content/npcs/mentor.yaml`: neue Antwort bei Kalle „Ich muss ein paar Tage weg vom Fenster"
   (`if: [{wanted_min: 1}]`), Knoten `untertauchen` mit den Effekten `wanted: -1` und `advance_day`.

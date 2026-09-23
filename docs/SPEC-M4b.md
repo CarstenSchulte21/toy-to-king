@@ -40,6 +40,7 @@ Heat, Zeit und Wanted wird aus „wo male ich als Nächstes" eine echte Abwägun
 | Buff | Montags sind die Rolltore leer. An allen anderen Spots hat jedes Werk pro Tag eine kleine Chance, gebufft zu werden – abhängig vom Spot-Typ, an der legalen Wand nie. | F3.3. Macht Werke vergänglich, ohne dass es willkürlich wirkt. |
 | Crossen | Werke mit Qualität 0 oder 1 können von NOX gecrosst werden, gute nie. | Lehrt ohne Text, dass Qualität zählt. Und es ist die Regel der Szene: Man crosst, was schlechter ist. |
 | Polizeistation | Kein Hotspot führt hin. Man wacht dort auf. Drei Sätze von Brandt, ein Knopf „Raus hier". | Die harte Regel aus dem Backlog. Wird der Raum länger als ein Bildschirm, ist er falsch gebaut. |
+| Öffnungszeiten | Der Graffitistore hat nachts zu – weder über die Straße noch über die Karte kommt man rein. Tagsüber und abends offen. | Ein Laden, der um drei Uhr nachts offen hat, macht die ganze Tageszeit unglaubwürdig. Und es erzwingt eine Entscheidung: Material besorgt man, solange es hell ist. |
 | Nowak | Steht montags an den Rolltoren und macht sie sauber. Man kann mit ihm reden. Er ist nicht der Feind, er hat einen Job. | Gibt dem Buff ein Gesicht, statt ihn als Systemmeldung abzutun. |
 
 ## 4. Werte (Startwerte, in `content/risk.yaml`)
@@ -65,14 +66,15 @@ sonst Rolltor 20 %, Hauswand 10 %, Heaven Spot 5 %, Zug 15 %, legale Wand 0 %.
 
 - **Spielstand v5:** `day` (Zähler ab 1), `phase` (0–2), `heat` (je Spot), `wanted`, `caught`
   (Zähler). Migration v4 → v5 setzt Tag 1, Abschnitt 0, alles Übrige auf 0.
-- **Neue Bedingungen:** `wanted_min`, `wanted_max`, `phase`, `weekday`, `heat_min`.
+- **Neue Bedingungen:** `wanted_min`, `wanted_max`, `phase`, `not_phase`, `weekday`, `heat_min`.
 - **Neue Effekte:** `wanted: ±n`, `advance_day`.
 - **Neue Ereignisse:** `CAUGHT`, `ESCAPED`, `DAY_STARTED {day, weekday, buffed, crossed}`,
   `PHASE_CHANGED`.
 - **Nachtbilder:** kein zweiter Satz gezeichneter Szenen. `npm run art` schreibt zu jedem Raum
   zusätzlich `<room>-night.png`, erzeugt durch eine feste Umfärbetabelle über die Palette: alles wird
   dunkler und zieht ins Blaue, Gelb, Orange und Rot bleiben, damit Lampen und Lichter brennen. Das ist eine Tabelle,
-  keine sieben neuen Bilder.
+  keine sieben neuen Bilder. Wo die Nacht mehr als eine Farbe ändert, malt eine Handvoll Zeilen in
+  `NIGHT_OVERLAYS` darüber – zum Beispiel der heruntergelassene Rollladen am Graffitistore.
 - **Content:** `risk.yaml` (Werte), `rooms/wache.yaml`, `npcs/buff.yaml` (Nowak), Texte für
   Erwischen, Entkommen, Buff, Cross, Tageswechsel.
 
@@ -86,6 +88,7 @@ sonst Rolltor 20 %, Hauswand 10 %, Heaven Spot 5 %, Zug 15 %, legale Wand 0 %.
 - [x] Montags sind die Rolltore leer, und Nowak steht davor.
 - [x] Ein Werk mit Qualität 0 oder 1 kann gecrosst werden, ein gutes nie.
 - [x] Nachts sehen alle sieben Räume dunkel aus, die Lampen brennen weiter.
+- [x] Nachts ist der Graffitistore zu, sichtbar am heruntergelassenen Rollladen.
 - [x] Der Durchlauf-Test belegt: King bleibt erreichbar, auch wenn man zwischendurch erwischt wird.
 
 ## 7. Offene Fragen an den Tester

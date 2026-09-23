@@ -46,13 +46,14 @@ export const conditionSchema = z.union(
     z.strictObject({ wanted_min: z.number().int().min(0).max(3) }),
     z.strictObject({ wanted_max: z.number().int().min(0).max(3) }),
     z.strictObject({ phase: z.enum(PHASES) }),
+    z.strictObject({ not_phase: z.enum(PHASES) }),
     z.strictObject({ weekday: z.enum(WEEKDAYS) }),
     z.strictObject({ heat_min: z.strictObject({ spot: id, value: z.number().int().min(0).max(3) }) }),
   ],
   {
     error:
       "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed, " +
-      "rank_min, wanted_min, wanted_max, phase, weekday, heat_min.",
+      "rank_min, wanted_min, wanted_max, phase, not_phase, weekday, heat_min.",
   },
 );
 

@@ -992,6 +992,28 @@ const wache: Scene = (R) => {
   return a;
 };
 
+// Ein paar Räume sehen nachts nicht nur dunkler aus, sondern anders: Der Laden hat zu.
+// Das wird nach dem Umfärben auf das Nachtbild gemalt.
+export const NIGHT_OVERLAYS: Record<string, (a: Art, R: () => number) => void> = {
+  strasse: (a, R) => {
+    // Rollladen über der ganzen Ladenfront
+    rect(a, 166, 54, 72, 96, C.grey_darker);
+    shutter(a, 168, 56, 68, 92, C.grey_darker, C.grey_mid, C.black);
+    frame(a, 168, 56, 68, 92, C.black);
+    rect(a, 192, 140, 20, 5, C.grey_mid);
+    disc(a, 202, 142, 2, C.black);
+    rect(a, 170, 146, 64, 4, C.black);
+    grain(a, 168, 56, 68, 92, C.black, 0.05, R);
+    // Zettel an der Scheibe
+    rect(a, 176, 90, 18, 12, C.grey_soft);
+    frame(a, 176, 90, 18, 12, C.grey_mid);
+    hline(a, 178, 94, 14, C.grey_darker);
+    hline(a, 178, 97, 10, C.grey_darker);
+    // Ein paar Tags auf dem frischen Blech
+    tags(a, 172, 100, 60, 26, [C.black], 1, R);
+  },
+};
+
 export const SCENES: Record<string, Scene> = {
   hinterhof,
   strasse,

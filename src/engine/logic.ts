@@ -36,6 +36,7 @@ export function evaluateCondition(condition: Condition, state: GameState, ctx: C
     const index = (ctx.content.risk?.phases.length ?? PHASE_COUNT) > 0 ? PHASES_INDEX[condition.phase] : 0;
     return (state.phase ?? 0) === index;
   }
+  if ("not_phase" in condition) return (state.phase ?? 0) !== PHASES_INDEX[condition.not_phase];
   if ("weekday" in condition) return weekdayOf(state.day ?? 1) === condition.weekday;
   if ("heat_min" in condition) return heatOf(state, condition.heat_min.spot) >= condition.heat_min.value;
   if ("trust_min" in condition) {
