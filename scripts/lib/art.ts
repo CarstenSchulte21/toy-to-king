@@ -351,8 +351,13 @@ export function graffiti(
   return width;
 }
 
-// Tags an einer Wand: kleine Handstyles, dazwischen ein paar Kritzel.
-const TAG_WORDS = ["TREN", "SANS", "HBF"];
+// Die Namen, die in dieser Stadt an den Wänden stehen. Kommen vom Tester.
+// „ONE" und „1" hängt man in Handstyles gern hinten dran.
+export const CREW = "NOX";
+const TAG_WORDS = ["RUBIX", "TEAR", "REMS", "YARE", "CRES", "TEAR1", "REMS1", "YARE1", "CRES1", CREW];
+
+// Tags an einer Wand: kleine Handstyles, in Zeilen und Spalten verteilt,
+// damit sie sich nicht zu einem Knäuel überlagern.
 export function tags(
   a: Art,
   x: number,
@@ -363,22 +368,33 @@ export function tags(
   count: number,
   R: () => number,
 ): void {
-  // In Zeilen verteilt, damit sich die Tags nicht zu einem Knäuel überlagern.
-  const rows = Math.max(1, Math.ceil(count / Math.max(1, Math.floor(w / 46))));
+  const cols = Math.max(1, Math.min(count, Math.floor(w / 58)));
+  const rows = Math.ceil(count / cols);
   const rowH = h / rows;
+  const slot = w / cols;
+  let last = "";
   for (let k = 0; k < count; k++) {
     const c = colors[Math.floor(R() * colors.length)]!;
-    const text = TAG_WORDS[Math.floor(R() * TAG_WORDS.length)]!;
-    const size = Math.min(12 + Math.floor(R() * 6), Math.max(10, rowH - 3));
-    const used = text.length * 4.3 * (size / 6);
-    const row = k % rows;
-    const col = Math.floor(k / rows);
-    const perRow = Math.ceil(count / rows);
-    const slot = w / perRow;
+    // Kein Name zweimal an derselben Wand – das sieht sonst nach Copy-Paste aus.
+    let text = TAG_WORDS[Math.floor(R() * TAG_WORDS.length)]!;
+    while (text === last) text = TAG_WORDS[Math.floor(R() * TAG_WORDS.length)]!;
+    last = text;
+    // Die Größe muss in die Zeile und in die Spalte passen, sonst läuft der Name aus der Wand.
+    const byRow = Math.min(17, Math.floor(rowH) - 3);
+    const byCol = Math.floor((slot * 6) / (text.length * 4.3));
+    const size = Math.max(8, Math.min(byRow, byCol));
+    const used = (text.length * 4.3 * size) / 6;
+    const col = k % cols;
+    const row = Math.floor(k / cols);
     const tx = x + col * slot + R() * Math.max(1, slot - used);
-    const ty = y + row * rowH + R() * Math.max(1, rowH - size - 4);
+    const ty = y + row * rowH + R() * Math.max(1, rowH - size - 3);
     graffiti(a, tx, ty, size, text, "tag", { fill: c, outline: c }, R);
   }
+}
+
+// Das Crew-Kürzel neben einem Werk – klein, wie hingekritzelt.
+export function crewTag(a: Art, x: number, y: number, size: number, color: number, R: () => number): void {
+  graffiti(a, x, y, size, CREW, "tag", { fill: color, outline: color }, R);
 }
 
 export function toRgba(art: Art): Uint8Array {

@@ -11,6 +11,7 @@ import {
   box,
   bricks,
   cable,
+  crewTag,
   crack,
   disc,
   dither,
@@ -100,7 +101,8 @@ const hinterhof: Scene = (R) => {
   pipe(a, 96, 22, 128, C.grey, C.light_grey, C.dark_grey);
   cable(a, 0, 30, 96, 26, 6, C.black);
   // Throw-up auf der Backsteinwand, dazu ein paar Handstyles.
-  graffiti(a, 22, 64, 22, "SANS", "throwup", { fill: C.light_red, fill2: C.red, outline: C.black }, R);
+  graffiti(a, 22, 64, 22, "REMS", "throwup", { fill: C.light_red, fill2: C.red, outline: C.black }, R);
+  crewTag(a, 78, 88, 11, C.black, R);
   tags(a, 22, 88, 74, 20, [C.black, C.white], 2, R);
   tags(a, 252, 60, 62, 30, [C.black, C.purple], 2, R);
 
@@ -130,7 +132,7 @@ const hinterhof: Scene = (R) => {
   rect(a, 126, 74, 60, 46, C.light_grey);
   dither(a, 126, 74, 60, 46, C.light_grey, C.grey, 0.35);
   // Fremdes Throw-up auf dem Rolltor – halb übergerollt, deshalb blass.
-  graffiti(a, 131, 82, 22, "HBF", "throwup", { fill: C.white, outline: C.blue, fill2: C.cyan }, R);
+  graffiti(a, 130, 84, 18, "TEAR", "throwup", { fill: C.white, outline: C.blue, fill2: C.cyan }, R);
   grain(a, 128, 78, 56, 38, C.light_grey, 0.28, R);
   rect(a, 148, 142, 14, 4, C.dark_grey);
   disc(a, 155, 144, 2, C.black);
@@ -451,7 +453,8 @@ const unterfuehrung: Scene = (R) => {
     },
     R,
   );
-  tags(a, 92, 120, 116, 24, [C.black, C.white], 3, R);
+  crewTag(a, 176, 88, 13, C.white, R);
+  tags(a, 92, 120, 116, 24, [C.black, C.white], 2, R);
   rect(a, 0, 40, 16, 100, C.light_grey);
   dither(a, 0, 40, 16, 100, C.light_grey, C.grey, 0.3);
   frame(a, 0, 40, 16, 100, C.dark_grey);
@@ -557,15 +560,15 @@ const jugendzentrum: Scene = (R) => {
   frame(a, 198, 50, 118, 92, C.grey_mid);
 
   // Fremde Werke auf der linken Fläche: verblasst zuerst, frisch darüber
-  graffiti(a, 40, 86, 24, "HBF", "throwup", { fill: C.light_grey, fill2: C.grey, outline: C.dark_grey }, R);
+  graffiti(a, 40, 86, 24, "CRES", "throwup", { fill: C.light_grey, fill2: C.grey, outline: C.dark_grey }, R);
   grain(a, 34, 80, 70, 36, C.grey_soft, 0.34, R);
   grain(a, 34, 80, 70, 36, C.grey_mid, 0.14, R);
   graffiti(
     a,
     30,
-    56,
-    34,
-    "TREN",
+    58,
+    28,
+    "RUBIX",
     "wildstyle",
     {
       fill: C.yellow,
@@ -580,7 +583,8 @@ const jugendzentrum: Scene = (R) => {
   tags(a, 30, 116, 104, 22, [C.black, C.white, C.purple], 2, R);
 
   // Rechts oben ein Throw-up, darunter bleibt die Wand frei
-  graffiti(a, 244, 54, 20, "SANS", "throwup", { fill: C.cyan, fill2: C.light_blue, outline: C.black }, R);
+  graffiti(a, 244, 54, 20, "YARE", "throwup", { fill: C.cyan, fill2: C.light_blue, outline: C.black }, R);
+  crewTag(a, 288, 74, 12, C.black, R);
   // Reste älterer Schichten am unteren Rand – die Fläche darüber bleibt frei.
   for (const [rx, rc] of [
     [204, C.purple],

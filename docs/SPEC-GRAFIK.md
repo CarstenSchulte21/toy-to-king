@@ -18,7 +18,7 @@ Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M
 | Palette | 32 Farben: die 16 C64-Farben plus 16 Zwischentöne für Haut, Mauerwerk, Metall und Nacht. Die ersten 16 bleiben unverändert, gespeicherte Werke sehen genauso aus wie vorher. | 16 Farben reichten für Gesichter und Schattierungen nicht (Tester). Der Retro-Look bleibt. |
 | Größe | 320×180, genau die Bühne | Keine Skalierung, keine unscharfen Kanten. |
 | Motive | Jede Szene richtet sich nach den Hotspot-Rechtecken der Room-Datei | Wer etwas sieht, kann es auch antippen – und umgekehrt. |
-| Fremde Werke | Die Werke an den Wänden entstehen aus denselben Buchstaben-Skeletten wie die eigenen. Es sind immer dieselben drei Namen: **TREN, SANS, HBF** – klein als Handstyle, groß als Throw-up oder Wildstyle. Dazu KRUX als Wildstyle in der Unterführung. | Der Tester will wiedererkennbare Namen statt erfundener Kürzel: drei Namen, die überall auftauchen, machen aus den Räumen eine Stadt. |
+| Fremde Werke | Die Werke an den Wänden entstehen aus denselben Buchstaben-Skeletten wie die eigenen. Es sind immer dieselben Namen (Abschnitt 10): klein als Handstyle, groß als Throw-up oder Wildstyle. Dazu KRUX als Wildstyle in der Unterführung. | Der Tester will wiedererkennbare Namen statt erfundener Kürzel: wenige Namen, die überall auftauchen, machen aus den Räumen eine Stadt. |
 | Freie Flächen | Wo man selbst malen darf (Rolltore, linke Wand, Hall, Brückenblech, Waggon), ist die Fläche leer und ruhig. | Das eigene Werk soll wirken. |
 | Hotspots finden | Neuer HUD-Knopf „Blick": zeigt 2,5 Sekunden lang die Umrisse mit Namen. | Gegen Pixel-Sucherei (Backlog F1.5), ohne die Bilder mit Markierungen zu verschandeln. |
 
@@ -83,10 +83,10 @@ Der Tester wollte echte Namen an allen Wänden, den Kölner Laden und eine Köln
 
 | Thema | Vorher | Jetzt |
 |-------|--------|-------|
-| Namen an den Wänden | SEB, ZINK, MOA, ARO, ein verblasstes TOY | Überall nur noch TREN, SANS und HBF. Klein als Handstyle, groß als Throw-up oder Wildstyle. Kein TOY mehr als Graffiti. |
+| Namen an den Wänden | SEB, ZINK, MOA, ARO, ein verblasstes TOY | Nur noch eine kleine, feste Liste (siehe Abschnitt 10). Klein als Handstyle, groß als Throw-up oder Wildstyle. Kein TOY mehr als Graffiti. |
 | Graffiti-Zeichner | `piece()` – eckige Kästen mit Schriftzug | Neuer `graffiti()` in `scripts/lib/art.ts` mit drei Formen: `tag` (dünne Cap, Schräge, Schwung), `throwup` (runde Bubble-Formen, Verlauf, Highlight), `wildstyle` (Arrows, Widerhaken, Connections, Second Outline, 3D-Schatten, Background) |
 | Unterführung | KRUX als Kasten-Piece | KRUX als Wildstyle mit Arrows, weißer Second Outline und 3D |
-| Hall of Fame | Vier gleich aussehende Pieces | Drei Styles nebeneinander: TREN als Wildstyle, SANS und HBF als Throw-up, dazu ein altes, verblasstes Werk darunter |
+| Hall of Fame | Vier gleich aussehende Pieces | Drei Styles nebeneinander: ein Wildstyle, zwei Throw-ups, dazu ein altes, verblasstes Werk darunter |
 | Laden | „FARBEN" | Heißt **DEDICATED**, nach dem Laden in Köln. Ladenfront wie im echten Leben: Schaufenster und Eingangstür nebeneinander, die Tür in Menschenhöhe. Keine Sprühdosen mehr im Schaufenster, stattdessen Shirts auf der Stange, Schuhkartons auf einem Brett und ein Deck. Sockel voller Aufkleber. Innen ein Schild an der Wand und eine zugeklebte Theke. |
 | Raumname | Farbenladen | **Graffitistore** (`content/rooms/farbenladen.yaml`, `content/npcs/laden.yaml`, `content/facts.yaml`, `content/rooms/strasse.yaml`) |
 | Eisenbahnbrücke | Graue Wand vor Skyline | Grüner Stahlbogen mit zwei Gurtungen und Diagonalen wie an den Kölner Rheinbrücken, Hänger zum Fahrbahnträger, dahinter der Dom mit zwei Türmen, unten die Straße, vorn Gleis und Laufsteg |
@@ -116,3 +116,31 @@ im Bürgerzentrum und passte nicht zum Ton („Hier wird gemalt, nicht geredet")
 Jugendhilfeträger gehört nicht ungefragt in eine Welt, in der es später um Heat und Erwischtwerden geht.
 Über dem Tor hängt jetzt eine Hoflaterne. Gebäude und Orte dürfen echten Kölner Vorbildern nachempfunden
 sein, Namen von Personen, Vereinen und Projekten nicht.
+
+## 10. Die Namen an den Wänden
+
+Der Tester hat die Liste vorgegeben. Sie steht in `scripts/lib/art.ts` und gilt für alle Räume:
+
+**RUBIX · TEAR · REMS · YARE · CRES**
+
+In Handstyles hängt manchmal ein „ONE" oder eine „1" hinten dran (TEAR1, YARE1, CRES1) – so wie im
+echten Leben. `tags()` zieht die Namen zufällig, aber deterministisch aus dieser Liste und wiederholt
+nie denselben Namen direkt hintereinander.
+
+**Crew: NOX.** Das Kürzel steht klein neben manchen Werken, so wie Writer ihre Crew neben den Namen
+setzen. Es ist frei erfunden und hat mit keiner echten Crew zu tun. `crewTag()` zeichnet es; in
+`tags()` taucht es außerdem gelegentlich als eigener Handstyle auf.
+
+**KRUX** bleibt davon unberührt: Das ist der Rivale aus der Geschichte, kein Wandname.
+
+Wo die Namen stehen:
+
+| Raum | Groß | Klein |
+|------|------|-------|
+| Hinterhof | REMS (Throw-up) an der Wand, TEAR (Throw-up) auf dem Garagentor | Handstyles, NOX |
+| Straße | – (die Rolltore bleiben frei) | Handstyles über dem Rolltor und an der Hauswand |
+| Graffitistore | – | – (innen bleibt sauber) |
+| Unterführung | KRUX (Wildstyle) | Handstyles, NOX unter dem Piece |
+| Jugendzentrum | RUBIX (Wildstyle), YARE (Throw-up), CRES (Throw-up, verblasst) | Handstyles, NOX |
+| Eisenbahnbrücke | – (das Blech bleibt frei) | Handstyles auf dem Fahrbahnträger |
+| Abstellgleis | – (die Waggonseite bleibt frei) | zwei Handstyles neben der Tür |
