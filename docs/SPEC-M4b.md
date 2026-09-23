@@ -41,6 +41,7 @@ Heat, Zeit und Wanted wird aus „wo male ich als Nächstes" eine echte Abwägun
 | Crossen | Werke mit Qualität 0 oder 1 können von NOX gecrosst werden, gute nie. | Lehrt ohne Text, dass Qualität zählt. Und es ist die Regel der Szene: Man crosst, was schlechter ist. |
 | Polizeistation | Kein Hotspot führt hin. Man wacht dort auf. Drei Sätze von Brandt, ein Knopf „Raus hier". | Die harte Regel aus dem Backlog. Wird der Raum länger als ein Bildschirm, ist er falsch gebaut. |
 | Öffnungszeiten | Der Graffitistore hat nachts zu – weder über die Straße noch über die Karte kommt man rein. Tagsüber und abends offen. | Ein Laden, der um drei Uhr nachts offen hat, macht die ganze Tageszeit unglaubwürdig. Und es erzwingt eine Entscheidung: Material besorgt man, solange es hell ist. |
+| NPCs merken es | Jeder NPC hat eine Nachtfassung und reagiert ab Wanted 1 bzw. 2 anders. Brandt tastet ab und kennt ab Stufe 2 deinen Namen, KRUX findet die Fahndung gut, Kalle macht sich Sorgen, Sibel wird vorsichtig. | Backlog F7.2 verlangt „NPCs vorsichtiger" ausdrücklich für M4. Eine Welt mit Uhrzeit und Fahndung, in der die Leute beides nicht bemerken, untergräbt beides. |
 | Nowak | Steht montags an den Rolltoren und macht sie sauber. Man kann mit ihm reden. Er ist nicht der Feind, er hat einen Job. | Gibt dem Buff ein Gesicht, statt ihn als Systemmeldung abzutun. |
 
 ## 4. Werte (Startwerte, in `content/risk.yaml`)
@@ -89,6 +90,7 @@ sonst Rolltor 20 %, Hauswand 10 %, Heaven Spot 5 %, Zug 15 %, legale Wand 0 %.
 - [x] Ein Werk mit Qualität 0 oder 1 kann gecrosst werden, ein gutes nie.
 - [x] Nachts sehen alle sieben Räume dunkel aus, die Lampen brennen weiter.
 - [x] Nachts ist der Graffitistore zu, sichtbar am heruntergelassenen Rollladen.
+- [x] Jeder NPC sagt nachts etwas anderes, und ab Wanted 1 bzw. 2 reagieren alle auf die Fahndung.
 - [x] Der Durchlauf-Test belegt: King bleibt erreichbar, auch wenn man zwischendurch erwischt wird.
 
 ## 7. Offene Fragen an den Tester
@@ -96,6 +98,7 @@ sonst Rolltor 20 %, Hauswand 10 %, Heaven Spot 5 %, Zug 15 %, legale Wand 0 %.
 - Ist „drei Abschnitte pro Tag" genug, oder will man mehr pro Sitzung schaffen?
 - Soll das Werk nach dem Erwischtwerden wirklich hängen bleiben?
 - Fehlt ein dritter Weg, Wanted zu senken?
+- Merkt man beim Spielen, dass die Leute nachts anders reden – oder muss das deutlicher sein?
 
 ## 8. Abweichungen bei der Umsetzung
 

@@ -8,6 +8,10 @@ trust:
 
 dialogue:
   start:
+    - if: [{flag: krux_kennt_dich}, {wanted_min: 2}]
+      node: gesucht
+    - if: [{flag: krux_kennt_dich}, {phase: nacht}]
+      node: nachts
     - if: [{flag: krux_kennt_dich}]
       node: wieder_da
     - node: erstes_mal
@@ -22,7 +26,24 @@ dialogue:
       next: hub
 
     wieder_da:
-      text: "{name}. Schon wieder."
+      text:
+        - "{name}. Schon wieder."
+        - "Am hellen Tag. Mutig."
+      next: hub
+
+    nachts:
+      text:
+        - "Er steht im Dunkeln, wo die Lampe nicht hinkommt."
+        - "Jetzt ist die richtige Zeit. Tagsüber bist du hier nur im Weg."
+      next: hub
+
+    gesucht:
+      text:
+        - "Er guckt hoch, und zum ersten Mal grinst er."
+        - "{name}. Die halbe Ladenzeile redet über dich."
+        - "Und die Streife auch. Nicht schlecht."
+      effects:
+        - trust: 1
       next: hub
 
     hub:

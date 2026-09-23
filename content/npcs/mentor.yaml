@@ -8,6 +8,10 @@ trust:
 
 dialogue:
   start:
+    - if: [{flag: kalle_kennt_dich}, {wanted_min: 2}]
+      node: sorge
+    - if: [{flag: kalle_kennt_dich}, {phase: nacht}]
+      node: nachts
     - if: [{flag: kalle_kennt_dich}]
       node: wieder_da
     - node: erstes_mal
@@ -60,6 +64,19 @@ dialogue:
       text:
         - "Irgendwann kennst du jede Streife beim Vornamen."
         - "Und die kennen deinen Tag."
+      next: hub
+
+    nachts:
+      text:
+        - "Kalle sitzt im Dunkeln auf der Kiste. Das Licht im Treppenhaus geht an und wieder aus."
+        - "Um die Zeit sind nur zwei Sorten Leute draußen. Und ich bin die langweilige."
+      next: hub
+
+    sorge:
+      text:
+        - "Kalle steht auf, als du in den Hof kommst."
+        - "Setz dich. Nein, nicht da – da sieht man dich von der Straße aus."
+        - "Ich hör Sachen, {name}. Und ich will die nicht hören."
       next: hub
 
     wieder_da:

@@ -36,7 +36,7 @@ hotspots:
   - id: nowak
     label: Mann in oranger Jacke
     rect: [92, 96, 34, 60]
-    if: [{weekday: mo}]
+    if: [{weekday: mo}, {not_phase: nacht}]
     untersuchen: "Ein Reinigungswagen steht auf dem Gehweg. Der Schlauch liegt quer über den Bordstein."
     sprechen: buff
 

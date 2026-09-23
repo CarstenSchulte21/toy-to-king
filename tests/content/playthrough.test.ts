@@ -19,6 +19,8 @@ import {
   traceGuide,
   reduce,
   trustOf,
+  startNode,
+  isHotspotVisible,
   visibleHotspots,
   mapPlaces,
   viewDialogue,
@@ -387,5 +389,57 @@ describe("Risiko (M4b)", () => {
     const r = sprayAt(before, "hall", 7);
     expect(r.state.wanted).toBe(1);
     expect(r.events.some((e) => e.type === "CAUGHT" || e.type === "ESCAPED")).toBe(false);
+  });
+});
+
+// NPCs merken die Tageszeit und die Fahndung (M4b, Backlog F7.2).
+describe("NPCs nachts und unter Fahndung (M4b)", () => {
+  const content = loadContent();
+  const KNOWN = {
+    kalle_kennt_dich: true,
+    krux_kennt_dich: true,
+    sibel_kennt_dich: true,
+    brandt_kennt_dich: true,
+  } as const;
+
+  function seed(extra: Partial<GameState> = {}): GameState {
+    const s = createNewGame(content, "TESTER", NOW);
+    return {
+      ...s,
+      facts: Object.fromEntries(Object.keys(content.facts).map((f) => [f, { new: false }])),
+      flags: { ...KNOWN },
+      ...extra,
+    };
+  }
+
+  const startFor = (npcId: string, s: GameState) => startNode(s, content, content.npcs[npcId]!);
+
+  it("Frau Brandt redet nachts anders und reagiert auf die Fahndung", () => {
+    expect(startFor("streife", seed())).toBe("wieder_da");
+    expect(startFor("streife", seed({ phase: 2 }))).toBe("nachts");
+    expect(startFor("streife", seed({ wanted: 1 }))).toBe("abtasten");
+    expect(startFor("streife", seed({ wanted: 2 }))).toBe("gesucht");
+  });
+
+  it("KRUX findet die Fahndung gut, Kalle und Sibel nicht", () => {
+    expect(startFor("rivale", seed({ phase: 2 }))).toBe("nachts");
+    expect(startFor("rivale", seed({ wanted: 2 }))).toBe("gesucht");
+    expect(startFor("mentor", seed({ phase: 2 }))).toBe("nachts");
+    expect(startFor("mentor", seed({ wanted: 2 }))).toBe("sorge");
+    expect(startFor("laden", seed({ wanted: 2 }))).toBe("vorsichtig");
+  });
+
+  it("auch nachts und unter Fahndung bleibt man in keinem Gespräch hängen", () => {
+    for (const extra of [{ phase: 2 }, { wanted: 1 }, { wanted: 2 }, { wanted: 3, phase: 2 }]) {
+      for (const npcId of Object.keys(content.npcs)) {
+        const npc = content.npcs[npcId]!;
+        const state = seed(extra);
+        // Wer gerade gar nicht da ist (Nowak ist nur montags tagsüber da), wird auch nicht geprüft.
+        const hotspot = content.rooms[npc.room]?.hotspots.find((h) => h.id === npc.hotspot);
+        if (!hotspot || !isHotspotVisible(hotspot, state, content)) continue;
+        const r = exploreNpc(content, state, npcId);
+        expect(r.stuck, `${npcId} bei ${JSON.stringify(extra)}`).toEqual([]);
+      }
+    }
   });
 });

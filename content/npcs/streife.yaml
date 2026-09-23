@@ -7,8 +7,14 @@ trust: false
 
 dialogue:
   start:
+    - if: [{wanted_min: 2}]
+      node: gesucht
+    - if: [{wanted_min: 1}]
+      node: abtasten
     - if: [{flag: brandt_misstrauisch}]
       node: misstrauisch
+    - if: [{phase: nacht}]
+      node: nachts
     - if: [{flag: brandt_kennt_dich}]
       node: wieder_da
     - node: erstes_mal
@@ -58,6 +64,75 @@ dialogue:
 
     misstrauisch:
       text: "Du schon wieder. Ich hab dich im Blick."
+      end: true
+
+    nachts:
+      text:
+        - "Sie stellt den Pappbecher aufs Dach vom Wagen."
+        - "„Spät für dein Alter.\""
+      effects:
+        - set_flag: brandt_kennt_dich
+      options:
+        - text: "Kann nicht schlafen."
+          next: nicht_schlafen
+        - text: "Ist doch noch früh."
+          next: noch_frueh
+        - text: "Muss weiter."
+          end: true
+
+    nicht_schlafen:
+      text:
+        - "„Kenn ich. Ich auch nicht, nur werde ich dafür bezahlt.\""
+        - "Sie guckt die Ladenzeile runter, bis zur Unterführung."
+        - "„Geh nach Hause, ja?\""
+      end: true
+
+    noch_frueh:
+      text:
+        - "„Für mich fängt es jetzt erst an.\""
+        - "„Und wenn hier gleich einer mit einer Dose um die Ecke kommt, bin ich in zwei Minuten da.\""
+      end: true
+
+    abtasten:
+      text:
+        - "Sie guckt dich zwei Sekunden zu lange an."
+        - "„Zeig mal deine Hände.\""
+      options:
+        - text: "Warum?"
+          next: haende
+        - text: "Nö."
+          next: noe
+
+    haende:
+      text:
+        - "„Schwarz unterm Daumennagel.\""
+        - "„Ich sag ja nichts. Ich guck nur.\""
+      end: true
+
+    noe:
+      text:
+        - "„Muss ich auch nicht. Ich hab sie ja schon gesehen.\""
+      end: true
+
+    gesucht:
+      text:
+        - "Diesmal lächelt sie nicht."
+        - "„{name}.\""
+        - "„Ja, wir kennen den Namen. Steht auf genug Wänden.\""
+      options:
+        - text: "Ich weiß nicht, wovon Sie reden."
+          next: leugnen
+        - text: "Und jetzt?"
+          next: und_jetzt
+
+    leugnen:
+      text: "„Natürlich nicht.\""
+      end: true
+
+    und_jetzt:
+      text:
+        - "„Jetzt gar nichts. Ich hab dich nicht dabei erwischt.\""
+        - "„Mach nur nicht den Fehler zu denken, dass das so bleibt.\""
       end: true
 
     wieder_da:

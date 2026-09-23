@@ -1454,6 +1454,19 @@ dialogue:
 - `content/rooms/strasse.yaml`: `zum_laden` gilt jetzt nur `if: [{not_phase: nacht}]`. Nachts steht
   dort stattdessen `laden_zu` – Rollladen runter, kein Weg hinein.
 - `content/map.yaml`: der Graffitistore steht nachts nicht auf der Karte.
+- `content/rooms/strasse.yaml`: Nowak ist nur montags **tagsüber** da (`{weekday: mo}, {not_phase: nacht}`).
+
+### 8.4 Die NPCs merken Tageszeit und Fahndung
+
+Alle vier alten NPCs haben neue Einstiegsknoten. Die Reihenfolge in `start` entscheidet: Fahndung
+schlägt Tageszeit, Tageszeit schlägt den Normalfall.
+
+| NPC | Nachts | Ab Wanted 1 | Ab Wanted 2 |
+|-----|--------|-------------|-------------|
+| Frau Brandt | `nachts` – „Spät für dein Alter." | `abtasten` – sie will die Hände sehen | `gesucht` – sie kennt den Namen von den Wänden |
+| KRUX | `nachts` – jetzt ist die richtige Zeit | – | `gesucht` – Respekt, dazu +1 Vertrauen |
+| Kalle | `nachts` – zwei Sorten Leute sind um die Zeit draußen | – | `sorge` – setz dich nicht ans Fenster |
+| Sibel | – (Laden ist zu) | – | `vorsichtig` – „dann kenn ich dich nicht" |
 - `content/spots.yaml`: der Waggon am Abstellgleis geht nur nachts (`{phase: nacht}`).
 - `content/npcs/mentor.yaml`: neue Antwort bei Kalle „Ich muss ein paar Tage weg vom Fenster"
   (`if: [{wanted_min: 1}]`), Knoten `untertauchen` mit den Effekten `wanted: -1` und `advance_day`.
