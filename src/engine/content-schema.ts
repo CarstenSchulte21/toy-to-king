@@ -252,6 +252,8 @@ export const spraySchema = z.strictObject({
 
 export const SPOT_TYPES = ["zug", "heaven_spot", "legale_wand", "rolltor", "hauswand"] as const;
 export const RISK_LEVELS = ["kein", "niedrig", "mittel", "hoch"] as const;
+// Was man beim Sprühen vor sich hat. Ohne Angabe richtet es sich nach dem Spot-Typ.
+export const SURFACES = ["rolltor", "hauswand", "beton", "zug", "mast", "kasten", "blech", "tonne"] as const;
 
 export const spotSchema = z.strictObject({
   id,
@@ -263,6 +265,7 @@ export const spotSchema = z.strictObject({
   fit_hint: text,
   risk: z.enum(RISK_LEVELS, { error: `risk muss eine von ${RISK_LEVELS.join(", ")} sein.` }),
   tool: z.enum(TOOLS).optional(), // M5a: Auf glatten Flächen geht nur der Marker
+  surface: z.enum(SURFACES).optional(), // M5a: Untergrund im Sprüh-Bildschirm
   if: z.array(conditionSchema).optional(),
 });
 export const spotsFileSchema = z.array(spotSchema);

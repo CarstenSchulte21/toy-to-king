@@ -128,9 +128,9 @@ export function SprayScene(props: {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wall = useMemo(() => {
     const buf = new Uint8ClampedArray(WORK_W * WORK_H * 4);
-    paintWall(buf, choices.spot.type, 7);
+    paintWall(buf, choices.spot.surface ?? choices.spot.type, 7);
     return buf;
-  }, [choices.spot.type]);
+  }, [choices.spot.surface, choices.spot.type]);
   const lettering = style ? letteringFor(content, name, style, seed) : null;
   const flow = dose ? (content.items[dose]?.flow ?? 4) : 4;
   const limit = lettering ? passTimeLimit(lettering, flow) : 10000;
@@ -477,7 +477,7 @@ export function SprayScene(props: {
             </button>
           </div>
           <button className="btn spray-go" disabled={!ready} onPointerUp={startSpraying}>
-            An die Wand
+            {isMarker ? "Drauf" : "An die Wand"}
           </button>
           {reason && <p className="sketch-reason">{reason}</p>}
           {!reason && props.tips.length > 0 && (

@@ -6,9 +6,14 @@ hotspots:
   - id: muelltonnen
     label: Mülltonnen
     rect: [20, 110, 70, 50]
+    sprühen: muelltonnen
     untersuchen:
-      - "Drei Tonnen, alle mit deinem Tag drauf."
-      - "Von links nach rechts wird der Handstyle besser. Die erste Tonne will keiner mehr sehen."
+      - if: [{sprayed: muelltonnen}]
+        text: "Der neue Handstyle sitzt. Die erste Tonne von links will trotzdem keiner mehr sehen."
+      - text:
+          - "Drei Tonnen, alle mit deinem Tag drauf."
+          - "Von links nach rechts wird der Handstyle besser. Die erste Tonne will keiner mehr sehen."
+          - "Auf der mittleren ist noch Platz."
 
   - id: rolltor
     label: Garagentor

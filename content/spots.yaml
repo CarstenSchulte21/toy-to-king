@@ -55,6 +55,7 @@
   room: strasse
   hotspot: laterne
   tool: marker
+  surface: mast
   fits: [tag]
   fit_hint: "Auf einem Mast ist kein Platz für mehr als einen Handstyle."
   risk: niedrig
@@ -65,6 +66,7 @@
   room: hinterhof
   hotspot: stromkasten
   tool: marker
+  surface: kasten
   fits: [tag]
   fit_hint: "Der Kasten ist glatt und klein. Marker, sonst nichts."
   risk: kein
@@ -75,6 +77,7 @@
   room: abstellgleis
   hotspot: waggontuer
   tool: marker
+  surface: blech
   fits: [tag]
   fit_hint: "Auf dem lackierten Blech hält nur der Marker."
   risk: niedrig
@@ -86,7 +89,19 @@
   room: unterfuehrung
   hotspot: zaunloch
   tool: marker
+  surface: kasten
   fits: [tag]
   fit_hint: "Das Schild am Zaun ist handtellergroß."
   risk: kein
   if: [{fact: zaun}]
+
+- id: muelltonnen
+  name: den Mülltonnen
+  type: hauswand
+  room: hinterhof
+  hotspot: muelltonnen
+  tool: marker
+  surface: tonne
+  fits: [tag]
+  fit_hint: "Auf eine Tonne passt ein Handstyle, mehr nicht."
+  risk: kein

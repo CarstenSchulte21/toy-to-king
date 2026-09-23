@@ -515,7 +515,9 @@ describe("Material und Geld (M5a)", () => {
     const tag = content.spray!.styles.find((s) => s.id === "tag")!;
     const canStyle = content.spray!.styles.find((s) => s.tool !== "marker" && !s.only_at)!;
     const markerSpots = Object.values(content.spots).filter((s) => s.tool === "marker");
-    expect(markerSpots.length).toBeGreaterThanOrEqual(4);
+    expect(markerSpots.length).toBeGreaterThanOrEqual(5);
+    // Jeder Marker-Spot sagt auch, worauf man da malt – sonst steht eine Steinwand im Bild.
+    for (const spot of markerSpots) expect(spot.surface).toBeTruthy();
     for (const spot of markerSpots) {
       expect(styleBlocker(state, content, canStyle, spot)).toMatch(/Marker/);
       expect(spot.fits).toContain("tag");
