@@ -363,7 +363,7 @@ Jede Beobachtung über den Feedback-Button, daraus Issues.
 | **M4a – Aufstieg** | XP (Style × Qualität × Spot × Tempo), Ränge Toy → King, Style-Leiter freischalten, Wildstyle von KRUX lernen, eigene Formen für Bombing, Piece, Wildstyle. Details: `SPEC-M4a.md`. | Man steigt auf und arbeitet sich zum ersten Piece an der Hall hoch. |
 | **G – Grafik** | Umgesetzt auf Branch `grafik` (22.09.2026), Details in `SPEC-GRAFIK.md`. Bilder für alle sieben Räume, neuer Knopf „Blick“. Offen: Bewertung durch den Tester (Artifact „Raum-Check“). | Das Spiel sieht überall wie ein Spiel aus. |
 | **M4b – Risiko** | Heat je Spot (Zeit an der Wand, Risikostufe), Wanted-Stufen, Tag/Nacht, Buff und Crossen, Ruf, erwischt werden (knapp, keine Moralpredigt) | Die Kernschleife ist komplett. |
-| **M5 – Crew und Material** | Crew gründen, rekrutieren, anleiten, Sidequests, Geld und Farbenladen, Verbrauch, Fluchtszene | Die Aufbau-Ebene steht. |
+| **M5 – Crew und Material** | Crew gründen, rekrutieren, anleiten, Sidequests, Geld und Graffitistore, Verbrauch, **Marker**, Fluchtszene | Die Aufbau-Ebene steht. |
 | **M6 – Rund machen** | King-Ende, Content-Ausbau, echte Handstyles (Skizzen des Testers), Hilfen, Polish | Rundes Spiel von Toy bis King |
 
 **Warum M4 geteilt ist:** Aufstieg und Risiko auf einmal wäre schwer zu testen. Und wenn es sich falsch anfühlt, weiß niemand, woran es liegt.

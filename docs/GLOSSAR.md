@@ -65,6 +65,10 @@
 | [ ] | Low Pressure | Dose mit wenig Druck: kontrollierter, verzeiht mehr, gut für Details |
 | [ ] | High Pressure | Dose mit viel Druck: deckt schnell, tropft leichter, gut für Bombing |
 | [ ] | Chrom | Silberne Farbe, Klassiker fürs Fill-in bei Throw-ups |
+| [x] | Marker | Stift statt Dose. Womit man Tags macht, bevor man an Dosen kommt. Vom Tester genannt, kommt mit M5. |
+| [x] | T-Tip | Marker mit Keilspitze: schmal bis mittel, sauber, tropft nicht |
+| [x] | Dripper | Selbstgebauter Marker mit Tinte: breit, nass, tropft stark |
+| [x] | Wachsmarker | Dicker, trockener Strich, tropft nie, lässt sich kaum wegputzen |
 
 ### Orte und Handlungen
 
