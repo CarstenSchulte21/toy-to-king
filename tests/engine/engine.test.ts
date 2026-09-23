@@ -60,6 +60,7 @@ const content: GameContent = {
   map: null,
   progress: null,
   risk: null,
+  economy: null,
 };
 
 // Kurzformen mit festem Kontext für die Tests ohne Gespräch.
@@ -99,7 +100,7 @@ describe("createNewGame", () => {
     expect(s.room).toBe("hof");
     expect(s.player).toEqual({ name: "KRAZE", crew: null });
     expect(s.visited).toEqual([]);
-    expect(s.schemaVersion).toBe(5);
+    expect(s.schemaVersion).toBe(6);
     expect(s.works).toEqual({});
   });
 });
@@ -275,7 +276,7 @@ describe("migrate", () => {
     delete v1.works;
     const withStart = { ...content, config: { ...content.config, start_items: { standard_cap: 1 } } };
     const migrated = migrate(v1, withStart);
-    expect(migrated.schemaVersion).toBe(5);
+    expect(migrated.schemaVersion).toBe(6);
     expect(migrated.items).toEqual({ standard_cap: 1 });
     expect(migrated.works).toEqual({});
     expect(migrated.player.name).toBe("KRAZE");
@@ -300,7 +301,7 @@ describe("migrate", () => {
       },
     };
     const m = migrate(JSON.parse(JSON.stringify(v2)), withColors);
-    expect(m.schemaVersion).toBe(5);
+    expect(m.schemaVersion).toBe(6);
     expect(m.items).toEqual({ standard_cap: 1, low_pressure: 1, schwarz: 1, chrom: 1 });
     expect(m.works.rolltore).toEqual({
       style: "bubble",
@@ -322,7 +323,7 @@ describe("migrate", () => {
         result: "{style}",
         hints: { gaps: ".", gaps_low: ".", reach: ".", fat_line: ".", drips: "." },
         styles: [
-          { id: "bubble", name: "Bubble", look: "bubble", caps: { fill: ["f"], outline: ["o"] }, xp: 30 },
+          { id: "bubble", name: "Bubble", tool: "can" as const, look: "bubble", caps: { fill: ["f"], outline: ["o"] }, xp: 30 },
         ],
       },
       spots: {
@@ -369,7 +370,7 @@ describe("migrate", () => {
     delete v3.xp;
     delete v3.best;
     const m = migrate(v3, withProgress);
-    expect(m.schemaVersion).toBe(5);
+    expect(m.schemaVersion).toBe(6);
     expect(m.xp).toBe(54); // 30 × 1,5 × 1,2
     expect(m.best.wand).toBe(54);
     expect(rankOf(m, withProgress)?.id).toBe("tagger");

@@ -14,6 +14,12 @@ hotspots:
           - "Ein abgestellter Waggon. Die Seite ist fast leer."
           - "Nur ein paar alte Tags, halb abgewaschen."
 
+  - id: waggontuer
+    label: Waggontür
+    rect: [130, 96, 20, 36]
+    sprühen: waggontuer
+    untersuchen: "Die Schiebetür ist lackiert und glatt. Darauf hält keine Dose, aber ein Marker schon."
+
   - id: gleise
     label: Gleise
     rect: [250, 120, 60, 50]

@@ -21,8 +21,11 @@ dialogue:
       text:
         - "{name}. Du bist das also mit den Tags an den Mülltonnen."
         - "Handstyle wackelt noch. Aber du bleibst dran, das seh ich."
+        - "Hier. Der lag noch rum."
+        - "Ein T-Tip. Keilspitze, halb voll. Damit machst du Handstyles, nicht mit der Dose."
       effects:
         - set_flag: kalle_kennt_dich
+        - give: t_tip
       options:
         - text: "Und wer bist du?"
           next: wer_bist_du

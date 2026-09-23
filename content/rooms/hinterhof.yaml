@@ -30,6 +30,7 @@ hotspots:
   - id: stromkasten
     label: Stromkasten
     rect: [255, 100, 30, 45]
+    sprühen: stromkasten
     untersuchen:
       - "Stromkasten voller Sticker. Ein paar Namen kennst du. Die meisten nicht."
       - "Einer taucht überall auf: KRUX. Sauberer Handstyle, das muss man ihm lassen."

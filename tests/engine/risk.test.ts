@@ -76,6 +76,7 @@ const content = {
   map: null,
   progress: null,
   risk,
+  economy: null,
 } as unknown as GameContent;
 
 function game(): GameState {

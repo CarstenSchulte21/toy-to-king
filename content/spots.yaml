@@ -46,3 +46,47 @@
   fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
   risk: hoch
   if: [{fact: zaun}, {phase: nacht}]
+
+# Marker-Spots (M5a): glatte Flächen, auf denen nur der Marker geht. Kosten keine Farbe,
+# bringen wenig XP – aber sie kosten auch fast nichts an Risiko.
+- id: laternenmast
+  name: dem Laternenmast
+  type: hauswand
+  room: strasse
+  hotspot: laterne
+  tool: marker
+  fits: [tag]
+  fit_hint: "Auf einem Mast ist kein Platz für mehr als einen Handstyle."
+  risk: niedrig
+
+- id: stromkasten
+  name: dem Stromkasten
+  type: hauswand
+  room: hinterhof
+  hotspot: stromkasten
+  tool: marker
+  fits: [tag]
+  fit_hint: "Der Kasten ist glatt und klein. Marker, sonst nichts."
+  risk: kein
+
+- id: waggontuer
+  name: der Waggontür
+  type: zug
+  room: abstellgleis
+  hotspot: waggontuer
+  tool: marker
+  fits: [tag]
+  fit_hint: "Auf dem lackierten Blech hält nur der Marker."
+  risk: niedrig
+  if: [{fact: zaun}]
+
+- id: zaunblech
+  name: dem Zaunschild
+  type: hauswand
+  room: unterfuehrung
+  hotspot: zaunloch
+  tool: marker
+  fits: [tag]
+  fit_hint: "Das Schild am Zaun ist handtellergroß."
+  risk: kein
+  if: [{fact: zaun}]

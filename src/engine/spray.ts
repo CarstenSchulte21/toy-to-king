@@ -29,6 +29,7 @@ export type StyleChoice = {
   id: string;
   name: string;
   look: Style["look"];
+  tool: Style["tool"];
   passes: PassKind[];
   available: boolean;
   reason?: string;
@@ -40,6 +41,7 @@ export type SprayChoices = {
   caps: ItemChoice[];
   doses: ItemChoice[];
   colors: ItemChoice[];
+  markers: ItemChoice[];
 };
 
 export const PASS_LABELS: Record<PassKind, string> = { line: "Linie", fill: "Fill-in", outline: "Outline" };
@@ -79,6 +81,22 @@ export function styleBlocker(
   const missing = (style.requires ?? []).filter((item) => (state.items[item] ?? 0) === 0);
   if (missing.length > 0) return style.requires_hint ?? "Dafür fehlt dir Material.";
   if (style.only_at && !style.only_at.includes(spot.id)) return style.only_at_hint ?? "Nicht an diesem Spot.";
+  // Werkzeug (M5a): Auf glatten Flächen geht nur der Marker, an der Wand nur die Dose.
+  if (spot.tool !== undefined && spot.tool !== style.tool) {
+    return spot.tool === "marker" ? "Darauf malst du mit dem Marker." : "Dafür brauchst du die Dose.";
+  }
+  const kind = style.tool === "marker" ? "marker" : "dose";
+  const hasTool = Object.values(content.items).some(
+    (i) => i.kind === kind && (state.items[i.id] ?? 0) > 0,
+  );
+  if (!hasTool) return style.tool === "marker" ? "Dafür brauchst du einen Marker." : "Dir fehlt eine Dose.";
+  // Ohne Farbe kein Werk – Marker brauchen keine.
+  if (style.tool !== "marker") {
+    const hasColor = Object.values(content.items).some(
+      (i) => i.kind === "color" && (state.items[i.id] ?? 0) > 0,
+    );
+    if (!hasColor) return content.economy?.texts.no_paint ?? "Die Farbe ist alle.";
+  }
   return null;
 }
 
@@ -87,7 +105,7 @@ export function sprayChoices(state: GameState, content: GameContent, spotId: str
   if (!spot || !content.spray) return null;
   const styles = content.spray.styles.map((s): StyleChoice => {
     const reason = styleBlocker(state, content, s, spot);
-    const base = { id: s.id, name: s.name, look: s.look, passes: passesFor(s.look) };
+    const base = { id: s.id, name: s.name, look: s.look, tool: s.tool, passes: passesFor(s.look) };
     return reason === null ? { ...base, available: true } : { ...base, available: false, reason };
   });
   return {
@@ -96,6 +114,7 @@ export function sprayChoices(state: GameState, content: GameContent, spotId: str
     caps: owned(state, content, "cap"),
     doses: owned(state, content, "dose"),
     colors: owned(state, content, "color"),
+    markers: owned(state, content, "marker"),
   };
 }
 

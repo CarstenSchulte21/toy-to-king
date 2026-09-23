@@ -7,7 +7,7 @@ ranks:
   - id: toy
     name: Toy
     xp: 0
-    text: "Du hast eine Dose und einen Namen. Mehr nicht."
+    text: "Du hast einen Marker und einen Namen. Mehr nicht."
     unlocks: "Tag"
   - id: tagger
     name: Tagger

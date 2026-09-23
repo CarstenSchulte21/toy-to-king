@@ -20,6 +20,7 @@ import {
   reduce,
   trustOf,
   startNode,
+  styleBlocker,
   isHotspotVisible,
   visibleHotspots,
   mapPlaces,
@@ -187,7 +188,10 @@ describe("Durchlauf durch die echten Inhalte", () => {
   });
 
   it("alles Material ist erreichbar", () => {
-    expect([...result.items].sort()).toEqual(Object.keys(content.items).sort());
+    // Was man kaufen kann, zählt auch (M5a).
+    const reachable = new Set(result.items);
+    for (const item of Object.values(content.items)) if (item.price !== undefined) reachable.add(item.id);
+    expect([...reachable].sort()).toEqual(Object.keys(content.items).sort());
   });
 
   it("an jedem Spot ist mit erreichbarem Material Qualität 3 möglich (sauber nachgefahren)", () => {
@@ -309,27 +313,24 @@ describe("Aufstieg (M4a)", () => {
 describe("Risiko (M4b)", () => {
   const content = loadContent();
 
+  // Ein Tag mit dem Marker: Der Marker ist Dose, Cap und Farbe in einem (M5a).
   function sprayAt(state: GameState, spotId: string, seed: number) {
     const spot = content.spots[spotId]!;
     const style = content.spray!.styles.find((s) => s.id === "tag")!;
-    const dose = Object.values(content.items).find((i) => i.kind === "dose")!;
-    const color = Object.values(content.items).find((i) => i.kind === "color")!;
-    const cap = (style.caps.line ?? [])[0]!;
+    const marker = Object.values(content.items).find((i) => i.kind === "marker")!;
     const lettering = buildLettering(state.player.name, style.look, 3);
     const action: Action = {
       type: "SPRAY",
       spot: spotId,
       style: style.id,
-      colors: { line: color.id },
-      dose: dose.id,
-      passes: [{ kind: "line", cap, strokes: traceGuide(lettering, comfortableSpeed(dose.flow!)) }],
+      colors: { line: marker.id },
+      dose: marker.id,
+      passes: [
+        { kind: "line", cap: marker.id, strokes: traceGuide(lettering, comfortableSpeed(marker.flow!)) },
+      ],
       seed,
     };
-    const ready: GameState = {
-      ...state,
-      room: spot.room,
-      items: { ...state.items, [dose.id]: 1, [color.id]: 1, [cap]: 1 },
-    };
+    const ready: GameState = { ...state, room: spot.room, items: { ...state.items, [marker.id]: 1 } };
     return reduce(ready, action, content, NOW);
   }
 
@@ -350,10 +351,59 @@ describe("Risiko (M4b)", () => {
     throw new Error("keine Saat ohne Zwischenfall gefunden");
   });
 
-  it("Erwischtwerden bringt auf die Wache, kostet Farbe und den Rest des Tages", () => {
+  // Mit einem Dosen-Style, damit auch der Materialverlust geprüft wird.
+  function sprayWithCan(state: GameState, spotId: string, seed: number) {
+    const spot = content.spots[spotId]!;
+    const style = content.spray!.styles.find((s) => s.tool !== "marker" && !s.only_at)!;
+    const dose = Object.values(content.items).find((i) => i.kind === "dose")!;
+    const colors = Object.values(content.items).filter((i) => i.kind === "color");
+    const lettering = buildLettering(state.player.name, style.look, 3);
+    const passes = passesFor(style.look).map((kind) => ({
+      kind,
+      cap: (style.caps[kind] ?? [])[0]!,
+      strokes: traceGuide(lettering, comfortableSpeed(dose.flow!)),
+    }));
+    const action: Action = {
+      type: "SPRAY",
+      spot: spotId,
+      style: style.id,
+      colors: { fill: [colors[1]!.id], outline: colors[0]!.id },
+      dose: dose.id,
+      passes,
+      seed,
+    };
+    const bag: Record<string, number> = { ...state.items, [dose.id]: 1 };
+    for (const c of colors) bag[c.id] = 3;
+    for (const p of passes) bag[p.cap] = 1;
+    return reduce({ ...state, room: spot.room, items: bag }, action, content, NOW);
+  }
+
+  it("ein Werk zieht die benutzten Farben ab", () => {
+    // Dosen-Styles gibt es erst ab Tagger, deshalb mit XP. An der Hall ist das Risiko 0,
+    // sonst könnte die Farbe stattdessen einkassiert werden.
+    const before: GameState = { ...withFacts(), xp: 1000 };
+    const r = sprayWithCan(before, "hall", 5);
+    const colors = Object.values(content.items).filter((i) => i.kind === "color");
+    expect(r.state.items[colors[0]!.id]).toBe(2);
+    expect(r.state.items[colors[1]!.id]).toBe(2);
+  });
+
+  it("der Marker wird beim Erwischtwerden nicht einkassiert", () => {
     const before: GameState = { ...withFacts(), wanted: 3, heat: { rolltore: 3 }, phase: 0 };
+    const marker = Object.values(content.items).find((i) => i.kind === "marker")!;
     for (let seed = 1; seed < 400; seed++) {
       const r = sprayAt(before, "rolltore", seed);
+      if (!r.events.some((e) => e.type === "CAUGHT")) continue;
+      expect(r.state.items[marker.id]).toBeGreaterThan(0);
+      return;
+    }
+    throw new Error("keine Saat mit Erwischtwerden gefunden");
+  });
+
+  it("Erwischtwerden bringt auf die Wache, kostet Farbe und den Rest des Tages", () => {
+    const before: GameState = { ...withFacts(), wanted: 3, heat: { rolltore: 3 }, phase: 0, xp: 1000 };
+    for (let seed = 1; seed < 400; seed++) {
+      const r = sprayWithCan(before, "rolltore", seed);
       const caught = r.events.find((e) => e.type === "CAUGHT");
       if (!caught) continue;
       expect(r.state.room).toBe(content.risk!.station_room);
@@ -441,5 +491,65 @@ describe("NPCs nachts und unter Fahndung (M4b)", () => {
         expect(r.stuck, `${npcId} bei ${JSON.stringify(extra)}`).toEqual([]);
       }
     }
+  });
+});
+
+// Material und Geld am echten Inhalt (M5a).
+describe("Material und Geld (M5a)", () => {
+  const content = loadContent();
+
+  it("man startet mit einem Marker und kann damit taggen", () => {
+    // Kalle gibt den T-Tip im ersten Gespräch – der Durchlauf findet ihn.
+    const result = explore(content);
+    const markers = Object.values(content.items).filter((i) => i.kind === "marker");
+    expect(markers.length).toBeGreaterThan(0);
+    expect([...result.items].some((id) => content.items[id]?.kind === "marker")).toBe(true);
+  });
+
+  it("die Marker-Spots gehen nur mit dem Marker, die Wände nur mit der Dose", () => {
+    // Mit XP und vollem Material, damit wirklich nur das Werkzeug blockiert.
+    const marker = Object.values(content.items).find((i) => i.kind === "marker")!;
+    const bag: Record<string, number> = { [marker.id]: 1 };
+    for (const i of Object.values(content.items)) bag[i.id] = 2;
+    const state: GameState = { ...createNewGame(content, "TESTER", NOW), xp: 1000, items: bag };
+    const tag = content.spray!.styles.find((s) => s.id === "tag")!;
+    const canStyle = content.spray!.styles.find((s) => s.tool !== "marker" && !s.only_at)!;
+    const markerSpots = Object.values(content.spots).filter((s) => s.tool === "marker");
+    expect(markerSpots.length).toBeGreaterThanOrEqual(4);
+    for (const spot of markerSpots) {
+      expect(styleBlocker(state, content, canStyle, spot)).toMatch(/Marker/);
+      expect(spot.fits).toContain("tag");
+    }
+    const wall = content.spots.rolltore!;
+    expect(styleBlocker({ ...state, items: {} }, content, tag, wall)).toMatch(/Marker/);
+  });
+
+  it("ohne Farbe geht kein Dosen-Werk, aber der Marker immer noch", () => {
+    const marker = Object.values(content.items).find((i) => i.kind === "marker")!;
+    const dose = Object.values(content.items).find((i) => i.kind === "dose")!;
+    const leer: GameState = {
+      ...createNewGame(content, "TESTER", NOW),
+      xp: 1000,
+      items: { [marker.id]: 1, [dose.id]: 1 },
+    };
+    const canStyle = content.spray!.styles.find((s) => s.tool !== "marker" && !s.only_at)!;
+    const tag = content.spray!.styles.find((s) => s.id === "tag")!;
+    const wall = content.spots.rolltore!;
+    expect(styleBlocker(leer, content, canStyle, wall)).toBe(content.economy!.texts.no_paint);
+    expect(styleBlocker(leer, content, tag, wall)).toBeNull();
+  });
+
+  it("am Zahltag kommt das Taschengeld an", () => {
+    const freitag: GameState = { ...createNewGame(content, "TESTER", NOW), day: 5, phase: 2 };
+    const r = reduce(freitag, { type: "TICK", seconds: 0 }, content, NOW);
+    expect(r.events).toEqual([]);
+    // Ein Tageswechsel über den Samstag: Kalles Untertauchen schiebt den Tag weiter.
+    const after = reduce(
+      { ...freitag, wanted: 1, room: "hinterhof" },
+      { type: "INTERACT", hotspot: "kalle", verb: "sprechen" },
+      content,
+      NOW,
+    );
+    expect(after.state.room).toBe("hinterhof");
   });
 });

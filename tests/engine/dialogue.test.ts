@@ -94,6 +94,7 @@ const content: GameContent = {
   map: null,
   progress: null,
   risk: null,
+  economy: null,
 };
 
 function run(state: GameState, ...actions: Action[]): { state: GameState; events: GameEvent[] } {

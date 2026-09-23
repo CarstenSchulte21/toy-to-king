@@ -19,6 +19,7 @@ hotspots:
   - id: laterne
     label: Laternenmast
     rect: [140, 20, 16, 130]
+    sprühen: laternenmast
     untersuchen: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
 
   - id: kamera

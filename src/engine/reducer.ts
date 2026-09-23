@@ -37,6 +37,7 @@ import {
   styleOf,
   type WorkDraft,
 } from "./spray";
+import { allowanceFor, buy, paintFor, spendPaint } from "./shop";
 import { createNewGame, validatePlayerName, type GameState, type WorkColors } from "./state";
 
 export type Action =
@@ -57,6 +58,7 @@ export type Action =
       passes: { kind: PassKind; cap: string; strokes: Stroke[] }[];
       seed: number;
     }
+  | { type: "BUY"; item: string }
   | { type: "TICK"; seconds: number };
 
 export type GameEvent =
@@ -68,6 +70,7 @@ export type GameEvent =
   | { type: "TRUST_CHANGED"; npc: string; from: number; to: number }
   | { type: "ITEM_GAINED"; item: string; name: string }
   | { type: "SPRAY_OPEN"; spot: string }
+  | { type: "SHOP_OPEN" }
   | {
       type: "SPRAYED";
       spot: string;
@@ -83,6 +86,8 @@ export type GameEvent =
   | { type: "CAUGHT"; lines: string[]; wanted: number; lost: string[]; room: string }
   | { type: "DAY_STARTED"; day: number; weekday: string; text: string; buffed: string[]; crossed: string[] }
   | { type: "PHASE_CHANGED"; day: number; phase: number }
+  | { type: "BOUGHT"; item: string; name: string; price: number; money: number }
+  | { type: "ALLOWANCE"; amount: number; money: number; text: string }
   | { type: "WARNING"; message: string };
 
 export type ReduceResult = { state: GameState; events: GameEvent[] };
@@ -151,6 +156,16 @@ export function reduce(
       const name = content.spots[spotId]?.name ?? spotId;
       events.push({ type: "TEXT", lines: [(texts?.buffed ?? "{spot}: weg.").replace("{spot}", name)] });
     }
+    const amount = allowanceFor(content, state.day ?? 1, next.day);
+    if (amount > 0) {
+      next = { ...next, money: (next.money ?? 0) + amount };
+      events.push({
+        type: "ALLOWANCE",
+        amount,
+        money: next.money,
+        text: (content.economy?.allowance.text ?? "{amount} €").replace("{amount}", String(amount)),
+      });
+    }
     for (const spotId of turn.crossed) {
       const name = content.spots[spotId]?.name ?? spotId;
       events.push({ type: "TEXT", lines: [(texts?.crossed ?? "{spot}: gecrosst.").replace("{spot}", name)] });
@@ -191,6 +206,26 @@ function reduceAction(state: GameState, action: Action, content: GameContent, no
     }
     case "SPRAY":
       return spray(state, action, content, now);
+    case "BUY": {
+      if (!content.economy) return unchanged(state, "Hier gibt es nichts zu kaufen.");
+      const here = content.rooms[state.room]?.hotspots.some((h) => h.kaufen === true);
+      if (!here) return unchanged(state, "Hier verkauft dir keiner was.");
+      const result = buy(state, content, action.item);
+      if (!result.ok) return unchanged(state, result.error);
+      const item = content.items[action.item]!;
+      return {
+        state: result.state,
+        events: [
+          {
+            type: "BOUGHT",
+            item: item.id,
+            name: item.name,
+            price: result.price,
+            money: result.state.money,
+          },
+        ],
+      };
+    }
     case "MARK_FACTS_SEEN": {
       const toMark = action.facts.filter((f) => state.facts[f]?.new);
       if (toMark.length === 0) return { state, events: [] };
@@ -255,6 +290,11 @@ function interact(state: GameState, hotspotId: string, verb: Verb, content: Game
     if (!spot || !isSpotKnown(spot, state, content))
       return unchanged(state, `Hier kann man (noch) nicht sprühen.`);
     return { state, events: [{ type: "SPRAY_OPEN", spot: spot.id }] };
+  }
+
+  if (verb === "kaufen") {
+    if (!content.economy) return unchanged(state, "Hier gibt es nichts zu kaufen.");
+    return { state, events: [{ type: "SHOP_OPEN" }] };
   }
 
   if (verb === "sprechen") {
@@ -328,7 +368,15 @@ function spray(
 
   const hasColor = (id: string | undefined) => id !== undefined && choices.colors.some((c) => c.id === id);
   const { colors } = action;
-  if (style.look === "tag") {
+  // Marker (M5a): Ein Marker ist Dose, Cap und Farbe in einem. Line, Dose und Cap
+  // müssen deshalb derselbe Marker sein, den man auch dabeihat.
+  if (style.tool === "marker") {
+    const marker = choices.markers.find((m) => m.id === colors.line);
+    if (!marker) return unchanged(state, "Dafür brauchst du einen Marker aus deiner Tasche.");
+    if (action.dose !== marker.id || action.passes.some((p) => p.cap !== marker.id)) {
+      return unchanged(state, "Mit dem Marker malst du in einem – kein extra Cap, keine extra Dose.");
+    }
+  } else if (style.look === "tag") {
     if (!hasColor(colors.line)) return unchanged(state, "Für den Tag fehlt eine Farbe, die du hast.");
   } else {
     const fill = colors.fill ?? [];
@@ -339,13 +387,15 @@ function spray(
   for (const extra of [colors.second, colors.background]) {
     if (extra !== undefined && !hasColor(extra)) return unchanged(state, "Die Farbe hast du nicht.");
   }
-  if (!choices.doses.some((d) => d.id === action.dose))
+  if (style.tool !== "marker" && !choices.doses.some((d) => d.id === action.dose))
     return unchanged(state, `Dose "${action.dose}" hast du nicht.`);
   const expected = passesFor(style.look);
   if (action.passes.length !== expected.length || action.passes.some((p, i) => p.kind !== expected[i]))
     return unchanged(state, `Ebenen passen nicht zum Style: erwartet ${expected.join(", ")}.`);
-  for (const p of action.passes) {
-    if (!choices.caps.some((c) => c.id === p.cap)) return unchanged(state, `Cap "${p.cap}" hast du nicht.`);
+  if (style.tool !== "marker") {
+    for (const p of action.passes) {
+      if (!choices.caps.some((c) => c.id === p.cap)) return unchanged(state, `Cap "${p.cap}" hast du nicht.`);
+    }
   }
   const numbers = action.passes.reduce((sum, p) => sum + p.strokes.reduce((n, s) => n + s.length, 0), 0);
   const badStroke = action.passes.some((p) =>
@@ -382,8 +432,10 @@ function spray(
   const totalXp = (state.xp ?? 0) + gain;
   const rankBefore = rankOf(state, content);
 
+  // Material (M5a): Je benutzter Farbe geht eine Dose weg. Marker verbrauchen nichts.
+  const paint = style.tool === "marker" ? [] : paintFor(draft.colors);
   let next: GameState = {
-    ...state,
+    ...spendPaint(state, content, paint),
     works: { ...state.works, [spot.id]: { ...draft, quality: rating.quality, at: now } },
     best: { ...state.best, [spot.id]: Math.max(bestBefore, xp) },
     xp: totalXp,
@@ -435,8 +487,11 @@ function spray(
       next = setWanted(next, (next.wanted ?? 0) + 1);
       next = bumpHeat(next, spot.id, rules.heat_per_caught);
       next = { ...next, caught: (next.caught ?? 0) + 1 };
-      // Die Farben dieses Werks sind weg – der Rest der Tasche bleibt.
-      const lost = usedColors(draft.colors).filter((id) => (next.items[id] ?? 0) > 0);
+      // Die Farben dieses Werks sind weg – Werkzeug bleibt. Sonst stünde man ohne Marker da
+      // und könnte als Toy gar nicht mehr malen (M5a).
+      const lost = usedColors(draft.colors).filter(
+        (id) => content.items[id]?.kind === "color" && (next.items[id] ?? 0) > 0,
+      );
       if (lost.length > 0) {
         const items = { ...next.items };
         for (const id of lost) delete items[id];

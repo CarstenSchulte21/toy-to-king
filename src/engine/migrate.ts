@@ -70,6 +70,16 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
     // v4 → v5 (M4b): Die Welt bekommt Zeit und Risiko. Wer schon gespielt hat, fängt bei Tag 1 an,
     // ohne Heat und ohne Wanted – man wird nicht rückwirkend für etwas gesucht.
     4: (s) => ({ ...s, schemaVersion: 5, day: 1, phase: 0, heat: {}, wanted: 0, caught: 0 }),
+    // v5 → v6 (M5a): Geld. Und ein T-Tip in die Tasche, damit nach dem Update niemand
+    // ohne Marker dasteht und plötzlich nicht mehr taggen kann.
+    5: (s, content) => {
+      const items = { ...((s.items ?? {}) as Record<string, number>) };
+      const marker = Object.values(content?.items ?? {}).find((i) => i.kind === "marker");
+      if (marker && !Object.values(content?.items ?? {}).some((i) => i.kind === "marker" && items[i.id])) {
+        items[marker.id] = 1;
+      }
+      return { ...s, schemaVersion: 6, money: content?.economy?.start_money ?? 0, items };
+    },
   };
 
 export function migrate(saved: unknown, content?: GameContent): GameState {
