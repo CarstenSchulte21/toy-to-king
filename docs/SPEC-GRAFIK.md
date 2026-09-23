@@ -87,7 +87,7 @@ Der Tester wollte echte Namen an allen Wänden, den Kölner Laden und eine Köln
 | Graffiti-Zeichner | `piece()` – eckige Kästen mit Schriftzug | Neuer `graffiti()` in `scripts/lib/art.ts` mit drei Formen: `tag` (dünne Cap, Schräge, Schwung), `throwup` (runde Bubble-Formen, Verlauf, Highlight), `wildstyle` (Arrows, Widerhaken, Connections, Second Outline, 3D-Schatten, Background) |
 | Unterführung | KRUX als Kasten-Piece | KRUX als Wildstyle mit Arrows, weißer Second Outline und 3D |
 | Hall of Fame | Vier gleich aussehende Pieces | Drei Styles nebeneinander: TREN als Wildstyle, SANS und HBF als Throw-up, dazu ein altes, verblasstes Werk darunter |
-| Laden | „FARBEN" | Heißt **DEDICATED**, nach dem Laden in Köln. Keine Sprühdosen mehr im Schaufenster, stattdessen Schuhkartons, Shirts und ein Deck. Innen ein Schild an der Wand und eine mit Stickern zugeklebte Theke. |
+| Laden | „FARBEN" | Heißt **DEDICATED**, nach dem Laden in Köln. Ladenfront wie im echten Leben: Schaufenster und Eingangstür nebeneinander, die Tür in Menschenhöhe. Keine Sprühdosen mehr im Schaufenster, stattdessen Shirts auf der Stange, Schuhkartons auf einem Brett und ein Deck. Sockel voller Aufkleber. Innen ein Schild an der Wand und eine zugeklebte Theke. |
 | Raumname | Farbenladen | **Graffitistore** (`content/rooms/farbenladen.yaml`, `content/npcs/laden.yaml`, `content/facts.yaml`, `content/rooms/strasse.yaml`) |
 | Eisenbahnbrücke | Graue Wand vor Skyline | Grüner Stahlbogen mit zwei Gurtungen und Diagonalen wie an den Kölner Rheinbrücken, Hänger zum Fahrbahnträger, dahinter der Dom mit zwei Türmen, unten die Straße, vorn Gleis und Laufsteg |
 

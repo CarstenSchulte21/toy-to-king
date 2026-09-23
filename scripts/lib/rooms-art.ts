@@ -221,37 +221,68 @@ const strasse: Scene = (R) => {
   rect(a, 140, 150, 15, 6, C.dark_grey);
 
   // Graffitistore [180,50,50,90] – der Laden heißt wie das Vorbild in Köln.
-  box(a, 172, 40, 64, 13, C.black, C.dark_grey, C.black);
-  word(a, 177, 43, 7, "DEDICATED", C.white, C.black);
-  box(a, 178, 56, 54, 56, C.dark_grey, C.grey, C.black);
-  rect(a, 182, 60, 46, 48, C.cyan);
-  dither(a, 182, 60, 46, 48, C.cyan, C.white, 0.3);
-  // Im Schaufenster: Schuhkartons, aufgehängte Shirts, ein Deck an der Rückwand.
-  hline(a, 182, 88, 46, C.dark_grey);
-  for (let k = 0; k < 4; k++) {
-    const bx = 184 + k * 11;
-    box(a, bx, 78, 9, 10, [C.white, C.light_red, C.yellow, C.light_blue][k]!, C.white, C.grey);
-    hline(a, bx + 1, 83, 7, C.dark_grey);
-  }
+  // Ladenfront wie im echten Leben: Schaufenster und Eingangstür nebeneinander,
+  // die Tür so hoch, dass ein Mensch durchpasst.
+  box(a, 166, 39, 72, 14, C.black, C.dark_grey, C.black);
+  word(a, 176, 43, 7, "DEDICATED", C.white, C.black);
+  box(a, 166, 54, 72, 96, C.dark_grey, C.grey, C.black);
+  vline(a, 210, 56, 92, C.black);
+  vline(a, 211, 56, 92, C.grey);
+
+  // Schaufenster
+  rect(a, 170, 58, 39, 78, C.cyan);
+  dither(a, 170, 58, 39, 78, C.cyan, C.white, 0.26);
+  for (const rx of [176, 192]) line(a, rx, 134, rx + 14, 60, C.white);
+  // Shirts auf der Stange
+  hline(a, 172, 66, 35, C.dark_grey);
   for (let k = 0; k < 3; k++) {
-    const sx = 186 + k * 14;
-    hline(a, sx - 3, 63, 9, C.dark_grey);
-    rect(a, sx - 2, 64, 7, 9, [C.purple, C.green, C.orange][k]!);
-    px(a, sx - 3, 65, [C.purple, C.green, C.orange][k]!);
-    px(a, sx + 5, 65, [C.purple, C.green, C.orange][k]!);
+    const sx = 174 + k * 12;
+    rect(a, sx, 68, 8, 11, [C.purple, C.light_green, C.orange][k]!);
+    px(a, sx - 1, 69, [C.purple, C.light_green, C.orange][k]!);
+    px(a, sx + 8, 69, [C.purple, C.light_green, C.orange][k]!);
+    vline(a, sx + 3, 66, 2, C.grey);
   }
-  rect(a, 186, 92, 38, 5, C.dark_brown);
-  hline(a, 186, 92, 38, C.tan);
-  for (const wx of [191, 219]) disc(a, wx, 98, 2, C.black);
-  // Aufkleber an der Scheibe
-  rect(a, 196, 100, 20, 6, C.white);
-  frame(a, 196, 100, 20, 6, C.grey);
-  hline(a, 198, 102, 16, C.black);
-  hline(a, 198, 104, 11, C.black);
-  box(a, 196, 112, 22, 38, C.tan, C.orange, C.dark_brown);
-  disc(a, 213, 132, 2, C.yellow);
-  rect(a, 176, 112, 20, 38, C.dark_grey);
-  dither(a, 176, 112, 20, 38, C.dark_grey, C.black, 0.3);
+  // Regalbrett mit Schuhkartons
+  rect(a, 171, 100, 37, 3, C.dark_brown);
+  hline(a, 171, 100, 37, C.tan);
+  for (let k = 0; k < 3; k++) {
+    const bx = 173 + k * 12;
+    box(a, bx, 89, 10, 11, [C.white, C.light_red, C.yellow][k]!, C.white, C.grey);
+    hline(a, bx + 1, 94, 8, C.dark_grey);
+  }
+  // Deck lehnt im Fenster
+  rect(a, 198, 106, 8, 26, C.dark_brown);
+  hline(a, 199, 106, 6, C.tan);
+  hline(a, 199, 131, 6, C.black);
+  rect(a, 199, 112, 6, 9, C.light_red);
+  for (const wy of [110, 128]) disc(a, 202, wy, 1, C.light_grey);
+  frame(a, 169, 57, 41, 80, C.grey);
+  frame(a, 168, 56, 43, 82, C.black);
+
+  // Sockel unter dem Fenster, vollgeklebt
+  rect(a, 168, 138, 42, 12, C.dark_grey);
+  dither(a, 168, 138, 42, 12, C.dark_grey, C.black, 0.3);
+  for (let k = 0; k < 4; k++) {
+    const sx = 171 + k * 10;
+    rect(a, sx, 141, 8, 5, [C.white, C.yellow, C.light_red, C.cyan][k]!);
+    hline(a, sx + 1, 143, 6, C.black);
+  }
+
+  // Eingangstür
+  box(a, 213, 58, 23, 90, C.grey, C.light_grey, C.dark_grey);
+  rect(a, 216, 62, 17, 48, C.cyan);
+  dither(a, 216, 62, 17, 48, C.cyan, C.white, 0.3);
+  line(a, 220, 106, 230, 68, C.white);
+  frame(a, 216, 62, 17, 48, C.dark_grey);
+  rect(a, 216, 114, 17, 30, C.dark_grey);
+  dither(a, 216, 114, 17, 30, C.dark_grey, C.grey, 0.35);
+  hline(a, 216, 113, 17, C.light_grey);
+  vline(a, 218, 100, 12, C.light_grey);
+  vline(a, 219, 100, 12, C.dark_grey);
+  rect(a, 219, 66, 11, 7, C.white);
+  hline(a, 221, 69, 7, C.black);
+  rect(a, 212, 148, 26, 3, C.light_grey);
+  hline(a, 212, 150, 26, C.grey);
 
   // Kamera [200,28,20,16]
   rect(a, 212, 24, 4, 8, C.dark_grey);
