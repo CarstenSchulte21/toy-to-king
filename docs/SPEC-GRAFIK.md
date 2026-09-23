@@ -87,12 +87,12 @@ Der Tester wollte echte Namen an allen Wänden, den Kölner Laden und eine Köln
 | Graffiti-Zeichner | `piece()` – eckige Kästen mit Schriftzug | Neuer `graffiti()` in `scripts/lib/art.ts` mit drei Formen: `tag` (dünne Cap, Schräge, Schwung), `throwup` (runde Bubble-Formen, Verlauf, Highlight), `wildstyle` (Arrows, Widerhaken, Connections, Second Outline, 3D-Schatten, Background) |
 | Unterführung | KRUX als Kasten-Piece | KRUX als Wildstyle mit Arrows, weißer Second Outline und 3D |
 | Hall of Fame | Vier gleich aussehende Pieces | Drei Styles nebeneinander: ein Wildstyle, zwei Throw-ups, dazu ein altes, verblasstes Werk darunter |
-| Laden | „FARBEN" | Heißt **DEDICATED**, nach dem Laden in Köln. Ladenfront wie im echten Leben: Schaufenster und Eingangstür nebeneinander, die Tür in Menschenhöhe. Keine Sprühdosen mehr im Schaufenster, stattdessen Shirts auf der Stange, Schuhkartons auf einem Brett und ein Deck. Sockel voller Aufkleber. Innen ein Schild an der Wand und eine zugeklebte Theke. |
+| Laden | „FARBEN" | Heißt **DRUCK** (siehe Abschnitt 11). Ladenfront wie im echten Leben: Schaufenster und Eingangstür nebeneinander, die Tür in Menschenhöhe. Keine Sprühdosen mehr im Schaufenster, stattdessen Shirts auf der Stange, Schuhkartons auf einem Brett und ein Deck. Sockel voller Aufkleber. Innen ein Schild an der Wand und eine zugeklebte Theke. |
 | Raumname | Farbenladen | **Graffitistore** (`content/rooms/farbenladen.yaml`, `content/npcs/laden.yaml`, `content/facts.yaml`, `content/rooms/strasse.yaml`) |
 | Eisenbahnbrücke | Graue Wand vor Skyline | Grüner Stahlbogen mit zwei Gurtungen und Diagonalen wie an den Kölner Rheinbrücken, Hänger zum Fahrbahnträger, dahinter der Dom mit zwei Türmen, unten die Straße, vorn Gleis und Laufsteg |
 
-**Fremde Logos:** Der Ladenname steht als Schriftzug in unserem eigenen Pixel-Alphabet. Das echte Logo
-der Firma wird nicht nachgezeichnet – auch nicht in Pixeln.
+**Fremde Logos:** Der Ladenname steht als Schriftzug in unserem eigenen Pixel-Alphabet. Fremde
+Firmenlogos werden nicht nachgezeichnet – auch nicht in Pixeln.
 
 ## 9. Runde 5: Kölner Vorbilder
 
@@ -144,3 +144,17 @@ Wo die Namen stehen:
 | Jugendzentrum | RUBIX (Wildstyle), YARE (Throw-up), CRES (Throw-up, verblasst) | Handstyles, NOX |
 | Eisenbahnbrücke | – (das Blech bleibt frei) | Handstyles auf dem Fahrbahnträger |
 | Abstellgleis | – (die Waggonseite bleibt frei) | zwei Handstyles neben der Tür |
+
+## 11. Der Laden heißt DRUCK
+
+Zwischendurch hieß der Laden **DEDICATED**, nach dem echten Geschäft in Köln. Das ist wieder raus – aus
+demselben Grund wie in Abschnitt 9: Namen echter Firmen, Vereine und Projekte kommen nicht ins Spiel,
+Orte und Gebäude dürfen echten Vorbildern nachempfunden sein.
+
+Der Laden heißt jetzt **DRUCK**. Das Wort passt doppelt: Die Regale im Laden heißen „LOW" und „HIGH",
+also Low und High Pressure, und Druck machen ist genau das, was der Laden dem Spieler abverlangt.
+Kurz genug für ein großes Schild, deutsch, und kein bekannter Graffiti-Laden heißt so.
+
+Der Name steht nur in der Grafik (Fassadenschild an der Straße, Schild an der Wand im Laden). In den
+Texten heißt der Ort weiterhin neutral **Graffitistore** – wer den Namen ändern will, ändert zwei
+Zeilen in `scripts/lib/rooms-art.ts`.
