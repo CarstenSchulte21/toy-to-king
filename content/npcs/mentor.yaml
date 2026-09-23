@@ -89,6 +89,9 @@ dialogue:
           if: [{trust_min: 2}]
           show_locked: "Dafür kennt Kalle dich noch nicht gut genug."
           next: zaun
+        - text: "Ich muss ein paar Tage weg vom Fenster."
+          if: [{wanted_min: 1}]
+          next: untertauchen
         - text: "Guck mal, wie weit ich bin."
           id: rang_tagger
           once: true
@@ -131,6 +134,16 @@ dialogue:
         - "Und nimm den Fat Cap. Deine Fill-ins brauchen das."
       effects:
         - give: fat_cap
+      next: hub
+
+    untertauchen:
+      text:
+        - "Kalle guckt dich kurz an, dann macht er die Tür auf."
+        - "„Rein. Handy aus. Und morgen gehst du nicht an dieselbe Wand.\""
+        - "Du sitzt einen Tag im Hinterhof und machst nichts. Fühlt sich falsch an. Hilft aber."
+      effects:
+        - wanted: -1
+        - advance_day: true
       next: hub
 
     zaun:

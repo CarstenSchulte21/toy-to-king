@@ -1326,3 +1326,131 @@ Die Hintergründe liegen als PNG in `public/art/<room>.png` und entstehen aus Co
 `scripts/lib/rooms-art.ts` malt jede Szene, `npm run art` schreibt die Bilder.
 Jeder Room verweist über `background: <room>.png` darauf. Wer ein Bild ändern will, ändert die Szene
 und lässt `npm run art` neu laufen – ein Test vergleicht Bild und Szene.
+
+## 8. M4b – Risiko (Zeit, Heat, Wanted, Buff)
+
+Werte und Texte stehen in `content/risk.yaml` (siehe `SPEC-M4b.md`, Abschnitt 4). Neu dazu:
+
+### 8.1 Wache
+
+```yaml
+id: wache
+name: Wache
+background: wache.png
+description: "Ein Raum mit Neonlicht und einem Tisch. Deine Tasche liegt offen daneben, halb leer."
+hotspots:
+  - id: brandt_wache
+    label: Frau Brandt
+    rect: [180, 70, 40, 80]
+    untersuchen:
+      - "Sie sortiert deine Dosen in eine Kiste und schreibt etwas auf."
+      - "„Name steht schon dran. Spar dir die Mühe.\""
+      - "„Nächstes Mal ruf einer deiner Freunde an, bevor ich es tue.\""
+
+  - id: tasche_wache
+    label: Deine Tasche
+    rect: [90, 110, 50, 40]
+    untersuchen: "Caps noch da, Farben weg. Hätte schlimmer kommen können."
+
+  - id: raus_wache
+    label: Raus hier
+    rect: [20, 60, 40, 100]
+    gehen: hinterhof
+```
+
+### 8.2 Nowak – Reinigungstrupp
+
+Steht montags an den Rolltoren und macht sie sauber. Nicht der Feind, er hat einen Job.
+Gibt dem Buff ein Gesicht.
+
+```yaml
+id: buff
+name: Nowak
+role: Reinigungstrupp
+room: strasse
+hotspot: nowak
+trust:
+  start: 0
+
+dialogue:
+  start:
+    - if: [{flag: nowak_kennt_dich}]
+      node: wieder_da
+    - node: erstes_mal
+
+  nodes:
+    erstes_mal:
+      text:
+        - "Ein Mann in oranger Jacke zieht den Schlauch vom Wagen."
+        - "„Morgen. Geh mal zwei Schritte weiter, das spritzt.\""
+      effects:
+        - set_flag: nowak_kennt_dich
+      options:
+        - text: "Machen Sie das jede Woche?"
+          next: jede_woche
+        - text: "Das war richtig gute Arbeit, die Sie da wegmachen."
+          next: gute_arbeit
+        - text: "Ich geh dann mal."
+          end: true
+
+    wieder_da:
+      text: "„Du schon wieder. Und ich schon wieder.\""
+      options:
+        - text: "Was macht am meisten Arbeit?"
+          if: [{trust_min: 1}]
+          show_locked: "Nowak redet nicht mit jedem über seine Arbeit."
+          next: arbeit
+        - text: "Lassen Sie was stehen?"
+          next: stehen_lassen
+        - text: "Bis nächste Woche."
+          end: true
+
+    jede_woche:
+      text:
+        - "„Montags die Ladenzeile, mittwochs die Unterführung. Steht so im Plan.\""
+        - "„Die Unterführung lassen wir inzwischen. Da kommt eh am Freitag was Neues.\""
+      effects:
+        - learn: buff_montag
+      next: hub
+
+    gute_arbeit:
+      text:
+        - "Er stellt den Schlauch ab und guckt sich die Wand an."
+        - "„Kunst hin oder her. Ist halt nicht meine Wand und nicht deine.\""
+        - "„Aber ja. Manches ist schade drum.\""
+      effects:
+        - trust: 1
+      next: hub
+
+    arbeit:
+      text:
+        - "„Rolltore sind einfach. Ein Durchgang, fertig.\""
+        - "„Backstein ist die Hölle. Da kriegst du das nie ganz raus, das sieht man noch nach Jahren.\""
+      effects:
+        - trust: 1
+      next: hub
+
+    stehen_lassen:
+      text:
+        - "„Was an der Hall hängt, fasse ich nicht an. Das ist freigegeben, das ist nicht mein Problem.\""
+        - "„Alles andere kommt weg. Nicht persönlich.\""
+      next: hub
+
+    hub:
+      text: "Der Schlauch zischt."
+      options:
+        - text: "Was macht am meisten Arbeit?"
+          if: [{trust_min: 1}]
+          next: arbeit
+        - text: "Lassen Sie was stehen?"
+          next: stehen_lassen
+        - text: "Ich lass Sie mal machen."
+          end: true
+```
+
+### 8.3 Ergänzungen an bestehenden Inhalten
+
+- `content/rooms/strasse.yaml`: neuer Hotspot `nowak`, sichtbar nur `if: [{weekday: mo}]`.
+- `content/spots.yaml`: der Waggon am Abstellgleis geht nur nachts (`{phase: nacht}`).
+- `content/npcs/mentor.yaml`: neue Antwort bei Kalle „Ich muss ein paar Tage weg vom Fenster"
+  (`if: [{wanted_min: 1}]`), Knoten `untertauchen` mit den Effekten `wanted: -1` und `advance_day`.

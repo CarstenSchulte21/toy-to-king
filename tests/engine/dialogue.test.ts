@@ -93,6 +93,7 @@ const content: GameContent = {
   spots: {},
   map: null,
   progress: null,
+  risk: null,
 };
 
 function run(state: GameState, ...actions: Action[]): { state: GameState; events: GameEvent[] } {

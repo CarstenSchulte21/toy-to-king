@@ -532,3 +532,38 @@ export function crack(a: Art, x: number, y: number, len: number, c: number, R: (
     cx += R() < 0.5 ? -1 : R() < 0.5 ? 0 : 1;
   }
 }
+
+// ---------- Nacht (M4b) ----------
+// Statt sieben weitere Szenen zu zeichnen, färbt eine feste Tabelle das Tagbild um:
+// alles wird dunkler und zieht ins Blaue. Was leuchtet, bleibt hell – Lampen, erleuchtete
+// Fenster, Rücklichter. So sieht die Nacht überall gleich aus und bleibt reproduzierbar.
+const NIGHT_KEEP: PaletteKey[] = ["yellow", "light_red", "orange"];
+
+function nearestIndex(r: number, g: number, b: number): number {
+  let best = 0;
+  let bestD = Infinity;
+  PALETTE.forEach((p, i) => {
+    const d = (p.rgb[0] - r) ** 2 + (p.rgb[1] - g) ** 2 + (p.rgb[2] - b) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = i;
+    }
+  });
+  return best;
+}
+
+export const NIGHT_MAP: number[] = PALETTE.map((p, i) => {
+  if (NIGHT_KEEP.includes(p.key)) return i;
+  const [r, g, b] = p.rgb;
+  // Auf 45 % abdunkeln und Richtung Nachtblau ziehen.
+  const nr = Math.round(r * 0.45 + 12);
+  const ng = Math.round(g * 0.45 + 14);
+  const nb = Math.round(b * 0.52 + 38);
+  return nearestIndex(nr, ng, nb);
+});
+
+export function toNight(art: Art): Art {
+  const out = new Uint8Array(art.length);
+  for (let i = 0; i < art.length; i++) out[i] = NIGHT_MAP[art[i]!]!;
+  return out;
+}

@@ -8,6 +8,9 @@ import {
   createNewGame,
   nextRank,
   rankOf,
+  phaseName,
+  weekdayName,
+  wantedLabel,
   reduce,
   viewDialogue,
   type Action,
@@ -24,7 +27,7 @@ import { buildVersion, type FeedbackContext } from "./feedback";
 import { FeedbackPanel } from "./FeedbackPanel";
 import { MapView } from "./MapView";
 import { RoomView } from "./RoomView";
-import { ConfirmNewGame, MainMenu, NameEntry, PauseMenu, RankUp, TextBox } from "./Screens";
+import { ConfirmNewGame, Incident, MainMenu, NameEntry, PauseMenu, RankUp, TextBox } from "./Screens";
 import { SprayScene } from "./SprayScene";
 import { Stage, useStageScale } from "./Stage";
 
@@ -54,6 +57,8 @@ export function Game() {
   const [bagOpen, setBagOpen] = useState(false);
   const [spraySpot, setSpraySpot] = useState<{ spot: string; title: string } | null>(null);
   const [rankUp, setRankUp] = useState<Extract<GameEvent, { type: "RANK_UP" }> | null>(null);
+  // Zwischenfall beim Sprühen (M4b): knapp entkommen oder erwischt.
+  const [incident, setIncident] = useState<{ kind: "escaped" | "caught"; lines: string[] } | null>(null);
   const [feedback, setFeedback] = useState<FeedbackContext | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [debug, setDebug] = useState(false);
@@ -112,6 +117,24 @@ export function Game() {
             break;
           case "SPRAYED":
             // Das Ergebnis zeigt die Sprüh-Szene selbst.
+            break;
+          case "ESCAPED":
+            setIncident({ kind: "escaped", lines: e.lines });
+            break;
+          case "CAUGHT":
+            setIncident({
+              kind: "caught",
+              lines: [
+                ...e.lines,
+                ...(e.lost.length > 0 ? [`Weg: ${e.lost.join(", ")}.`] : []),
+                "Der Rest des Tages ist gelaufen.",
+              ],
+            });
+            break;
+          case "DAY_STARTED":
+            toast(e.text);
+            break;
+          case "PHASE_CHANGED":
             break;
           case "TRUST_CHANGED": {
             const name = content.npcs[e.npc]?.name ?? e.npc;
@@ -247,6 +270,7 @@ export function Game() {
     bagOpen ||
     spraySpot !== null ||
     rankUp !== null ||
+    incident !== null ||
     feedback !== null;
 
   return (
@@ -323,6 +347,16 @@ export function Game() {
                       </i>
                     </span>
                   )}
+                  {content.risk && (
+                    <span className="hud-time">
+                      {weekdayName(content, state.day)} · {phaseName(content, state.phase)}
+                      {state.wanted > 0 && (
+                        <i className="hud-wanted" title={wantedLabel(content, state.wanted)}>
+                          {"!".repeat(state.wanted)}
+                        </i>
+                      )}
+                    </span>
+                  )}
                 </span>
               </div>
             )}
@@ -373,6 +407,9 @@ export function Game() {
                 onSpray={(action) => dispatch(action)}
                 onClose={() => setSpraySpot(null)}
               />
+            )}
+            {incident && !spraySpot && (
+              <Incident kind={incident.kind} lines={incident.lines} onClose={() => setIncident(null)} />
             )}
             {/* Der Aufstieg wartet, bis das Ergebnis an der Wand weggeklickt ist. */}
             {rankUp && !spraySpot && content.progress && (

@@ -131,3 +131,21 @@ export function RankUp(props: {
     </div>
   );
 }
+
+// Zwischenfall beim Sprühen (M4b): knapp entkommen oder erwischt.
+// Bewusst kurz und ohne Zeigefinger – was weh tut, sind Material und Zeit, nicht der Ton.
+export function Incident(props: { kind: "escaped" | "caught"; lines: string[]; onClose: () => void }) {
+  return (
+    <div className={`screen overlay incident incident-${props.kind}`}>
+      <p className="title">{props.kind === "caught" ? "Erwischt" : "Knapp"}</p>
+      {props.lines.map((line, i) => (
+        <p className="menu-text" key={i}>
+          {line}
+        </p>
+      ))}
+      <button className="btn" onPointerUp={props.onClose}>
+        {props.kind === "caught" ? "Raus hier" : "Weiter"}
+      </button>
+    </div>
+  );
+}

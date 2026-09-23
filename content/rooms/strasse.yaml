@@ -33,6 +33,13 @@ hotspots:
     untersuchen: "Eine Polizistin lehnt am Streifenwagen und trinkt Kaffee aus einem Pappbecher."
     sprechen: streife
 
+  - id: nowak
+    label: Mann in oranger Jacke
+    rect: [92, 96, 34, 60]
+    if: [{weekday: mo}]
+    untersuchen: "Ein Reinigungswagen steht auf dem Gehweg. Der Schlauch liegt quer über den Bordstein."
+    sprechen: buff
+
   - id: zum_hinterhof
     label: Hinterhof
     rect: [0, 60, 20, 100]

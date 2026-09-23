@@ -1,0 +1,22 @@
+id: wache
+name: Wache
+background: wache.png
+description: "Ein Raum mit Neonlicht und einem Tisch. Deine Tasche liegt offen daneben, halb leer."
+hotspots:
+  - id: brandt_wache
+    label: Frau Brandt
+    rect: [180, 70, 40, 80]
+    untersuchen:
+      - "Sie sortiert deine Dosen in eine Kiste und schreibt etwas auf."
+      - "„Name steht schon dran. Spar dir die Mühe.\""
+      - "„Nächstes Mal ruf einer deiner Freunde an, bevor ich es tue.\""
+
+  - id: tasche_wache
+    label: Deine Tasche
+    rect: [90, 110, 50, 40]
+    untersuchen: "Caps noch da, Farben weg. Hätte schlimmer kommen können."
+
+  - id: raus_wache
+    label: Raus hier
+    rect: [20, 60, 40, 100]
+    gehen: hinterhof

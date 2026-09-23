@@ -4,6 +4,9 @@
 // (dieselbe Rechnung für die Live-Ansicht und für das gespeicherte Werk).
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import {
+  heatLabel,
+  heatOf,
+  riskFor,
   PASS_LABELS,
   decorFor,
   WORK_H,
@@ -323,6 +326,10 @@ export function SprayScene(props: {
   };
   const colorName = (id?: string) => choices.colors.find((c) => c.id === id)?.name ?? "keine";
 
+  // Risiko und Heat am Spot, so wie es jetzt gerade steht (M4b).
+  const risk = content.risk ? riskFor(content, state, choices.spot) : null;
+  const heat = heatOf(state, choices.spot.id);
+
   return (
     <div className={`overlay spray-scene phase-${phase.kind}`}>
       <canvas
@@ -428,8 +435,17 @@ export function SprayScene(props: {
           </div>
           <div className="sketch-info">
             <span>
-              {props.title} · {TYPE_LABELS[choices.spot.type] ?? choices.spot.type} · Risiko:{" "}
-              {choices.spot.risk}
+              {props.title} · {TYPE_LABELS[choices.spot.type] ?? choices.spot.type}
+              {/* M4b: Das Risiko steht vor dem ersten Strich da – niemand soll überrascht werden. */}
+              {risk ? (
+                <>
+                  {" "}
+                  · Risiko: <i className={`risk risk-${risk.level}`}>{risk.label}</i>
+                  {heat > 0 && <> · {heatLabel(content, heat)}</>}
+                </>
+              ) : (
+                <> · Risiko: {choices.spot.risk}</>
+              )}
             </span>
             <button className="small-btn" onPointerUp={() => setSeed((s) => (s % 999_983) + 17)}>
               Anders

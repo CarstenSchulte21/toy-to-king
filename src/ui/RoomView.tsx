@@ -62,6 +62,12 @@ export function RoomView(props: {
     });
   };
 
+  // Nachts zeigt jeder Raum seine dunkle Fassung (M4b). Die Datei entsteht mit "npm run art".
+  const background =
+    (state.phase ?? 0) >= 2 && room.background
+      ? room.background.replace(/\.png$/, "-night.png")
+      : room.background;
+
   return (
     <div className="room" onPointerUp={() => setMenu(null)}>
       {placeholder ? (
@@ -70,7 +76,7 @@ export function RoomView(props: {
         </div>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- Pixel-Art braucht exakte Größe ohne Optimierung
-        <img className="room-bg" src={`/art/${room.background}`} alt={room.name} draggable={false} />
+        <img className="room-bg" src={`/art/${background}`} alt={room.name} draggable={false} />
       )}
 
       {hotspots.map((h) => {

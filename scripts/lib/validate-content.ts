@@ -18,8 +18,10 @@ import {
   spotsFileSchema,
   spraySchema,
   progressSchema,
+  riskSchema,
   SPOT_TYPES,
   type Progress,
+  type Risk,
   type Condition,
   type Effect,
   type Fact,
@@ -45,6 +47,7 @@ const SPRAY_PATH = "content/spray.yaml";
 const SPOTS_PATH = "content/spots.yaml";
 const MAP_PATH = "content/map.yaml";
 const PROGRESS_PATH = "content/progress.yaml";
+const RISK_PATH = "content/risk.yaml";
 
 export function validateContent(files: ContentFile[]): ValidationResult {
   const errors: string[] = [];
@@ -59,6 +62,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   let spray: SprayRules | null = null;
   let map: MapConfig | null = null;
   let progress: Progress | null = null;
+  let risk: Risk | null = null;
   const fileOf: Record<string, string> = {};
   // Dateien mit Fehlern – Verweise darauf nicht zusätzlich als „fehlt" melden.
   const broken: Broken = {
@@ -117,6 +121,10 @@ export function validateContent(files: ContentFile[]): ValidationResult {
         pushIssues(file.path, data, parsed.error.issues, errors);
         broken.spray = true;
       }
+    } else if (kind === "risk") {
+      const parsed = riskSchema.safeParse(data);
+      if (parsed.success) risk = parsed.data;
+      else pushIssues(file.path, data, parsed.error.issues, errors);
     } else if (kind === "progress") {
       const parsed = progressSchema.safeParse(data);
       if (parsed.success) progress = parsed.data;
@@ -417,7 +425,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   const ok = errors.length === 0 && config !== null;
   return {
     content: ok
-      ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig, progress }
+      ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig, progress, risk }
       : null,
     errors,
     warnings,
@@ -426,7 +434,18 @@ export function validateContent(files: ContentFile[]): ValidationResult {
 
 // ---------------------------------------------------------------------------
 
-type Kind = "config" | "facts" | "items" | "spray" | "spots" | "map" | "progress" | "room" | "npc" | "other";
+type Kind =
+  | "config"
+  | "facts"
+  | "items"
+  | "spray"
+  | "spots"
+  | "map"
+  | "progress"
+  | "risk"
+  | "room"
+  | "npc"
+  | "other";
 
 function kindOf(path: string): Kind {
   if (path === CONFIG_PATH) return "config";
@@ -436,6 +455,7 @@ function kindOf(path: string): Kind {
   if (path === SPOTS_PATH) return "spots";
   if (path === MAP_PATH) return "map";
   if (path === PROGRESS_PATH) return "progress";
+  if (path === RISK_PATH) return "risk";
   if (path.startsWith("content/rooms/")) return "room";
   if (path.startsWith("content/npcs/")) return "npc";
   return "other";

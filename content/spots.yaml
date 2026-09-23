@@ -45,4 +45,4 @@
   fits: [straight, bubble, bombing]
   fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
   risk: hoch
-  if: [{fact: zaun}]
+  if: [{fact: zaun}, {phase: nacht}]
