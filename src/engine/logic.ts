@@ -2,12 +2,15 @@
 // Jeder Bedingungs- und Effekttyp ist ein eigener Fall im switch. Neue Typen kommen als weiterer Fall dazu.
 import type { Condition, Effect, GameContent, Hotspot, Room, TextVariants } from "./content-schema";
 import { hasRank } from "./progress";
+import { heatOf, weekdayOf, PHASE_COUNT } from "./risk";
 import type { GameState } from "./state";
 
 // Kontext: Welcher NPC ist im Gespräch? Nötig für "trust_min: 2" und "trust: 1" ohne Namen.
 export type Ctx = { content: GameContent; npc?: string };
 
 export const MAX_TRUST = 5;
+
+const PHASES_INDEX: Record<string, number> = { tag: 0, abend: 1, nacht: 2 };
 
 // Aktuelles Vertrauen eines NPC – solange nichts passiert ist, der Startwert aus dem Inhalt.
 export function trustOf(state: GameState, content: GameContent, npcId: string): number {
@@ -26,6 +29,16 @@ export function evaluateCondition(condition: Condition, state: GameState, ctx: C
   if ("has" in condition) return (state.items[condition.has] ?? 0) > 0;
   if ("sprayed" in condition) return state.works[condition.sprayed] !== undefined;
   if ("rank_min" in condition) return hasRank(state, ctx.content, condition.rank_min);
+  // Risiko (M4b)
+  if ("wanted_min" in condition) return (state.wanted ?? 0) >= condition.wanted_min;
+  if ("wanted_max" in condition) return (state.wanted ?? 0) <= condition.wanted_max;
+  if ("phase" in condition) {
+    const index = (ctx.content.risk?.phases.length ?? PHASE_COUNT) > 0 ? PHASES_INDEX[condition.phase] : 0;
+    return (state.phase ?? 0) === index;
+  }
+  if ("not_phase" in condition) return (state.phase ?? 0) !== PHASES_INDEX[condition.not_phase];
+  if ("weekday" in condition) return weekdayOf(state.day ?? 1) === condition.weekday;
+  if ("heat_min" in condition) return heatOf(state, condition.heat_min.spot) >= condition.heat_min.value;
   if ("trust_min" in condition) {
     const t = condition.trust_min;
     const npc = typeof t === "number" ? ctx.npc : t.npc;
@@ -59,6 +72,14 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
   if ("give" in effect) {
     return { ...state, items: { ...state.items, [effect.give]: (state.items[effect.give] ?? 0) + 1 } };
   }
+  if ("wanted" in effect) {
+    const next = Math.min(3, Math.max(0, (state.wanted ?? 0) + effect.wanted));
+    if (next === (state.wanted ?? 0)) return state;
+    return { ...state, wanted: next };
+  }
+  if ("advance_day" in effect) {
+    return { ...state, day: (state.day ?? 1) + 1, phase: 0 };
+  }
   if ("trust" in effect) {
     const npcId = ctx.npc;
     const npc = npcId ? ctx.content.npcs[npcId] : undefined;
@@ -72,7 +93,7 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
 }
 
 export function applyEffects(state: GameState, effects: Effect[] | undefined, ctx: Ctx): GameState {
-  return (effects ?? []).reduce((s, e) => applyEffect(s, e, ctx), state);
+  return (effects ?? []).reduce<GameState>((s, e) => applyEffect(s, e, ctx), state);
 }
 
 // Sucht die passende Textvariante: erste Variante, deren Bedingungen erfüllt sind (SPEC 4.3).

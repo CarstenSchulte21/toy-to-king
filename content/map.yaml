@@ -7,6 +7,7 @@ places:
     pos: [140, 110]
   - room: farbenladen
     pos: [150, 70]
+    if: [{not_phase: nacht}]
   - room: unterfuehrung
     pos: [220, 125]
   - room: jugendzentrum

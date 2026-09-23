@@ -8,6 +8,8 @@ trust:
 
 dialogue:
   start:
+    - if: [{flag: sibel_kennt_dich}, {wanted_min: 2}]
+      node: vorsichtig
     - if: [{flag: sibel_kennt_dich}]
       node: wieder_da
     - node: erstes_mal
@@ -37,6 +39,13 @@ dialogue:
         - "Aber Low Pressure ist für den Anfang eh besser. Verzeiht mehr."
       effects:
         - learn: druck
+      next: hub
+
+    vorsichtig:
+      text:
+        - "Sie sieht dich und lässt die Hand kurz auf der Kasse liegen."
+        - "Ich hab nichts gegen dich. Aber ich hab hier einen Laden."
+        - "Wenn hier einer in Uniform reinkommt und nach dir fragt, kenn ich dich nicht. Klar?"
       next: hub
 
     wieder_da:

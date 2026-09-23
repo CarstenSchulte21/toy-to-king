@@ -19,6 +19,10 @@ import {
   traceGuide,
   reduce,
   trustOf,
+  startNode,
+  isHotspotVisible,
+  visibleHotspots,
+  mapPlaces,
   viewDialogue,
   type Action,
   type GameContent,
@@ -225,8 +229,19 @@ describe("Durchlauf durch die echten Inhalte", () => {
 
   it("alle Rooms und alle NPCs sind vom Start aus erreichbar", () => {
     const rooms = reachableRooms(content);
-    expect([...rooms].sort()).toEqual(Object.keys(content.rooms).sort());
+    // Die Wache betritt man nie freiwillig – dorthin bringt einen nur das Erwischtwerden.
+    const station = content.risk?.station_room;
+    const walkable = Object.keys(content.rooms).filter((r) => r !== station);
+    expect([...rooms].sort()).toEqual(walkable.sort());
     for (const npc of Object.values(content.npcs)) expect(rooms).toContain(npc.room);
+  });
+
+  it("von der Wache kommt man wieder weg", () => {
+    const station = content.risk?.station_room;
+    expect(station).toBeTruthy();
+    const room = content.rooms[station!];
+    expect(room).toBeTruthy();
+    expect(room!.hotspots.some((h) => h.gehen !== undefined)).toBe(true);
   });
 });
 
@@ -287,4 +302,144 @@ describe("Aufstieg (M4a)", () => {
     }
     expect(reached).toEqual(content.progress!.ranks.map((r) => r.id));
   }, 120_000);
+});
+
+// Risiko (M4b) am echten Inhalt: Wer erwischt wird, verliert Material und Zeit –
+// aber nicht sein Werk und nicht seinen Fortschritt.
+describe("Risiko (M4b)", () => {
+  const content = loadContent();
+
+  function sprayAt(state: GameState, spotId: string, seed: number) {
+    const spot = content.spots[spotId]!;
+    const style = content.spray!.styles.find((s) => s.id === "tag")!;
+    const dose = Object.values(content.items).find((i) => i.kind === "dose")!;
+    const color = Object.values(content.items).find((i) => i.kind === "color")!;
+    const cap = (style.caps.line ?? [])[0]!;
+    const lettering = buildLettering(state.player.name, style.look, 3);
+    const action: Action = {
+      type: "SPRAY",
+      spot: spotId,
+      style: style.id,
+      colors: { line: color.id },
+      dose: dose.id,
+      passes: [{ kind: "line", cap, strokes: traceGuide(lettering, comfortableSpeed(dose.flow!)) }],
+      seed,
+    };
+    const ready: GameState = {
+      ...state,
+      room: spot.room,
+      items: { ...state.items, [dose.id]: 1, [color.id]: 1, [cap]: 1 },
+    };
+    return reduce(ready, action, content, NOW);
+  }
+
+  function withFacts(): GameState {
+    const s = createNewGame(content, "TESTER", NOW);
+    return { ...s, facts: Object.fromEntries(Object.keys(content.facts).map((f) => [f, { new: false }])) };
+  }
+
+  it("Sprühen schiebt die Zeit weiter", () => {
+    const before = withFacts();
+    // Saat suchen, bei der nichts passiert – dann zählt nur der Zeitfortschritt.
+    for (let seed = 1; seed < 400; seed++) {
+      const r = sprayAt(before, "rolltore", seed);
+      if (r.events.some((e) => e.type === "ESCAPED" || e.type === "CAUGHT")) continue;
+      expect(r.state.phase).toBe(before.phase + 1);
+      return;
+    }
+    throw new Error("keine Saat ohne Zwischenfall gefunden");
+  });
+
+  it("Erwischtwerden bringt auf die Wache, kostet Farbe und den Rest des Tages", () => {
+    const before: GameState = { ...withFacts(), wanted: 3, heat: { rolltore: 3 }, phase: 0 };
+    for (let seed = 1; seed < 400; seed++) {
+      const r = sprayAt(before, "rolltore", seed);
+      const caught = r.events.find((e) => e.type === "CAUGHT");
+      if (!caught) continue;
+      expect(r.state.room).toBe(content.risk!.station_room);
+      expect(r.state.day).toBe(before.day + 1);
+      expect(r.state.phase).toBe(0);
+      expect(caught.lost.length).toBeGreaterThan(0);
+      // Das Werk bleibt an der Wand, die XP bleiben auch.
+      expect(r.state.works.rolltore).toBeDefined();
+      expect(r.state.xp).toBeGreaterThanOrEqual(before.xp);
+      return;
+    }
+    throw new Error("keine Saat mit Erwischtwerden gefunden");
+  });
+
+  it("nachts ist der Graffitistore zu – weder über die Straße noch über die Karte", () => {
+    const tag: GameState = { ...withFacts(), room: "strasse", phase: 0 };
+    const night: GameState = { ...tag, phase: 2 };
+    const strasse = content.rooms.strasse!;
+    const ids = (s: GameState) => visibleHotspots(strasse, s, content).map((h) => h.id);
+    expect(ids(tag)).toContain("zum_laden");
+    expect(ids(tag)).not.toContain("laden_zu");
+    expect(ids(night)).not.toContain("zum_laden");
+    expect(ids(night)).toContain("laden_zu");
+    expect(mapPlaces(night, content).map((p) => p.room)).not.toContain("farbenladen");
+    expect(mapPlaces(tag, content).map((p) => p.room)).toContain("farbenladen");
+    // Und wer es trotzdem versucht, kommt nicht rein.
+    const r = reduce(night, { type: "TRAVEL", room: "farbenladen" }, content, NOW);
+    expect(r.state.room).toBe("strasse");
+  });
+
+  it("ein Werk an der Hall senkt das Wanted", () => {
+    const before: GameState = { ...withFacts(), wanted: 2 };
+    const r = sprayAt(before, "hall", 7);
+    expect(r.state.wanted).toBe(1);
+    expect(r.events.some((e) => e.type === "CAUGHT" || e.type === "ESCAPED")).toBe(false);
+  });
+});
+
+// NPCs merken die Tageszeit und die Fahndung (M4b, Backlog F7.2).
+describe("NPCs nachts und unter Fahndung (M4b)", () => {
+  const content = loadContent();
+  const KNOWN = {
+    kalle_kennt_dich: true,
+    krux_kennt_dich: true,
+    sibel_kennt_dich: true,
+    brandt_kennt_dich: true,
+  } as const;
+
+  function seed(extra: Partial<GameState> = {}): GameState {
+    const s = createNewGame(content, "TESTER", NOW);
+    return {
+      ...s,
+      facts: Object.fromEntries(Object.keys(content.facts).map((f) => [f, { new: false }])),
+      flags: { ...KNOWN },
+      ...extra,
+    };
+  }
+
+  const startFor = (npcId: string, s: GameState) => startNode(s, content, content.npcs[npcId]!);
+
+  it("Frau Brandt redet nachts anders und reagiert auf die Fahndung", () => {
+    expect(startFor("streife", seed())).toBe("wieder_da");
+    expect(startFor("streife", seed({ phase: 2 }))).toBe("nachts");
+    expect(startFor("streife", seed({ wanted: 1 }))).toBe("abtasten");
+    expect(startFor("streife", seed({ wanted: 2 }))).toBe("gesucht");
+  });
+
+  it("KRUX findet die Fahndung gut, Kalle und Sibel nicht", () => {
+    expect(startFor("rivale", seed({ phase: 2 }))).toBe("nachts");
+    expect(startFor("rivale", seed({ wanted: 2 }))).toBe("gesucht");
+    expect(startFor("mentor", seed({ phase: 2 }))).toBe("nachts");
+    expect(startFor("mentor", seed({ wanted: 2 }))).toBe("sorge");
+    expect(startFor("laden", seed({ wanted: 2 }))).toBe("vorsichtig");
+  });
+
+  it("auch nachts und unter Fahndung bleibt man in keinem Gespräch hängen", () => {
+    for (const extra of [{ phase: 2 }, { wanted: 1 }, { wanted: 2 }, { wanted: 3, phase: 2 }]) {
+      for (const npcId of Object.keys(content.npcs)) {
+        const npc = content.npcs[npcId]!;
+        const state = seed(extra);
+        // Wer gerade gar nicht da ist (Nowak ist nur montags tagsüber da), wird auch nicht geprüft.
+        const hotspot = content.rooms[npc.room]?.hotspots.find((h) => h.id === npc.hotspot);
+        if (!hotspot || !isHotspotVisible(hotspot, state, content)) continue;
+        const r = exploreNpc(content, state, npcId);
+        expect(r.stuck, `${npcId} bei ${JSON.stringify(extra)}`).toEqual([]);
+      }
+    }
+  });
 });

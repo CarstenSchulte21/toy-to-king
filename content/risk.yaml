@@ -1,0 +1,54 @@
+# Risiko (M4b): Zeit, Heat, Wanted, Erwischtwerden, Buff und Crossen.
+# Alle Wahrscheinlichkeiten als Anteil: 0.25 heißt jedes vierte Mal.
+phases: [Tag, Abend, Nacht]
+weekdays: [Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag]
+heat_labels: [ruhig, beobachtet, heiß, verbrannt]
+wanted_labels: [unauffällig, bekannt, gesucht, ganz oben auf der Liste]
+risk_labels: [kaum was, geht schon, wird eng, Selbstmord]
+
+# Grundrisiko je Spot-Typ
+base:
+  legale_wand: 0
+  rolltor: 0.25
+  hauswand: 0.15
+  heaven_spot: 0.4
+  zug: 0.45
+
+per_heat: 0.12
+per_wanted: 0.1
+per_phase: [0.15, 0, -0.15] # Tag, Abend, Nacht
+slow_max: 0.15
+cap: 0.85
+caught_share: 0.34
+
+heat_per_work: 1
+heat_per_caught: 3
+heat_decay: 1
+
+buff_per_day:
+  rolltor: 0.2
+  hauswand: 0.1
+  heaven_spot: 0.05
+  zug: 0.15
+  legale_wand: 0
+buff_weekday: { day: mo, type: rolltor }
+
+wanted_relief_legal: 1
+cross_per_day: 0.2
+cross_max_quality: 1
+
+station_room: wache
+
+texts:
+  escaped:
+    - "Schritte. Du lässt die Dose fallen und rennst."
+    - "Zwei Straßen weiter bleibst du stehen. Niemand hinter dir. Aber gesehen haben sie dich."
+  caught:
+    - "Eine Hand am Kragen. Das war's."
+  buffed: "{spot}: alles grau. Weg."
+  crossed: "Über deinem Ding an {spot} liegt ein Cross. NOX."
+  day: "{weekday}, Tag {day}."
+  hide_out:
+    - "Kalle guckt dich an und macht die Tür auf."
+    - "Du sitzt einen Tag im Hinterhof und machst nichts. Fühlt sich falsch an. Hilft aber."
+  no_time: "Für heute ist Schluss. Morgen weiter."

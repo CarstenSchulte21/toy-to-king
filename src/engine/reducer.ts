@@ -17,6 +17,16 @@ import {
 import { passesFor, type PassKind, type Stroke } from "./lettering";
 import { rankOf, timeLeftShare, xpForWork, xpGain } from "./progress";
 import {
+  advanceTime,
+  bumpHeat,
+  passDays,
+  riskFor,
+  rollOutcome,
+  setWanted,
+  weekdayName,
+  type Outcome,
+} from "./risk";
+import {
   isSpotKnown,
   mapPlaces,
   rateWork,
@@ -69,6 +79,10 @@ export type GameEvent =
     }
   | { type: "XP_GAINED"; amount: number; total: number }
   | { type: "RANK_UP"; rank: string; name: string; text?: string; unlocks?: string }
+  | { type: "ESCAPED"; lines: string[]; wanted: number }
+  | { type: "CAUGHT"; lines: string[]; wanted: number; lost: string[]; room: string }
+  | { type: "DAY_STARTED"; day: number; weekday: string; text: string; buffed: string[]; crossed: string[] }
+  | { type: "PHASE_CHANGED"; day: number; phase: number }
   | { type: "WARNING"; message: string };
 
 export type ReduceResult = { state: GameState; events: GameEvent[] };
@@ -116,6 +130,33 @@ export function reduce(
       (k) => !before.has(k) && !next.newlyVisible.includes(k),
     );
     if (fresh.length > 0) next = { ...next, newlyVisible: [...next.newlyVisible, ...fresh] };
+  }
+
+  // Tageswechsel: Heat kühlt ab, die Stadt bufft, NOX crosst. Egal, wodurch der Tag vorbei ist.
+  if ((next.day ?? 1) > (state.day ?? 1)) {
+    const turn = passDays(next, content, state.day ?? 1);
+    next = turn.state;
+    const texts = content.risk?.texts;
+    events.push({
+      type: "DAY_STARTED",
+      day: next.day,
+      weekday: weekdayName(content, next.day),
+      text: (texts?.day ?? "Tag {day}.")
+        .replace("{day}", String(next.day))
+        .replace("{weekday}", weekdayName(content, next.day)),
+      buffed: turn.buffed,
+      crossed: turn.crossed,
+    });
+    for (const spotId of turn.buffed) {
+      const name = content.spots[spotId]?.name ?? spotId;
+      events.push({ type: "TEXT", lines: [(texts?.buffed ?? "{spot}: weg.").replace("{spot}", name)] });
+    }
+    for (const spotId of turn.crossed) {
+      const name = content.spots[spotId]?.name ?? spotId;
+      events.push({ type: "TEXT", lines: [(texts?.crossed ?? "{spot}: gecrosst.").replace("{spot}", name)] });
+    }
+  } else if ((next.phase ?? 0) !== (state.phase ?? 0)) {
+    events.push({ type: "PHASE_CHANGED", day: next.day, phase: next.phase });
   }
 
   if (action.type !== "TICK") next = { ...next, meta: { ...next.meta, updatedAt: now } };
@@ -263,6 +304,11 @@ function chooseOption(
   return goToNode(next, content, action.npc, option.next);
 }
 
+function toLines(value: string | string[] | undefined): string[] {
+  if (value === undefined) return [];
+  return typeof value === "string" ? [value] : value;
+}
+
 const MAX_SAMPLES = 12000; // Zahlen je Werk – schützt den Spielstand vor riesigen Fingerbahnen
 
 function spray(
@@ -336,7 +382,7 @@ function spray(
   const totalXp = (state.xp ?? 0) + gain;
   const rankBefore = rankOf(state, content);
 
-  const next: GameState = {
+  let next: GameState = {
     ...state,
     works: { ...state.works, [spot.id]: { ...draft, quality: rating.quality, at: now } },
     best: { ...state.best, [spot.id]: Math.max(bestBefore, xp) },
@@ -373,5 +419,51 @@ function spray(
       ...(rankAfter.unlocks ? { unlocks: rankAfter.unlocks } : {}),
     });
   }
+
+  // Risiko (M4b): Erst ist das Werk fertig, dann entscheidet sich, ob jemand hingeguckt hat.
+  const rules = content.risk;
+  if (rules) {
+    const slow = lettering ? 1 - timeLeftShare(lettering, content, draft) : 0;
+    const view = riskFor(content, state, spot, slow);
+    const outcome: Outcome = rollOutcome(content, view.chance, action.seed);
+    next = bumpHeat(next, spot.id, rules.heat_per_work);
+
+    if (outcome === "escaped") {
+      next = setWanted(next, (next.wanted ?? 0) + 1);
+      events.push({ type: "ESCAPED", lines: toLines(rules.texts.escaped), wanted: next.wanted });
+    } else if (outcome === "caught") {
+      next = setWanted(next, (next.wanted ?? 0) + 1);
+      next = bumpHeat(next, spot.id, rules.heat_per_caught);
+      next = { ...next, caught: (next.caught ?? 0) + 1 };
+      // Die Farben dieses Werks sind weg – der Rest der Tasche bleibt.
+      const lost = usedColors(draft.colors).filter((id) => (next.items[id] ?? 0) > 0);
+      if (lost.length > 0) {
+        const items = { ...next.items };
+        for (const id of lost) delete items[id];
+        next = { ...next, items };
+      }
+      // Der Rest des Tages ist weg, und man wacht auf der Wache auf.
+      next = { ...next, day: (next.day ?? 1) + 1, phase: 0, room: rules.station_room };
+      events.push({
+        type: "CAUGHT",
+        lines: toLines(rules.texts.caught),
+        wanted: next.wanted,
+        lost: lost.map((id) => content.items[id]?.name ?? id),
+        room: rules.station_room,
+      });
+    } else {
+      next = advanceTime(next);
+    }
+    // An der legalen Wand malen heißt: Man war einen Abschnitt lang jemand, den keiner sucht.
+    if (spot.type === "legale_wand" && rules.wanted_relief_legal > 0) {
+      next = setWanted(next, (next.wanted ?? 0) - rules.wanted_relief_legal);
+    }
+  }
   return { state: next, events };
+}
+
+/** Alle Farb-IDs, die in einem Werk stecken – ohne Doppelte. */
+function usedColors(colors: WorkColors): string[] {
+  const all = [colors.line, ...(colors.fill ?? []), colors.outline, colors.second, colors.background];
+  return [...new Set(all.filter((c): c is string => c !== undefined))];
 }

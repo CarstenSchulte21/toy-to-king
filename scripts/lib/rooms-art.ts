@@ -921,6 +921,99 @@ const abstellgleis: Scene = (R) => {
   return a;
 };
 
+// Die Wache (M4b): kalt, leer, ein Bildschirm lang. Hier hält man sich nicht auf.
+const wache: Scene = (R) => {
+  const a = newArt(C.grey_pale);
+  // Decke mit Neonröhren
+  rect(a, 0, 0, ART_W, 16, C.grey_soft);
+  dither(a, 0, 0, ART_W, 16, C.grey_soft, C.grey_mid, 0.4);
+  for (const lx of [70, 190]) {
+    box(a, lx, 6, 60, 6, C.white, C.white, C.grey);
+    lightCone(a, lx + 30, 12, 120, 60, C.white);
+  }
+  // Wand mit Fliesenspiegel unten
+  rect(a, 0, 16, ART_W, 118, C.grey_pale);
+  dither(a, 0, 16, ART_W, 118, C.grey_pale, C.grey_soft, 0.3);
+  dither(a, 0, 100, ART_W, 34, C.grey_soft, C.grey_mid, 0.4);
+  hline(a, 0, 100, ART_W, C.grey_mid);
+  for (let x = 0; x < ART_W; x += 16) vline(a, x, 101, 33, C.grey_mid);
+  for (let y = 108; y < 134; y += 12) hline(a, 0, y, ART_W, C.grey_mid);
+  grain(a, 0, 16, ART_W, 118, C.grey_mid, 0.03, R);
+  // Boden
+  rect(a, 0, 134, ART_W, 46, C.grey_mid);
+  hline(a, 0, 134, ART_W, C.grey_soft);
+  dither(a, 0, 136, ART_W, 44, C.grey_mid, C.dark_grey, 0.3);
+  for (let k = -3; k < 8; k++) line(a, 150 + k * 22, 134, 150 + k * 80, ART_H, C.dark_grey);
+
+  // Uhr und Aushang an der Wand
+  disc(a, 262, 34, 9, C.white);
+  frame(a, 253, 25, 19, 19, C.dark_grey);
+  disc(a, 262, 34, 8, C.grey_pale);
+  line(a, 262, 34, 262, 28, C.black);
+  line(a, 262, 34, 267, 36, C.black);
+  poster(a, 40, 26, 22, 28, C.white, C.grey_mid, R);
+  poster(a, 68, 30, 20, 22, C.grey_pale, C.grey_mid, R);
+
+  // Tür nach draußen [20,60,40,100]
+  box(a, 16, 56, 48, 88, C.grey_soft, C.grey_pale, C.grey_mid);
+  rect(a, 20, 60, 40, 80, C.dark_grey);
+  dither(a, 20, 60, 40, 80, C.dark_grey, C.grey_mid, 0.3);
+  rect(a, 24, 66, 32, 26, C.navy);
+  dither(a, 24, 66, 32, 26, C.navy, C.black, 0.4);
+  frame(a, 24, 66, 32, 26, C.grey_mid);
+  disc(a, 54, 104, 2, C.light_grey);
+  rect(a, 30, 146, 22, 3, C.dark_grey);
+
+  // Tisch mit der Tasche [90,110,50,40]
+  box(a, 78, 108, 84, 10, C.tan, C.orange, C.dark_brown);
+  rect(a, 84, 118, 5, 28, C.dark_brown);
+  rect(a, 150, 118, 5, 28, C.dark_brown);
+  // Kiste mit beschlagnahmten Dosen
+  box(a, 92, 88, 46, 20, C.dark_brown, C.brown, C.black);
+  rect(a, 94, 90, 42, 3, C.black);
+  for (let i = 0; i < 5; i++) {
+    const cx = 96 + i * 8;
+    rect(a, cx, 78, 6, 12, [C.grey, C.grey_soft, C.light_grey, C.grey, C.grey_soft][i]!);
+    vline(a, cx, 78, 12, C.light_grey);
+    rect(a, cx + 1, 75, 4, 3, C.grey_mid);
+  }
+  // Zettel auf dem Tisch
+  rect(a, 140, 104, 16, 5, C.white);
+  hline(a, 142, 106, 12, C.grey_mid);
+
+  // Frau Brandt [180,70,40,80]
+  character(a, 188, 66, 78, BRANDT);
+
+  // Vergitterter Durchgang rechts
+  rect(a, 286, 40, 34, 100, C.black);
+  frame(a, 286, 40, 34, 100, C.grey_mid);
+  for (let x = 290; x < 318; x += 6) vline(a, x, 42, 96, C.grey_soft);
+  for (let y = 46; y < 138; y += 14) hline(a, 288, y, 30, C.grey);
+  return a;
+};
+
+// Ein paar Räume sehen nachts nicht nur dunkler aus, sondern anders: Der Laden hat zu.
+// Das wird nach dem Umfärben auf das Nachtbild gemalt.
+export const NIGHT_OVERLAYS: Record<string, (a: Art, R: () => number) => void> = {
+  strasse: (a, R) => {
+    // Rollladen über der ganzen Ladenfront
+    rect(a, 166, 54, 72, 96, C.grey_darker);
+    shutter(a, 168, 56, 68, 92, C.grey_darker, C.grey_mid, C.black);
+    frame(a, 168, 56, 68, 92, C.black);
+    rect(a, 192, 140, 20, 5, C.grey_mid);
+    disc(a, 202, 142, 2, C.black);
+    rect(a, 170, 146, 64, 4, C.black);
+    grain(a, 168, 56, 68, 92, C.black, 0.05, R);
+    // Zettel an der Scheibe
+    rect(a, 176, 90, 18, 12, C.grey_soft);
+    frame(a, 176, 90, 18, 12, C.grey_mid);
+    hline(a, 178, 94, 14, C.grey_darker);
+    hline(a, 178, 97, 10, C.grey_darker);
+    // Ein paar Tags auf dem frischen Blech
+    tags(a, 172, 100, 60, 26, [C.black], 1, R);
+  },
+};
+
 export const SCENES: Record<string, Scene> = {
   hinterhof,
   strasse,
@@ -929,6 +1022,7 @@ export const SCENES: Record<string, Scene> = {
   jugendzentrum,
   bruecke,
   abstellgleis,
+  wache,
 };
 
 export function drawRoom(id: string, seed = 7): Art | null {

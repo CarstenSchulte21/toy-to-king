@@ -13,6 +13,12 @@ export const MAX_TEXT_LENGTH = 120;
 export const MIN_HOTSPOT_SIZE = 16;
 export const ALLOWED_PLACEHOLDERS = ["name", "crew"] as const;
 
+// Risiko (M4b): Ein Tag hat drei Abschnitte, die Woche sieben Tage.
+export const PHASES = ["tag", "abend", "nacht"] as const;
+export const WEEKDAYS = ["mo", "di", "mi", "do", "fr", "sa", "so"] as const;
+export type Phase = (typeof PHASES)[number];
+export type Weekday = (typeof WEEKDAYS)[number];
+
 const id = z
   .string()
   .regex(
@@ -36,10 +42,18 @@ export const conditionSchema = z.union(
     z.strictObject({ has: id }),
     z.strictObject({ sprayed: id }),
     z.strictObject({ rank_min: id }), // Rang aus progress.yaml (M4a)
+    // Risiko (M4b)
+    z.strictObject({ wanted_min: z.number().int().min(0).max(3) }),
+    z.strictObject({ wanted_max: z.number().int().min(0).max(3) }),
+    z.strictObject({ phase: z.enum(PHASES) }),
+    z.strictObject({ not_phase: z.enum(PHASES) }),
+    z.strictObject({ weekday: z.enum(WEEKDAYS) }),
+    z.strictObject({ heat_min: z.strictObject({ spot: id, value: z.number().int().min(0).max(3) }) }),
   ],
   {
     error:
-      "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed, rank_min.",
+      "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed, " +
+      "rank_min, wanted_min, wanted_max, phase, not_phase, weekday, heat_min.",
   },
 );
 
@@ -50,8 +64,13 @@ export const effectSchema = z.union(
     z.strictObject({ learn: id }),
     z.strictObject({ trust: z.number().int().min(-5).max(5) }),
     z.strictObject({ give: id }),
+    z.strictObject({ wanted: z.number().int().min(-3).max(3) }), // M4b
+    z.strictObject({ advance_day: z.literal(true) }), // M4b: abtauchen kostet einen ganzen Tag
   ],
-  { error: "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give." },
+  {
+    error:
+      "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give, wanted, advance_day.",
+  },
 );
 
 const lines = z.union([text, z.array(text).min(1)], {
@@ -259,6 +278,42 @@ export const progressSchema = z.strictObject({
   rank_up_title: text, // Überschrift auf dem Aufstiegs-Bildschirm
 });
 
+// Risiko-Regeln (M4b): Wie wahrscheinlich ist es, dass an einem Spot etwas passiert?
+const share = z.number().min(0).max(1);
+
+export const riskSchema = z.strictObject({
+  phases: z.array(text).length(3, "phases braucht genau drei Namen: Tag, Abend, Nacht."),
+  weekdays: z.array(text).length(7, "weekdays braucht genau sieben Namen, beginnend mit Montag."),
+  heat_labels: z.array(text).length(4, "heat_labels braucht genau vier Stufen (0–3)."),
+  wanted_labels: z.array(text).length(4, "wanted_labels braucht genau vier Stufen (0–3)."),
+  risk_labels: z.array(text).length(4, "risk_labels braucht genau vier Stufen für die Anzeige im Sketch."),
+  base: z.partialRecord(z.enum(SPOT_TYPES), share),
+  per_heat: share,
+  per_wanted: share,
+  per_phase: z.array(z.number().min(-1).max(1)).length(3, "per_phase braucht genau drei Werte."),
+  slow_max: share, // Aufschlag, wenn man lange an der Wand steht
+  cap: share, // Obergrenze
+  caught_share: share, // Anteil der Zwischenfälle, die im Erwischtwerden enden
+  heat_per_work: z.number().int().min(0).max(3),
+  heat_per_caught: z.number().int().min(0).max(3),
+  heat_decay: z.number().int().min(0).max(3),
+  buff_per_day: z.partialRecord(z.enum(SPOT_TYPES), share),
+  buff_weekday: z.strictObject({ day: z.enum(WEEKDAYS), type: z.enum(SPOT_TYPES) }).optional(),
+  wanted_relief_legal: z.number().int().min(0).max(3), // Werk an der legalen Wand senkt Wanted
+  cross_per_day: share,
+  cross_max_quality: z.number().int().min(0).max(3),
+  station_room: id, // Raum, in dem man nach dem Erwischtwerden aufwacht
+  texts: z.strictObject({
+    escaped: lines,
+    caught: lines,
+    buffed: text, // {spot} wird ersetzt
+    crossed: text, // {spot} wird ersetzt
+    day: text, // {day} und {weekday}
+    hide_out: lines,
+    no_time: text,
+  }),
+});
+
 export const FACT_CATEGORIES = ["spot", "risiko", "crews", "material", "szene"] as const;
 
 export const factSchema = z.strictObject({
@@ -337,6 +392,7 @@ export type Spot = z.infer<typeof spotSchema>;
 export type MapConfig = z.infer<typeof mapSchema>;
 export type Rank = z.infer<typeof rankSchema>;
 export type Progress = z.infer<typeof progressSchema>;
+export type Risk = z.infer<typeof riskSchema>;
 
 export type GameContent = {
   config: GameConfig;
@@ -348,4 +404,5 @@ export type GameContent = {
   spots: Record<string, Spot>;
   map: MapConfig | null;
   progress: Progress | null;
+  risk: Risk | null;
 };

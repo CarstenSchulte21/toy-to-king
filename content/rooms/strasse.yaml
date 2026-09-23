@@ -33,6 +33,13 @@ hotspots:
     untersuchen: "Eine Polizistin lehnt am Streifenwagen und trinkt Kaffee aus einem Pappbecher."
     sprechen: streife
 
+  - id: nowak
+    label: Mann in oranger Jacke
+    rect: [92, 96, 34, 60]
+    if: [{weekday: mo}, {not_phase: nacht}]
+    untersuchen: "Ein Reinigungswagen steht auf dem Gehweg. Der Schlauch liegt quer über den Bordstein."
+    sprechen: buff
+
   - id: zum_hinterhof
     label: Hinterhof
     rect: [0, 60, 20, 100]
@@ -41,7 +48,17 @@ hotspots:
   - id: zum_laden
     label: Graffitistore
     rect: [180, 50, 50, 90]
+    if: [{not_phase: nacht}]
+    untersuchen: "Durch die Scheibe siehst du die Regale. Sibel sortiert irgendwas ein."
     gehen: farbenladen
+
+  - id: laden_zu
+    label: Graffitistore (zu)
+    rect: [180, 50, 50, 90]
+    if: [{phase: nacht}]
+    untersuchen:
+      - "Rollladen runter, Licht aus. Steht ein Zettel dran: ab zehn Uhr."
+      - "Was du heute Nacht nicht dabei hast, hast du heute Nacht nicht."
 
   - id: zur_unterfuehrung
     label: Unterführung

@@ -889,6 +889,18 @@ body {
   margin-left: 6px;
   color: var(--c64-cyan);
 }
+.hud-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  color: var(--c64-light-grey);
+}
+.hud-wanted {
+  font-style: normal;
+  color: var(--c64-light-red);
+  letter-spacing: 1px;
+}
 .hud-xp {
   display: inline-block;
   width: 24px;
@@ -1009,4 +1021,27 @@ body {
 }
 .work .quality {
   margin-top: 1px;
+}
+
+/* Risiko im Sketch (M4b) */
+.risk {
+  font-style: normal;
+}
+.risk-0 {
+  color: var(--c64-light-green);
+}
+.risk-1 {
+  color: var(--c64-yellow);
+}
+.risk-2 {
+  color: var(--c64-orange);
+}
+.risk-3 {
+  color: var(--c64-light-red);
+}
+.incident .title {
+  color: var(--c64-light-red);
+}
+.incident-escaped .title {
+  color: var(--c64-yellow);
 }

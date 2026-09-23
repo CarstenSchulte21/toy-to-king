@@ -67,6 +67,9 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
       }
       return { ...s, schemaVersion: 4, xp, best };
     },
+    // v4 → v5 (M4b): Die Welt bekommt Zeit und Risiko. Wer schon gespielt hat, fängt bei Tag 1 an,
+    // ohne Heat und ohne Wanted – man wird nicht rückwirkend für etwas gesucht.
+    4: (s) => ({ ...s, schemaVersion: 5, day: 1, phase: 0, heat: {}, wanted: 0, caught: 0 }),
   };
 
 export function migrate(saved: unknown, content?: GameContent): GameState {
@@ -100,6 +103,10 @@ export function fitToContent(state: GameState, content: GameContent): GameState 
   const spots = Object.keys(next.works).filter((s) => content.spots[s] && styles.has(next.works[s]!.style));
   if (spots.length !== Object.keys(next.works).length) {
     next = { ...next, works: Object.fromEntries(spots.map((s) => [s, next.works[s]!])) };
+  }
+  const heat = Object.keys(next.heat ?? {}).filter((s) => content.spots[s]);
+  if (heat.length !== Object.keys(next.heat ?? {}).length) {
+    next = { ...next, heat: Object.fromEntries(heat.map((s) => [s, next.heat[s]!])) };
   }
   const best = Object.keys(next.best).filter((s) => content.spots[s]);
   if (best.length !== Object.keys(next.best).length) {

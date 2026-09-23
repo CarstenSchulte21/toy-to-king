@@ -157,6 +157,7 @@ const content: GameContent = {
       { room: "hall", pos: [50, 50], if: [{ fact: "hall" }] },
     ],
   },
+  risk: null,
 };
 
 function run(state: GameState, ...actions: E.Action[]) {

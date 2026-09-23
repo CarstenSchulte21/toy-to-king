@@ -6,6 +6,7 @@ export * from "./spray";
 export * from "./progress";
 export * from "./reducer";
 export * from "./migrate";
+export * from "./risk";
 export {
   LOOKS,
   PALETTE,
