@@ -1,5 +1,6 @@
 id: bruecke
 name: Eisenbahnbrücke
+background: bruecke.png
 description: "Oben auf der Eisenbahnbrücke. Der Wind zieht, unten fahren die Autos."
 hotspots:
   - id: brueckenwand

@@ -16,6 +16,24 @@ export const PALETTE = [
   { key: "light_green", rgb: [170, 255, 102] },
   { key: "light_blue", rgb: [0, 136, 255] },
   { key: "light_grey", rgb: [187, 187, 187] },
+  // Zweite Hälfte (32 statt 16 Farben): Zwischentöne für Haut, Stoff, Metall und Nacht.
+  // Die ersten 16 bleiben unverändert – gespeicherte Werke sehen damit genauso aus wie vorher.
+  { key: "skin_light", rgb: [255, 204, 153] },
+  { key: "skin", rgb: [221, 153, 102] },
+  { key: "skin_dark", rgb: [170, 102, 68] },
+  { key: "skin_deep", rgb: [119, 68, 51] },
+  { key: "grey_darker", rgb: [34, 34, 34] },
+  { key: "grey_mid", rgb: [85, 85, 85] },
+  { key: "grey_soft", rgb: [153, 153, 153] },
+  { key: "grey_pale", rgb: [221, 221, 221] },
+  { key: "navy", rgb: [34, 51, 102] },
+  { key: "steel", rgb: [68, 102, 170] },
+  { key: "sky", rgb: [102, 204, 255] },
+  { key: "moss", rgb: [85, 119, 51] },
+  { key: "forest", rgb: [34, 85, 51] },
+  { key: "tan", rgb: [187, 136, 85] },
+  { key: "dark_brown", rgb: [68, 51, 34] },
+  { key: "rust", rgb: [170, 68, 34] },
 ] as const;
 
 export type PaletteKey = (typeof PALETTE)[number]["key"];

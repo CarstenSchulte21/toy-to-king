@@ -1,5 +1,6 @@
 id: hinterhof
 name: Hinterhof
+background: hinterhof.png
 description: "Hinterhof. Hier hat alles angefangen: drei Mülltonnen und ein Edding."
 hotspots:
   - id: muelltonnen

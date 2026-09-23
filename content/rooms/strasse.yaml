@@ -1,6 +1,7 @@
 id: strasse
 name: Straße
-description: "Die Ladenzeile. Kiosk, Handyladen, Farbenladen. Und eine Streife, die hier öfter steht als der Bus."
+background: strasse.png
+description: "Die Ladenzeile. Kiosk, Handyladen, der Graffitistore. Und eine Streife, die hier öfter steht als der Bus."
 hotspots:
   - id: rolltore
     label: Rolltore
@@ -24,7 +25,7 @@ hotspots:
     label: Kamera
     rect: [200, 28, 20, 16]
     if: [{fact: kamera}]
-    untersuchen: "Die neue Kamera über dem Farbenladen. Sie zeigt genau auf die Rolltore."
+    untersuchen: "Die neue Kamera über dem Graffitistore. Sie zeigt genau auf die Rolltore."
 
   - id: brandt
     label: Polizistin
@@ -38,7 +39,7 @@ hotspots:
     gehen: hinterhof
 
   - id: zum_laden
-    label: Farbenladen
+    label: Graffitistore
     rect: [180, 50, 50, 90]
     gehen: farbenladen
 

@@ -50,6 +50,7 @@ In M1 ohne Gespräch, ohne Ausgang und ohne Info-Bedingungen – die kennt die E
 ```yaml
 id: hinterhof
 name: Hinterhof
+background: hinterhof.png
 description: "Hinterhof. Hier hat alles angefangen: drei Mülltonnen und ein Edding."
 hotspots:
   - id: muelltonnen
@@ -63,8 +64,11 @@ hotspots:
     label: Garagentor
     rect: [110, 60, 90, 90]
     untersuchen:
-      - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
-      - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
+      - if: [{fact: buff_montag}]
+        text: "Grau. Wie alles hier nach einem Montag."
+      - text:
+          - "Garagentor. Früher war hier ein Piece, jetzt ist da ein grauer Fleck."
+          - "Durch den Buff sieht man noch die Umrisse der Buchstaben. Das war mal ein Burner."
 
   - id: feuerleiter
     label: Feuerleiter
@@ -86,13 +90,13 @@ hotspots:
     untersuchen:
       - "Ein älterer Typ auf einer Getränkekiste. Blackbook auf dem Knie, Kaffee daneben."
       - "Er zeichnet, ohne aufzusehen."
-    # M2: sprechen: mentor
+    sprechen: mentor
 
   - id: durchgang
     label: Durchgang
     rect: [295, 60, 25, 100]
     untersuchen: "Der Durchgang zur Straße."
-    # M2: gehen: strasse
+    gehen: strasse
 ```
 
 ### 2.2 Straße (M2)
@@ -100,7 +104,8 @@ hotspots:
 ```yaml
 id: strasse
 name: Straße
-description: "Die Ladenzeile. Kiosk, Handyladen, Farbenladen. Und eine Streife, die hier öfter steht als der Bus."
+background: strasse.png
+description: "Die Ladenzeile. Kiosk, Handyladen, der Graffitistore. Und eine Streife, die hier öfter steht als der Bus."
 hotspots:
   - id: rolltore
     label: Rolltore
@@ -124,7 +129,7 @@ hotspots:
     label: Kamera
     rect: [200, 28, 20, 16]
     if: [{fact: kamera}]
-    untersuchen: "Die neue Kamera über dem Farbenladen. Sie zeigt genau auf die Rolltore."
+    untersuchen: "Die neue Kamera über dem Graffitistore. Sie zeigt genau auf die Rolltore."
 
   - id: brandt
     label: Polizistin
@@ -138,7 +143,7 @@ hotspots:
     gehen: hinterhof
 
   - id: zum_laden
-    label: Farbenladen
+    label: Graffitistore
     rect: [180, 50, 50, 90]
     gehen: farbenladen
 
@@ -148,11 +153,12 @@ hotspots:
     gehen: unterfuehrung
 ```
 
-### 2.3 Farbenladen (M2)
+### 2.3 Graffitistore (M2)
 
 ```yaml
 id: farbenladen
-name: Farbenladen
+name: Graffitistore
+background: farbenladen.png
 description: "Regale bis unter die Decke, Dosen nach Farben sortiert. Riecht nach Lack."
 hotspots:
   - id: regal_low
@@ -196,6 +202,7 @@ hotspots:
 ```yaml
 id: unterfuehrung
 name: Unterführung
+background: unterfuehrung.png
 description: "Jeder Zentimeter bemalt, bis unter die Decke. Das Licht flackert."
 hotspots:
   - id: tagwand
@@ -288,7 +295,7 @@ hotspots:
 - id: kamera
   category: risiko
   title: Kamera am Laden
-  text: "Über dem Farbenladen hängt seit letzter Woche eine Kamera. Sie zeigt auf die Rolltore."
+  text: "Über dem Graffitistore hängt seit letzter Woche eine Kamera. Sie zeigt auf die Rolltore."
   source: laden
 
 - id: krux_kauft_nicht
@@ -505,15 +512,15 @@ dialogue:
       next: hub
 ```
 
-### 4.2 Sibel – Farbenladen
+### 4.2 Sibel – Graffitistore
 
-Führt den Farbenladen. Sachlich-freundlich, Materialnerd, kennt die Kaufgewohnheiten jedes Writers in der Gegend.
+Führt den Graffitistore. Sachlich-freundlich, Materialnerd, kennt die Kaufgewohnheiten jedes Writers in der Gegend.
 Vertrauen: +1 für die erste echte Materialfrage, +1, wenn man sich mit ihr über die Kamera ärgert. −1 für die Frage nach Klauen. Ab 2 redet sie über Kunden.
 
 ```yaml
 id: laden
 name: Sibel
-role: Farbenladen
+role: Graffitistore
 room: farbenladen
 hotspot: sibel
 trust:
@@ -1166,29 +1173,38 @@ places:
 ```yaml
 id: jugendzentrum
 name: Jugendzentrum
-description: "Hinter dem Jugendzentrum: eine lange Wand, Stück für Stück bemalt. Legal. Hier hat man Zeit."
+background: jugendzentrum.png
+description: "Der Hof der alten Feuerwache. Backstein, Rundbögen, in der Mitte das rote Hallentor. Rechts davon ist die Wand frei."
 hotspots:
   - id: hall_wand
     label: Die Hall
-    rect: [20, 30, 190, 110]
+    rect: [204, 58, 104, 72]
     sprühen: hall
     untersuchen:
       - if: [{sprayed: hall}]
         text: "Dein Werk hängt zwischen den anderen. Hier sieht jeder, was du kannst."
       - text:
-          - "Piece an Piece, manche frisch, manche schon verblasst."
-          - "Ganz rechts ist noch ein Stück frei."
+          - "Rechts vom Tor ist die Wand fast leer. Nur unten ein paar alte Schichten."
+          - "Hier stört dich keiner. Nimm dir Zeit."
 
   - id: altes_piece
     label: Altes Piece
-    rect: [220, 35, 80, 70]
+    rect: [26, 50, 112, 92]
     untersuchen:
-      - "Ein altes Piece, klassische Buchstaben, sauberes 3D."
+      - "Ein Wildstyle, der hier schon ein paar Jahre hängt. Second Outline, sauberes 3D."
+      - "Darunter schimmert ein älteres Throw-up durch, halb weggeputzt."
       - "Unten rechts ein Tag, den du aus Kalles Blackbook kennst."
+
+  - id: hallentor
+    label: Hallentor
+    rect: [142, 70, 54, 82]
+    untersuchen:
+      - "Das rote Hallentor. Dahinter standen früher die Löschzüge, heute proben da Bands."
+      - "Zu. Aber der Hof ist offen, und die Wand daneben gehört allen."
 
   - id: dosen
     label: Karton
-    rect: [225, 120, 45, 35]
+    rect: [212, 118, 46, 46]
     untersuchen: "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
 
   - id: zur_strasse
@@ -1200,6 +1216,7 @@ hotspots:
 ```yaml
 id: bruecke
 name: Eisenbahnbrücke
+background: bruecke.png
 description: "Oben auf der Eisenbahnbrücke. Der Wind zieht, unten fahren die Autos."
 hotspots:
   - id: brueckenwand
@@ -1227,6 +1244,7 @@ hotspots:
 ```yaml
 id: abstellgleis
 name: Abstellgleis
+background: abstellgleis.png
 description: "Hinter dem Zaun. Schotter, abgestellte Waggons, kein Mensch zu sehen."
 hotspots:
   - id: waggon
@@ -1301,3 +1319,10 @@ tempo_bonus_max: 0.3
 tempo_min_quality: 2
 repeat_share: 0.2
 ```
+
+## 7. Raumbilder (Grafik-Schritt)
+
+Die Hintergründe liegen als PNG in `public/art/<room>.png` und entstehen aus Code:
+`scripts/lib/rooms-art.ts` malt jede Szene, `npm run art` schreibt die Bilder.
+Jeder Room verweist über `background: <room>.png` darauf. Wer ein Bild ändern will, ändert die Szene
+und lässt `npm run art` neu laufen – ein Test vergleicht Bild und Szene.

@@ -8,7 +8,7 @@ Rollen: **Product Owner** (Priorisierung, Abnahme, Issues), **Claude** (Code und
 
 ## Maßgebliche Dokumente
 
-- `docs/SPEC.md` – technische Spezifikation M1/M2, `docs/SPEC-M3.md` – Ergänzungen für M3, `docs/SPEC-M3.5.md` – Sprühen 2.0, `docs/SPEC-M4a.md` – Aufstieg. Bei Widersprüchen gilt die jeweils neuere SPEC.
+- `docs/SPEC.md` – technische Spezifikation M1/M2, `docs/SPEC-M3.md` – Ergänzungen für M3, `docs/SPEC-M3.5.md` – Sprühen 2.0, `docs/SPEC-M4a.md` – Aufstieg, `docs/SPEC-GRAFIK.md` – Raumbilder. Bei Widersprüchen gilt die jeweils neuere SPEC.
 - `docs/MEILENSTEINE.md` – aktueller Meilenstein und Aufgaben.
 - `docs/GLOSSAR.md` – verbindliche Begriffe und Tonalität.
 - `docs/CONTENT.md` – die Spielinhalte, Quelle für `content/`.
@@ -32,6 +32,7 @@ Rollen: **Product Owner** (Priorisierung, Abnahme, Issues), **Claude** (Code und
 
 ```
 npm run dev            # lokal starten
+npm run art            # Raumbilder neu erzeugen
 npm run build          # Produktionsbuild (prüft vorher den Content)
 npm test               # Tests
 npm run lint           # Code-Regeln

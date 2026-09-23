@@ -58,6 +58,7 @@ export function Game() {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [debug, setDebug] = useState(false);
   const [outlines, setOutlines] = useState(false);
+  const [peek, setPeek] = useState(false);
   const [font, setFont] = useState<FontChoice>("vt323");
   const stateRef = useRef<GameState | null>(null);
   const seqRef = useRef(0);
@@ -270,7 +271,7 @@ export function Game() {
               room={room}
               state={state}
               scale={scale}
-              outlines={outlines}
+              outlines={outlines || peek}
               active={!overlayOpen}
               onVerb={(hotspot, verb) => dispatch({ type: "INTERACT", hotspot: hotspot.id, verb })}
               onSeenHotspots={markHotspotsSeen}
@@ -299,6 +300,17 @@ export function Game() {
                   )}
                   <button className="hud-btn hud-bb" aria-label="Tasche" onPointerUp={() => setBagOpen(true)}>
                     Tasche
+                  </button>
+                  {/* Zeigt kurz, was man hier antippen kann – gegen Pixel-Sucherei. */}
+                  <button
+                    className="hud-btn hud-bb"
+                    aria-label="Hinsehen"
+                    onPointerUp={() => {
+                      setPeek(true);
+                      setTimeout(() => setPeek(false), 2500);
+                    }}
+                  >
+                    Blick
                   </button>
                 </div>
                 <span className="hud-name">
