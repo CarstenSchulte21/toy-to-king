@@ -1506,3 +1506,25 @@ Sprüh-Bildschirm hinter dem Werk zu sehen ist.
 - `content/spray.yaml`: der Tag-Style hat `tool: marker`, ideales Werkzeug ist der T-Tip.
 - `content/rooms/farbenladen.yaml`: Sibels Theke hat `kaufen: true`.
 - `content/progress.yaml`: Toy heißt jetzt „Du hast einen Marker und einen Namen."
+
+### 9.4 Funde beim Untersuchen
+
+Sieben Hotspots geben beim **ersten** Untersuchen etwas her. Danach steht dort der normale Text.
+Technisch braucht das nichts Neues: eine Textvariante mit `if: [{not_flag: fund_…}]` und
+`effects` darunter, die dieselbe Flagge setzt. Kein Fund lässt sich wiederholen.
+
+| Raum | Hotspot | Fund | Flagge |
+|------|---------|------|--------|
+| Hinterhof | Mülltonnen | Dose Chrom | `fund_tonne` |
+| Hinterhof | Stromkasten | Skinny Cap | `fund_kasten` |
+| Straße | Laterne | 5 € in der Sockelklappe | `fund_laterne` |
+| Jugendzentrum | Karton mit Dosen | Dose Weiß | `fund_karton` |
+| Abstellgleis | Gleise | NY Fat im Schotter | `fund_gleise` |
+| Unterführung | Tagwand | Info „NOX" (die Crew) | `fund_nox` |
+| Wache | Deine Tasche | Fat Cap, den sie übersehen haben | `fund_wache` |
+
+Der Fund auf der Wache ist der einzige, den man nur sieht, wenn man erwischt wurde – ein kleiner
+Trost, damit der Besuch nicht nur Verlust ist.
+
+Die Info **NOX** ist die erste, die von keinem NPC kommt. Im Blackbook steht als Quelle deshalb
+„selbst gesehen".

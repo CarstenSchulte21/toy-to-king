@@ -370,7 +370,7 @@ export const factSchema = z.strictObject({
   category: z.enum(FACT_CATEGORIES, { error: `Kategorie muss eine von ${FACT_CATEGORIES.join(", ")} sein.` }),
   title: text,
   text,
-  source: id,
+  source: id.optional(), // fehlt, wenn man die Info selbst gefunden hat (M5a)
 });
 export const factsFileSchema = z.array(factSchema);
 

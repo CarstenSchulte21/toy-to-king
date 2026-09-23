@@ -27,6 +27,8 @@ import {
   viewDialogue,
   type Action,
   type GameContent,
+  type Condition,
+  type Effect,
   type GameState,
 } from "@/engine";
 
@@ -146,6 +148,12 @@ function explore(content: GameContent) {
   return result;
 }
 
+// Nur die Varianten mit "if"/"text" können Effekte haben – reine Texte nicht.
+function variants(value: unknown): { if?: Condition[]; effects?: Effect[] }[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((v): v is { if?: Condition[]; effects?: Effect[] } => typeof v === "object" && v !== null);
+}
+
 function reachableRooms(content: GameContent): Set<string> {
   const seen = new Set<string>();
   const queue = [content.config.start_room];
@@ -169,7 +177,16 @@ describe("Durchlauf durch die echten Inhalte", () => {
   });
 
   it("jede Info ist erreichbar", () => {
-    expect([...result.learned].sort()).toEqual(Object.keys(content.facts).sort());
+    // Manche Infos findet man beim Untersuchen statt im Gespräch (M5a).
+    const reachable = new Set(result.learned);
+    for (const room of Object.values(content.rooms)) {
+      for (const h of room.hotspots) {
+        for (const v of variants(h.untersuchen)) {
+          for (const e of v.effects ?? []) if ("learn" in e) reachable.add(e.learn);
+        }
+      }
+    }
+    expect([...reachable].sort()).toEqual(Object.keys(content.facts).sort());
   });
 
   it("man bleibt nirgends hängen", () => {
@@ -553,5 +570,45 @@ describe("Material und Geld (M5a)", () => {
       NOW,
     );
     expect(after.state.room).toBe("hinterhof");
+  });
+});
+
+// Funde beim Untersuchen (M5a): Wer genau hinguckt, findet was – aber nur einmal.
+describe("Funde beim Untersuchen", () => {
+  const content = loadContent();
+
+  type Find = { room: string; hotspot: string; effects: Effect[]; conditions: Condition[] };
+
+  const finds: Find[] = [];
+  for (const room of Object.values(content.rooms)) {
+    for (const h of room.hotspots) {
+      for (const v of variants(h.untersuchen)) {
+        const effects = v.effects ?? [];
+        const gives = effects.some((e) => "give" in e || "money" in e);
+        if (gives) finds.push({ room: room.id, hotspot: h.id, effects, conditions: v.if ?? [] });
+      }
+    }
+  }
+
+  it("es gibt überhaupt etwas zu finden", () => {
+    expect(finds.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it("jeder Fund geht nur einmal – sonst könnte man ihn melken", () => {
+    for (const f of finds) {
+      const guard = f.conditions.find((c): c is { not_flag: string } => "not_flag" in c);
+      expect(guard, `${f.room}.${f.hotspot}: kein "not_flag" davor`).toBeTruthy();
+      const sets = f.effects.some((e) => "set_flag" in e && e.set_flag === guard!.not_flag);
+      expect(sets, `${f.room}.${f.hotspot}: setzt "${guard!.not_flag}" nicht`).toBe(true);
+    }
+  });
+
+  it("jeder Fund gibt es wirklich", () => {
+    for (const f of finds) {
+      for (const e of f.effects) {
+        if ("give" in e) expect(content.items[e.give], `${f.room}.${f.hotspot}`).toBeTruthy();
+        if ("money" in e) expect(e.money).toBeGreaterThan(0);
+      }
+    }
   });
 });

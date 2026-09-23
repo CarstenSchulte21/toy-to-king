@@ -14,7 +14,15 @@ hotspots:
   - id: tasche_wache
     label: Deine Tasche
     rect: [90, 110, 50, 40]
-    untersuchen: "Caps noch da, Farben weg. Hätte schlimmer kommen können."
+    untersuchen:
+      - if: [{not_flag: fund_wache}]
+        text:
+          - "Caps noch da, Farben weg. Hätte schlimmer kommen können."
+          - "In der Seitentasche, unter dem Futter: ein Fat Cap, den sie übersehen haben."
+        effects:
+          - set_flag: fund_wache
+          - give: fat_cap
+      - text: "Caps noch da, Farben weg. Hätte schlimmer kommen können."
 
   - id: raus_wache
     label: Raus hier

@@ -23,7 +23,15 @@ hotspots:
   - id: gleise
     label: Gleise
     rect: [250, 120, 60, 50]
-    untersuchen: "Die Gleise glänzen. Hier fährt nachts noch was."
+    untersuchen:
+      - if: [{not_flag: fund_gleise}]
+        text:
+          - "Die Gleise glänzen. Hier fährt nachts noch was."
+          - "Zwischen zwei Schwellen liegt ein NY Fat im Schotter. Jemand hatte es eilig."
+        effects:
+          - set_flag: fund_gleise
+          - give: ny_fat
+      - text: "Die Gleise glänzen. Hier fährt nachts noch was."
 
   - id: zurueck
     label: Zurück durch den Zaun

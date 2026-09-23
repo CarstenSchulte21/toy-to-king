@@ -63,3 +63,8 @@
   title: Streife um zwei
   text: "Die Streife fährt nachts gegen zwei durch die Unterführung."
   source: streife
+
+- id: nox
+  category: crews
+  title: NOX
+  text: "NOX ist keine Person, sondern eine Crew. Das Kürzel steht unter fremden Werken im ganzen Bezirk."

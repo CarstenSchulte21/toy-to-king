@@ -213,7 +213,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   const learnable = new Set<string>();
   for (const fact of Object.values(facts)) {
     const where = `${FACTS_PATH}, Info "${fact.id}"`;
-    if (fact.source !== "welt") refs.npc(where, "source", fact.source);
+    if (fact.source !== undefined && fact.source !== "welt") refs.npc(where, "source", fact.source);
     checkTexts(where, [fact.title, fact.text], warnings, errors);
   }
 
