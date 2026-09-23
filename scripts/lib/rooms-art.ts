@@ -222,12 +222,12 @@ const strasse: Scene = (R) => {
   lightCone(a, 147, 31, 44, 32, C.yellow);
   rect(a, 140, 150, 15, 6, C.dark_grey);
 
-  // Graffitistore [180,50,50,90] – der Laden heißt DRUCK: Low und High Pressure.
+  // Graffitistore [180,50,50,90] – der Laden heißt KINGSIZE, wie das Ziel des Spiels.
   // Ladenfront wie im echten Leben: Schaufenster und Eingangstür nebeneinander,
   // die Tür so hoch, dass ein Mensch durchpasst.
   box(a, 166, 38, 72, 16, C.black, C.dark_grey, C.black);
-  word(a, 183, 42, 9, "DRUCK", C.white, C.black);
-  hline(a, 181, 52, 42, C.light_red);
+  word(a, 172, 41, 9, "KINGSIZE", C.white, C.black);
+  hline(a, 172, 52, 60, C.light_red);
   box(a, 166, 54, 72, 96, C.dark_grey, C.grey, C.black);
   vline(a, 210, 56, 92, C.black);
   vline(a, 211, 56, 92, C.grey);
@@ -382,8 +382,8 @@ const farbenladen: Scene = (R) => {
 
   // Schild an der Wand: der Ladenname als Schriftzug in unserem Pixelstil.
   box(a, 162, 24, 68, 16, C.black, C.dark_grey, C.black);
-  word(a, 177, 27, 9, "DRUCK", C.white, C.black);
-  hline(a, 175, 37, 42, C.light_red);
+  word(a, 169, 27, 8, "KINGSIZE", C.white, C.black);
+  hline(a, 169, 37, 54, C.light_red);
   disc(a, 165, 27, 1, C.grey);
   disc(a, 227, 27, 1, C.grey);
 
