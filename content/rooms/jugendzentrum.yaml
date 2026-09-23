@@ -1,29 +1,37 @@
 id: jugendzentrum
 name: Jugendzentrum
 background: jugendzentrum.png
-description: "Hinter dem Jugendzentrum: eine lange Wand, Stück für Stück bemalt. Legal. Hier hat man Zeit."
+description: "Der Hof der alten Feuerwache. Backstein, Rundbögen, in der Mitte das rote Hallentor. Rechts davon ist die Wand frei."
 hotspots:
   - id: hall_wand
     label: Die Hall
-    rect: [20, 30, 190, 110]
+    rect: [204, 58, 104, 72]
     sprühen: hall
     untersuchen:
       - if: [{sprayed: hall}]
         text: "Dein Werk hängt zwischen den anderen. Hier sieht jeder, was du kannst."
       - text:
-          - "Piece an Piece, manche frisch, manche schon verblasst."
-          - "Ganz rechts ist noch ein Stück frei."
+          - "Rechts vom Tor ist die Wand fast leer. Nur unten ein paar alte Schichten."
+          - "Hier stört dich keiner. Nimm dir Zeit."
 
   - id: altes_piece
     label: Altes Piece
-    rect: [220, 35, 80, 70]
+    rect: [26, 50, 112, 92]
     untersuchen:
-      - "Ein altes Piece, klassische Buchstaben, sauberes 3D."
+      - "Ein Wildstyle, der hier schon ein paar Jahre hängt. Second Outline, sauberes 3D."
+      - "Darunter schimmert ein älteres Throw-up durch, halb weggeputzt."
       - "Unten rechts ein Tag, den du aus Kalles Blackbook kennst."
+
+  - id: hallentor
+    label: Hallentor
+    rect: [142, 70, 54, 82]
+    untersuchen:
+      - "Das rote Hallentor. Dahinter standen früher die Löschzüge, heute proben da Bands."
+      - "Am Tor hängt ein Zettel: mittwochs von vier bis sieben, Workshop von den Mittwochsmalern. Dosen gibt es vor Ort."
 
   - id: dosen
     label: Karton
-    rect: [225, 120, 45, 35]
+    rect: [212, 118, 46, 46]
     untersuchen: "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
 
   - id: zur_strasse

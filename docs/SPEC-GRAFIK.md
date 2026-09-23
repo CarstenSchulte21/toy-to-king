@@ -1,6 +1,6 @@
 # SPEC – TOY TO KING, Grafik-Schritt „Räume"
 
-**Stand 23.09.2026:** umgesetzt auf Branch `grafik` (136 Tests grün, Build grün), Runde 4 eingearbeitet. Vor dem Einbauen bewertet der Tester den Bilder-Prototyp (Artifact „Raum-Check").
+**Stand 23.09.2026:** umgesetzt auf Branch `grafik` (136 Tests grün, Build grün), Runde 4 und 5 eingearbeitet. Vor dem Einbauen bewertet der Tester den Bilder-Prototyp (Artifact „Raum-Check").
 
 Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M4b).
 
@@ -93,3 +93,23 @@ Der Tester wollte echte Namen an allen Wänden, den Kölner Laden und eine Köln
 
 **Fremde Logos:** Der Ladenname steht als Schriftzug in unserem eigenen Pixel-Alphabet. Das echte Logo
 der Firma wird nicht nachgezeichnet – auch nicht in Pixeln.
+
+## 9. Runde 5: Kölner Vorbilder
+
+Der Tester wollte zwei echte Kölner Orte im Bild haben.
+
+| Raum | Änderung |
+|------|----------|
+| Abstellgleis | Der Fernsehturm steht am Nachthimmel: schlanker Schaft, der nach unten breiter wird, die Kanzel mit beleuchtetem Aussichtsdeck, darüber ein zweiter, schmalerer Ring und der Antennenmast mit rotem Blinklicht. Er steht hinter der Böschung, halb verdeckt. |
+| Jugendzentrum | Jetzt der Hof einer alten Feuerwache: dunkelroter Backstein mit gelben Ziegelbändern und Zahnschnitt unter der Traufe, eine Rundbogendurchfahrt nach links, der Steigeturm mit Spitzdach und Rundbogenfenstern über der Mauer, in der Mitte das **rote Hallentor** mit Oberlicht und Bandbeschlägen, davor Hofpflaster. Gemalt wird – wie beim Vorbild – **links und rechts vom Tor**. |
+
+**Neue Hilfsfunktionen:** `arch()` (Rechteck mit halbrundem Abschluss) und `archWindow()` (Rundbogenfenster
+mit Ziegelgewände) in `scripts/lib/rooms-art.ts`.
+
+**Hotspots verschoben (`content/rooms/jugendzentrum.yaml`):** Die freie Fläche zum Sprühen liegt jetzt
+rechts vom Tor (`hall_wand` [204,58,104,72]), die fremden Werke links (`altes_piece` [26,50,112,92]).
+Neu ist der Hotspot `hallentor`.
+
+**Mittwochsmaler:** Über dem Tor hängt ein Schild „MITTWOCHS", und am Tor hängt ein Zettel mit der
+Workshop-Zeit. Das ist eine Verbeugung vor einem echten Kölner Graffiti-Projekt, kein Abbild: Unser
+Jugendzentrum ist ein erfundener Ort.

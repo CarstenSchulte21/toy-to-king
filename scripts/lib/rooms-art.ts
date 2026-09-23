@@ -475,31 +475,96 @@ const unterfuehrung: Scene = (R) => {
   return a;
 };
 
+// Rundbogen: Rechteck mit halbrundem Abschluss oben – das Motiv der alten Feuerwache.
+function arch(a: Art, x: number, y: number, w: number, h: number, c: number): void {
+  const r = w / 2;
+  const cx = x + r;
+  for (let j = 0; j < h; j++) {
+    if (j < r) {
+      const dy = r - j - 0.5;
+      const half = Math.sqrt(Math.max(0, r * r - dy * dy));
+      hline(a, Math.round(cx - half), y + j, Math.max(1, Math.round(half * 2)), c);
+    } else {
+      hline(a, x, y + j, w, c);
+    }
+  }
+}
+
+// Rundbogenfenster mit gelbem Ziegelgewände.
+function archWindow(a: Art, x: number, y: number, w: number, h: number, lit: boolean): void {
+  arch(a, x - 2, y - 2, w + 4, h + 4, C.tan);
+  arch(a, x - 1, y - 1, w + 2, h + 2, C.dark_brown);
+  arch(a, x, y, w, h, lit ? C.yellow : C.navy);
+  if (lit) arch(a, x + 1, y + 1, w - 2, Math.floor(h / 2), C.orange);
+  vline(a, x + Math.floor(w / 2), y + Math.floor(w / 2), h - Math.floor(w / 2), C.dark_brown);
+}
+
 const jugendzentrum: Scene = (R) => {
-  const a = newArt(C.grey);
-  gradient(a, 0, 0, ART_W, 26, C.steel, C.sky);
-  disc(a, 250, 12, 8, C.white);
-  disc(a, 262, 14, 6, C.white);
-  rect(a, 0, 22, ART_W, 6, C.dark_grey);
-  hline(a, 0, 22, ART_W, C.grey);
-  rect(a, 0, 28, ART_W, 122, C.grey_pale);
-  dither(a, 0, 28, ART_W, 122, C.grey_pale, C.grey_soft, 0.3);
-  dither(a, 0, 120, ART_W, 30, C.grey_soft, C.grey_mid, 0.35);
-  grain(a, 0, 28, ART_W, 122, C.grey, 0.03, R);
-  ground(a, 150, C.grey_mid, C.grey_soft, R);
-  for (let x = 6; x < ART_W; x += 46) rect(a, x, 170, 24, 2, C.light_grey);
+  const a = newArt(C.rust);
+  gradient(a, 0, 0, ART_W, 36, C.steel, C.sky);
+  disc(a, 66, 12, 8, C.white);
+  disc(a, 78, 14, 6, C.white);
+  disc(a, 56, 15, 5, C.white);
 
-  // Hall of Fame: verschiedene Styles nebeneinander, unten drunter die Handstyles.
-  // Ältestes zuerst, damit das Neue drüberliegt – so wächst eine Wand wirklich.
-  graffiti(a, 64, 60, 26, "HBF", "throwup", { fill: C.light_grey, fill2: C.grey, outline: C.dark_grey }, R);
-  grain(a, 58, 54, 72, 38, C.grey_pale, 0.32, R);
-  grain(a, 58, 54, 72, 38, C.grey_soft, 0.14, R);
+  // Steigeturm: das höchste Gebäude der alten Feuerwache
+  const TX = 258;
+  const TW = 46;
+  for (let j = 0; j < 12; j++) {
+    const w = Math.round((TW * (j + 1)) / 12);
+    const x0 = TX + Math.round((TW - w) / 2);
+    hline(a, x0, j, w, C.dark_brown);
+    px(a, x0, j, C.brown);
+    px(a, x0 + w - 1, j, C.grey_darker);
+  }
+  vline(a, TX + TW / 2, 0, 3, C.dark_grey);
+  hline(a, TX - 3, 12, TW + 6, C.tan);
+  hline(a, TX - 3, 13, TW + 6, C.dark_brown);
+  bricks(a, TX, 14, TW, 26, C.rust, C.dark_brown, C.grey_soft, R);
+  hline(a, TX, 22, TW, C.tan);
+  archWindow(a, TX + 8, 18, 8, 18, false);
+  archWindow(a, TX + 28, 18, 8, 18, true);
+  vline(a, TX, 14, 26, C.dark_brown);
+  vline(a, TX + TW - 1, 14, 26, C.dark_brown);
 
+  // Hofwand: dunkelroter Backstein mit gelben Ziegelbändern
+  bricks(a, 0, 36, ART_W, 116, C.rust, C.dark_brown, C.grey_soft, R);
+  dither(a, 0, 36, ART_W, 14, C.rust, C.dark_brown, 0.3);
+  for (const by of [36, 46, 136]) {
+    rect(a, 0, by, ART_W, 3, C.tan);
+    hline(a, 0, by, ART_W, C.orange);
+    hline(a, 0, by + 2, ART_W, C.dark_brown);
+  }
+  // Traufgesims mit Zahnschnitt
+  for (let x = 2; x < ART_W; x += 6) rect(a, x, 40, 3, 4, C.tan);
+  grain(a, 0, 50, ART_W, 86, C.dark_brown, 0.03, R);
+
+  // Durchgang zur Straße [0,60,16,100] – Rundbogendurchfahrt
+  arch(a, 0, 58, 24, 94, C.tan);
+  arch(a, 1, 60, 21, 92, C.dark_brown);
+  arch(a, 2, 62, 18, 90, C.black);
+  dither(a, 3, 74, 14, 78, C.black, C.dark_grey, 0.2);
+
+  // Linke Malfläche: hier stehen die fremden Werke
+  rect(a, 26, 50, 112, 92, C.grey_soft);
+  dither(a, 26, 50, 112, 92, C.grey_soft, C.grey_mid, 0.35);
+  grain(a, 26, 50, 112, 92, C.grey_pale, 0.05, R);
+  frame(a, 26, 50, 112, 92, C.grey_mid);
+
+  // Rechte Malfläche: das freie Stück [204,58,104,72]
+  rect(a, 198, 50, 118, 92, C.grey_soft);
+  dither(a, 198, 50, 118, 92, C.grey_soft, C.grey_mid, 0.3);
+  grain(a, 198, 50, 118, 92, C.grey_pale, 0.05, R);
+  frame(a, 198, 50, 118, 92, C.grey_mid);
+
+  // Fremde Werke auf der linken Fläche: verblasst zuerst, frisch darüber
+  graffiti(a, 40, 86, 24, "HBF", "throwup", { fill: C.light_grey, fill2: C.grey, outline: C.dark_grey }, R);
+  grain(a, 34, 80, 70, 36, C.grey_soft, 0.34, R);
+  grain(a, 34, 80, 70, 36, C.grey_mid, 0.14, R);
   graffiti(
     a,
-    14,
+    30,
+    56,
     34,
-    38,
     "TREN",
     "wildstyle",
     {
@@ -512,34 +577,71 @@ const jugendzentrum: Scene = (R) => {
     },
     R,
   );
-  graffiti(
-    a,
-    140,
-    40,
-    30,
-    "SANS",
-    "throwup",
-    { fill: C.cyan, fill2: C.light_blue, outline: C.black, second: C.white },
-    R,
-  );
-  graffiti(a, 244, 44, 26, "HBF", "throwup", { fill: C.light_green, fill2: C.green, outline: C.black }, R);
-  tags(a, 24, 108, 192, 30, [C.black, C.white, C.purple], 4, R);
+  tags(a, 30, 116, 104, 22, [C.black, C.white, C.purple], 2, R);
 
-  box(a, 225, 120, 46, 34, C.tan, C.orange, C.dark_brown);
-  rect(a, 227, 122, 42, 4, C.dark_grey);
-  for (let i = 0; i < 6; i++) {
-    const cx = 228 + i * 7;
-    rect(a, cx, 110, 5, 14, [C.red, C.white, C.green, C.light_blue, C.yellow, C.purple][i]!);
-    vline(a, cx, 110, 14, C.light_grey);
-    rect(a, cx + 1, 107, 3, 3, C.light_grey);
+  // Rechts oben ein Throw-up, darunter bleibt die Wand frei
+  graffiti(a, 244, 54, 20, "SANS", "throwup", { fill: C.cyan, fill2: C.light_blue, outline: C.black }, R);
+  // Reste älterer Schichten am unteren Rand – die Fläche darüber bleibt frei.
+  for (const [rx, rc] of [
+    [204, C.purple],
+    [244, C.green],
+    [284, C.light_red],
+  ] as [number, number][])
+    grain(a, rx, 128, 28, 12, rc, 0.16, R);
+
+  // Schild über dem Tor: mittwochs wird gemalt
+  box(a, 142, 52, 54, 15, C.dark_grey, C.grey, C.black);
+  word(a, 143, 56, 7, "MITTWOCHS", C.yellow, C.black);
+  vline(a, 148, 49, 3, C.grey);
+  vline(a, 190, 49, 3, C.grey);
+
+  // Das rote Hallentor [142,70,54,82]
+  arch(a, 142, 70, 54, 82, C.tan);
+  arch(a, 143, 72, 52, 80, C.dark_brown);
+  arch(a, 145, 74, 48, 78, C.red);
+  arch(a, 146, 76, 46, 76, C.light_red);
+  arch(a, 147, 78, 44, 74, C.red);
+  for (let x = 149; x < 192; x += 6) vline(a, x, 80, 72, C.brown);
+  hline(a, 147, 108, 44, C.brown);
+  hline(a, 147, 109, 44, C.light_red);
+  for (const hy of [90, 126]) {
+    rect(a, 147, hy, 12, 4, C.black);
+    rect(a, 179, hy, 12, 4, C.black);
   }
-  weeds(a, 300, 158, 6, C.green, R);
-  box(a, 150, 132, 46, 6, C.tan, C.orange, C.dark_brown);
-  rect(a, 154, 138, 4, 12, C.dark_grey);
-  rect(a, 188, 138, 4, 12, C.dark_grey);
+  disc(a, 166, 120, 2, C.black);
+  disc(a, 172, 120, 2, C.black);
+  // Oberlicht im Bogen
+  arch(a, 156, 76, 26, 14, C.navy);
+  for (let x = 158; x < 181; x += 5) vline(a, x, 78, 12, C.dark_brown);
 
-  rect(a, 0, 60, 16, 100, C.black);
-  dither(a, 0, 60, 16, 100, C.black, C.dark_grey, 0.25);
+  // Hofpflaster
+  rect(a, 0, 152, ART_W, 28, C.grey_mid);
+  hline(a, 0, 152, ART_W, C.grey_soft);
+  hline(a, 0, 153, ART_W, C.dark_grey);
+  for (let j = 0; j < 4; j++) {
+    const y = 156 + j * 6 + j * j;
+    hline(a, 0, y, ART_W, C.grey);
+    for (let x = (j % 2) * 5; x < ART_W; x += 10 + j * 3) vline(a, x, y - 4 - j, 5 + j, C.grey);
+  }
+  grain(a, 0, 154, ART_W, 26, C.grey_soft, 0.05, R);
+  puddle(a, 118, 172, 22, 5, C.dark_grey, C.grey_soft);
+
+  // Karton mit Dosen [212,132,44,32]
+  box(a, 212, 132, 44, 32, C.tan, C.orange, C.dark_brown);
+  rect(a, 214, 134, 40, 4, C.dark_grey);
+  for (let i = 0; i < 6; i++) {
+    const cx = 215 + i * 7;
+    rect(a, cx, 122, 5, 13, [C.red, C.white, C.green, C.light_blue, C.yellow, C.purple][i]!);
+    vline(a, cx, 122, 13, C.light_grey);
+    rect(a, cx + 1, 119, 3, 3, C.light_grey);
+  }
+
+  // Bank im Hof
+  box(a, 46, 142, 52, 6, C.tan, C.orange, C.dark_brown);
+  box(a, 46, 150, 52, 5, C.tan, C.orange, C.dark_brown);
+  rect(a, 50, 148, 4, 14, C.dark_grey);
+  rect(a, 90, 148, 4, 14, C.dark_grey);
+  weeds(a, 300, 158, 5, C.green, R);
   return a;
 };
 
@@ -727,6 +829,32 @@ const abstellgleis: Scene = (R) => {
   const a = newArt(C.black);
   gradient(a, 0, 0, ART_W, 44, C.black, C.navy);
   for (let k = 0; k < 50; k++) px(a, Math.floor(R() * ART_W), Math.floor(R() * 40), C.white);
+
+  // Der Fernsehturm über der Stadt: schlanker Schaft, Kanzel, langer Mast.
+  const FX = 104;
+  for (let j = 0; j < 30; j++) {
+    const w = 3 + Math.round(j / 7);
+    const x0 = FX - Math.floor(w / 2);
+    rect(a, x0, 16 + j, w, 1, C.grey);
+    px(a, x0, 16 + j, C.light_grey);
+    px(a, x0 + w - 1, 16 + j, C.dark_grey);
+  }
+  // Kanzel: breiter Ring mit Aussichtsdeck, darüber ein schmalerer
+  rect(a, FX - 7, 12, 15, 5, C.light_grey);
+  hline(a, FX - 8, 12, 17, C.grey);
+  hline(a, FX - 7, 13, 15, C.white);
+  for (let x = FX - 6; x <= FX + 6; x += 2) px(a, x, 15, C.yellow);
+  hline(a, FX - 7, 16, 15, C.dark_grey);
+  rect(a, FX - 4, 8, 9, 4, C.light_grey);
+  hline(a, FX - 5, 8, 11, C.grey);
+  px(a, FX - 2, 10, C.yellow);
+  px(a, FX + 2, 10, C.yellow);
+  // Antennenmast
+  vline(a, FX, 0, 8, C.grey);
+  px(a, FX, 0, C.light_red);
+  px(a, FX, 4, C.light_red);
+  hline(a, FX - 1, 6, 3, C.dark_grey);
+
   rect(a, 292, 10, 3, 36, C.dark_grey);
   box(a, 286, 6, 14, 5, C.light_grey, C.white, C.grey);
   lightCone(a, 293, 11, 96, 64, C.yellow);
