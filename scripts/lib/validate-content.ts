@@ -19,9 +19,11 @@ import {
   spraySchema,
   progressSchema,
   riskSchema,
+  economySchema,
   SPOT_TYPES,
   type Progress,
   type Risk,
+  type Economy,
   type Condition,
   type Effect,
   type Fact,
@@ -48,6 +50,7 @@ const SPOTS_PATH = "content/spots.yaml";
 const MAP_PATH = "content/map.yaml";
 const PROGRESS_PATH = "content/progress.yaml";
 const RISK_PATH = "content/risk.yaml";
+const ECONOMY_PATH = "content/economy.yaml";
 
 export function validateContent(files: ContentFile[]): ValidationResult {
   const errors: string[] = [];
@@ -63,6 +66,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   let map: MapConfig | null = null;
   let progress: Progress | null = null;
   let risk: Risk | null = null;
+  let economy: Economy | null = null;
   const fileOf: Record<string, string> = {};
   // Dateien mit Fehlern – Verweise darauf nicht zusätzlich als „fehlt" melden.
   const broken: Broken = {
@@ -124,6 +128,10 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     } else if (kind === "risk") {
       const parsed = riskSchema.safeParse(data);
       if (parsed.success) risk = parsed.data;
+      else pushIssues(file.path, data, parsed.error.issues, errors);
+    } else if (kind === "economy") {
+      const parsed = economySchema.safeParse(data);
+      if (parsed.success) economy = parsed.data;
       else pushIssues(file.path, data, parsed.error.issues, errors);
     } else if (kind === "progress") {
       const parsed = progressSchema.safeParse(data);
@@ -294,10 +302,14 @@ export function validateContent(files: ContentFile[]): ValidationResult {
             `${where}: "caps.${kind}" gibt es bei look "${s.look}" nicht. Ebenen: ${expected.join(", ")}.`,
           );
         }
+        // Ein Marker-Style nennt unter "caps" das ideale Werkzeug – also einen Marker (M5a).
+        const wanted = s.tool === "marker" ? "marker" : "cap";
         for (const c of caps ?? []) {
           refs.item(where, `caps.${kind}`, c);
-          if (items[c] && items[c].kind !== "cap")
-            errors.push(`${where}: "${c}" in caps.${kind} ist kein Cap.`);
+          if (items[c] && items[c].kind !== wanted)
+            errors.push(
+              `${where}: "${c}" in caps.${kind} ist kein ${wanted === "marker" ? "Marker" : "Cap"}.`,
+            );
         }
       }
       for (const r of s.requires ?? []) refs.item(where, "requires", r);
@@ -413,6 +425,8 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     }
   }
   collectGives(npcs, obtainable);
+  // Was einen Preis hat, kann man kaufen (M5a) – das zählt als Weg, es zu bekommen.
+  for (const item of Object.values(items)) if (item.price !== undefined) obtainable.add(item.id);
   for (const item of ids.items) {
     if (!obtainable.has(item))
       warnings.push(`${ITEMS_PATH}, "${item}": Diesen Gegenstand bekommt man nirgends.`);
@@ -425,7 +439,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   const ok = errors.length === 0 && config !== null;
   return {
     content: ok
-      ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig, progress, risk }
+      ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig, progress, risk, economy }
       : null,
     errors,
     warnings,
@@ -443,6 +457,7 @@ type Kind =
   | "map"
   | "progress"
   | "risk"
+  | "economy"
   | "room"
   | "npc"
   | "other";
@@ -456,6 +471,7 @@ function kindOf(path: string): Kind {
   if (path === MAP_PATH) return "map";
   if (path === PROGRESS_PATH) return "progress";
   if (path === RISK_PATH) return "risk";
+  if (path === ECONOMY_PATH) return "economy";
   if (path.startsWith("content/rooms/")) return "room";
   if (path.startsWith("content/npcs/")) return "npc";
   return "other";

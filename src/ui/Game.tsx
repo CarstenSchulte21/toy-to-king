@@ -20,6 +20,7 @@ import {
 } from "@/engine";
 import { LocalStorageSaveStore, createAutosaver, loadGame } from "@/save/SaveStore";
 import { BagView } from "./BagView";
+import { ShopView } from "./ShopView";
 import { Blackbook } from "./Blackbook";
 import { DebugPanel, type FontChoice } from "./DebugPanel";
 import { DialoguePanel } from "./DialoguePanel";
@@ -59,6 +60,7 @@ export function Game() {
   const [rankUp, setRankUp] = useState<Extract<GameEvent, { type: "RANK_UP" }> | null>(null);
   // Zwischenfall beim Sprühen (M4b): knapp entkommen oder erwischt.
   const [incident, setIncident] = useState<{ kind: "escaped" | "caught"; lines: string[] } | null>(null);
+  const [shopOpen, setShopOpen] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackContext | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [debug, setDebug] = useState(false);
@@ -110,6 +112,19 @@ export function Game() {
             setSpraySpot({ spot: e.spot, title: hotspot?.label ?? e.spot });
             break;
           }
+          case "SHOP_OPEN":
+            setShopOpen(true);
+            break;
+          case "BOUGHT":
+            toast(
+              (content.economy?.texts.bought ?? "{item}: {price} €")
+                .replace("{item}", e.name)
+                .replace("{price}", String(e.price)),
+            );
+            break;
+          case "ALLOWANCE":
+            toast(e.text);
+            break;
           case "RANK_UP":
             setRankUp(e);
             break;
@@ -269,6 +284,7 @@ export function Game() {
     mapOpen ||
     bagOpen ||
     spraySpot !== null ||
+    shopOpen ||
     rankUp !== null ||
     incident !== null ||
     feedback !== null;
@@ -350,6 +366,7 @@ export function Game() {
                   {content.risk && (
                     <span className="hud-time">
                       {weekdayName(content, state.day)} · {phaseName(content, state.phase)}
+                      {content.economy && <i className="hud-money">{state.money} €</i>}
                       {state.wanted > 0 && (
                         <i className="hud-wanted" title={wantedLabel(content, state.wanted)}>
                           {"!".repeat(state.wanted)}
@@ -396,6 +413,14 @@ export function Game() {
               />
             )}
             {bagOpen && <BagView content={content} state={state} onClose={() => setBagOpen(false)} />}
+            {shopOpen && content.economy && (
+              <ShopView
+                content={content}
+                state={state}
+                onBuy={(action) => dispatch(action)}
+                onClose={() => setShopOpen(false)}
+              />
+            )}
             {spraySpot && (
               <SprayScene
                 key={spraySpot.spot}

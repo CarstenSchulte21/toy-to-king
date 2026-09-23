@@ -32,6 +32,7 @@ hotspots:
     rect: [240, 85, 35, 70]
     untersuchen: "Hinter der Theke sortiert eine Frau Caps. Sie sieht kurz hoch und nickt."
     sprechen: laden
+    kaufen: true
 
   - id: raus
     label: Zur Straße

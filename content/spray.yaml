@@ -20,9 +20,10 @@ styles:
   - id: tag
     name: Tag
     look: tag
+    tool: marker
     xp: 10
     caps:
-      line: [skinny_cap, standard_cap]
+      line: [t_tip]
 
   - id: straight
     name: Straight Letter

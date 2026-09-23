@@ -3,7 +3,7 @@
 import { z } from "zod";
 import type { GameContent } from "./content-schema";
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 const passKind = z.enum(["line", "fill", "outline"]);
 
@@ -55,6 +55,7 @@ export const gameStateSchema = z.object({
   heat: z.record(z.string(), z.number().int().min(0)), // Heat je Spot (ab v5)
   wanted: z.number().int().min(0), // eigenes Wanted-Level (ab v5)
   caught: z.number().int().min(0), // wie oft man schon erwischt wurde (ab v5)
+  money: z.number().int().min(0), // Geld in Euro (ab v6)
   meta: z.object({ createdAt: z.string(), updatedAt: z.string(), playSeconds: z.number() }),
 });
 
@@ -97,6 +98,7 @@ export function createNewGame(content: GameContent, playerName: string, now: str
     heat: {},
     wanted: 0,
     caught: 0,
+    money: content.economy?.start_money ?? 0,
     meta: { createdAt: now, updatedAt: now, playSeconds: 0 },
   };
 }

@@ -1045,3 +1045,30 @@ body {
 .incident-escaped .title {
   color: var(--c64-yellow);
 }
+
+/* Laden (M5a) */
+.hud-money {
+  font-style: normal;
+  color: var(--c64-light-green);
+}
+.shop-money {
+  margin-left: auto;
+  margin-right: 8px;
+  color: var(--c64-light-green);
+}
+.shop-careful {
+  margin: 0 0 6px;
+  color: var(--c64-orange);
+}
+.shop-entry {
+  position: relative;
+  padding-right: 54px;
+}
+.shop-buy {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.shop-buy:disabled {
+  opacity: 0.4;
+}

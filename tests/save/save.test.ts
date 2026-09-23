@@ -13,6 +13,7 @@ const content: GameContent = {
   map: null,
   progress: null,
   risk: null,
+  economy: null,
 };
 const state = createNewGame(content, "KRAZE", "2026-01-01T00:00:00.000Z");
 

@@ -38,8 +38,10 @@ hotspots:
     label: Aufgebogener Zaun
     rect: [266, 90, 35, 60]
     if: [{fact: zaun}]
+    sprühen: zaunblech
     untersuchen:
       - "Der Zaun ist unten aufgebogen, gerade breit genug."
+      - "Am Pfosten hängt ein Blechschild, handtellergroß. Voll mit Namen."
       - "Dahinter Schotter, Gleise, abgestellte Waggons."
     gehen: abstellgleis
 

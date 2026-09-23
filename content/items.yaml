@@ -1,73 +1,115 @@
 # Caps: width = Strahlbreite (1 Skinny … 4 NY Fat). Dosen: flow = Farbe pro Sekunde.
+# Marker sind beides in einem: eigene Breite und eigener Fluss. price = was es bei Sibel kostet (M5a).
 # Farben: color = Palettenname (C64-Palette).
 - id: standard_cap
   name: Standard-Cap
   kind: cap
   width: 2
   text: "Der Cap, der auf der Dose steckt. Geht für alles, ist für nichts richtig gut."
+  price: 1
 
 - id: skinny_cap
   name: Skinny Cap
   kind: cap
   width: 1
   text: "Dünner, präziser Strahl. Für Tags und Outlines."
+  price: 1
 
 - id: fat_cap
   name: Fat Cap
   kind: cap
   width: 3
   text: "Breiter Strahl. Für Fill-ins."
+  price: 1
 
 - id: ny_fat
   name: NY Fat
   kind: cap
   width: 4
   text: "Sehr breit. Füllt schnell, verzeiht nichts."
+  price: 2
 
 - id: low_pressure
   name: Low Pressure
   kind: dose
   flow: 4
   text: "Wenig Druck, viel Kontrolle. Gut für Details und Fades."
+  price: 3
 
 - id: high_pressure
   name: High Pressure
   kind: dose
   flow: 10
   text: "Viel Druck, deckt schnell. Tropft aber leichter."
+  price: 3
 
 - id: farbe_schwarz
   name: Schwarz
   kind: color
   color: black
   text: "Für Outlines und Tags. Hat jeder dabei."
+  price: 2
 
 - id: farbe_chrom
   name: Chrom
   kind: color
   color: light_grey
   text: "Silber. Der Klassiker fürs Fill-in bei Throw-ups."
+  price: 2
 
 - id: farbe_weiss
   name: Weiß
   kind: color
   color: white
   text: "Für Highlights, Second Outlines und alles, was knallen soll."
+  price: 3
 
 - id: farbe_rot
   name: Rot
   kind: color
   color: red
   text: "Dunkles Rot. Deckt gut."
+  price: 4
 
 - id: farbe_gelb
   name: Gelb
   kind: color
   color: yellow
   text: "Hell und laut. Mit schwarzer Outline sieht man das von weit weg."
+  price: 4
 
 - id: farbe_hellblau
   name: Hellblau
   kind: color
   color: cyan
   text: "Kühl. Gut für Fades nach Weiß."
+  price: 4
+
+# Marker (M5a): Damit macht man Tags, bevor man an Dosen kommt.
+- id: t_tip
+  name: T-Tip
+  kind: marker
+  width: 1
+  flow: 5
+  color: black
+  price: 4
+  text: "Keilspitze. Schmal, sauber, tropft nicht. Womit jeder anfängt."
+
+- id: dripper
+  name: Dripper
+  kind: marker
+  width: 3
+  flow: 12
+  color: black
+  price: 6
+  text: "Selbst gebaut, voll Tinte. Breit und nass – und er läuft, wenn du stehen bleibst."
+
+- id: wachsmarker
+  name: Wachsmarker
+  kind: marker
+  width: 4
+  flow: 7
+  color: white
+  keeps: true
+  price: 9
+  text: "Dick und trocken. Tropft nie, und der Buff kriegt ihn kaum wieder runter."

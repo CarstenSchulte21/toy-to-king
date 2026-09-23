@@ -49,11 +49,12 @@ export const conditionSchema = z.union(
     z.strictObject({ not_phase: z.enum(PHASES) }),
     z.strictObject({ weekday: z.enum(WEEKDAYS) }),
     z.strictObject({ heat_min: z.strictObject({ spot: id, value: z.number().int().min(0).max(3) }) }),
+    z.strictObject({ money_min: z.number().int().min(0) }),
   ],
   {
     error:
       "Unbekannte Bedingung. Erlaubt: flag, not_flag, visited, fact, not_fact, trust_min, has, sprayed, " +
-      "rank_min, wanted_min, wanted_max, phase, not_phase, weekday, heat_min.",
+      "rank_min, wanted_min, wanted_max, phase, not_phase, weekday, heat_min, money_min.",
   },
 );
 
@@ -66,10 +67,11 @@ export const effectSchema = z.union(
     z.strictObject({ give: id }),
     z.strictObject({ wanted: z.number().int().min(-3).max(3) }), // M4b
     z.strictObject({ advance_day: z.literal(true) }), // M4b: abtauchen kostet einen ganzen Tag
+    z.strictObject({ money: z.number().int().min(-99).max(99) }), // M5a
   ],
   {
     error:
-      "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give, wanted, advance_day.",
+      "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give, wanted, advance_day, money.",
   },
 );
 
@@ -136,6 +138,7 @@ export const hotspotSchema = z
     gehen: id.optional(),
     sprechen: id.optional(),
     sprühen: id.optional(),
+    kaufen: z.literal(true).optional(), // M5a: Hier kann man einkaufen
   })
   .refine(
     (h) =>
@@ -164,44 +167,64 @@ export const configSchema = z.strictObject({
 
 // ---------- M3: Material, Sprühen, Spots, Karte ----------
 
-export const ITEM_KINDS = ["cap", "dose", "color"] as const;
+export const ITEM_KINDS = ["cap", "dose", "color", "marker"] as const;
 
 export const itemSchema = z
   .strictObject({
     id,
     name: text,
-    kind: z.enum(ITEM_KINDS, { error: 'kind ist "cap", "dose" oder "color".' }),
+    kind: z.enum(ITEM_KINDS, { error: `kind ist eine von ${ITEM_KINDS.join(", ")}.` }),
     text,
-    width: z.number().int().min(1).max(4).optional(), // Caps: 1 Skinny … 4 NY Fat (M3.5)
-    flow: z.number().positive().max(30).optional(), // Dosen: Farbe pro Sekunde (M3.5)
+    width: z.number().int().min(1).max(4).optional(), // Caps und Marker: 1 schmal … 4 sehr breit
+    flow: z.number().positive().max(30).optional(), // Dosen und Marker: Farbe pro Sekunde
     color: z.enum(PALETTE_KEYS, { error: `color muss eine von ${PALETTE_KEYS.join(", ")} sein.` }).optional(),
+    price: z.number().int().min(0).optional(), // was es bei Sibel kostet (M5a); ohne Preis nicht käuflich
+    keeps: z.literal(true).optional(), // Marker: hält den Buff länger aus (Wachsmarker)
   })
   .superRefine((item, ctx) => {
-    const need = { cap: "width", dose: "flow", color: "color" } as const;
-    const field = need[item.kind];
-    if (item[field] === undefined) {
-      ctx.addIssue({
-        code: "custom",
-        path: [field],
-        message: `Ein Gegenstand mit kind "${item.kind}" braucht "${field}".`,
-      });
+    // Ein Marker ist Dose und Cap in einem: Er braucht beides.
+    const need: Record<string, string[]> = {
+      cap: ["width"],
+      dose: ["flow"],
+      color: ["color"],
+      marker: ["width", "flow", "color"],
+    };
+    const fields = need[item.kind]!;
+    for (const field of fields) {
+      if (item[field as "width" | "flow" | "color"] === undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: [field],
+          message: `Ein Gegenstand mit kind "${item.kind}" braucht "${field}".`,
+        });
+      }
     }
-    for (const other of Object.values(need)) {
-      if (other !== field && item[other] !== undefined) {
+    for (const other of ["width", "flow", "color"] as const) {
+      if (!fields.includes(other) && item[other] !== undefined) {
+        const owners = Object.entries(need)
+          .filter(([, f]) => f.includes(other))
+          .map(([k]) => `"${k}"`)
+          .join(" und ");
         ctx.addIssue({
           code: "custom",
           path: [other],
-          message: `"${other}" gibt es nur bei kind "${Object.entries(need).find(([, f]) => f === other)![0]}".`,
+          message: `"${other}" gibt es nur bei kind ${owners}.`,
         });
       }
+    }
+    if (item.keeps !== undefined && item.kind !== "marker") {
+      ctx.addIssue({ code: "custom", path: ["keeps"], message: '"keeps" gibt es nur bei kind "marker".' });
     }
   });
 export const itemsFileSchema = z.array(itemSchema);
 
 // M3.5: Styles mit eigener Form. Die Ebenen ergeben sich aus der Form (Tag: line; sonst fill, outline).
+export const TOOLS = ["can", "marker"] as const;
+
 export const styleSchema = z.strictObject({
   id,
   name: text,
+  tool: z.enum(TOOLS).default("can"), // M5a: Tags macht man mit dem Marker
   look: z.enum(LOOKS, { error: `look muss eine von ${LOOKS.join(", ")} sein.` }),
   caps: z.partialRecord(z.enum(PASS_KINDS), z.array(id).min(1)), // ideale Caps je Ebene
   if: z.array(conditionSchema).optional(), // ohne erfüllte Bedingung gesperrt
@@ -239,6 +262,7 @@ export const spotSchema = z.strictObject({
   fits: z.array(id).min(1),
   fit_hint: text,
   risk: z.enum(RISK_LEVELS, { error: `risk muss eine von ${RISK_LEVELS.join(", ")} sein.` }),
+  tool: z.enum(TOOLS).optional(), // M5a: Auf glatten Flächen geht nur der Marker
   if: z.array(conditionSchema).optional(),
 });
 export const spotsFileSchema = z.array(spotSchema);
@@ -311,6 +335,28 @@ export const riskSchema = z.strictObject({
     day: text, // {day} und {weekday}
     hide_out: lines,
     no_time: text,
+  }),
+});
+
+// Geld und Verbrauch (M5a).
+export const economySchema = z.strictObject({
+  start_money: z.number().int().min(0),
+  allowance: z.strictObject({
+    day: z.enum(WEEKDAYS),
+    amount: z.number().int().min(0),
+    text, // {amount}
+  }),
+  careful_from_wanted: z.number().int().min(0).max(3),
+  careful_kinds: z.array(z.enum(ITEM_KINDS)),
+  careful_colors: z.array(id),
+  careful_text: text,
+  paint_per_color: z.number().int().min(0).max(3),
+  texts: z.strictObject({
+    bought: text, // {item}, {price}
+    too_expensive: text,
+    no_paint: text,
+    shop_title: text,
+    shop_empty: text,
   }),
 });
 
@@ -393,6 +439,7 @@ export type MapConfig = z.infer<typeof mapSchema>;
 export type Rank = z.infer<typeof rankSchema>;
 export type Progress = z.infer<typeof progressSchema>;
 export type Risk = z.infer<typeof riskSchema>;
+export type Economy = z.infer<typeof economySchema>;
 
 export type GameContent = {
   config: GameConfig;
@@ -405,4 +452,5 @@ export type GameContent = {
   map: MapConfig | null;
   progress: Progress | null;
   risk: Risk | null;
+  economy: Economy | null;
 };

@@ -39,6 +39,7 @@ export function evaluateCondition(condition: Condition, state: GameState, ctx: C
   if ("not_phase" in condition) return (state.phase ?? 0) !== PHASES_INDEX[condition.not_phase];
   if ("weekday" in condition) return weekdayOf(state.day ?? 1) === condition.weekday;
   if ("heat_min" in condition) return heatOf(state, condition.heat_min.spot) >= condition.heat_min.value;
+  if ("money_min" in condition) return (state.money ?? 0) >= condition.money_min;
   if ("trust_min" in condition) {
     const t = condition.trust_min;
     const npc = typeof t === "number" ? ctx.npc : t.npc;
@@ -76,6 +77,11 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
     const next = Math.min(3, Math.max(0, (state.wanted ?? 0) + effect.wanted));
     if (next === (state.wanted ?? 0)) return state;
     return { ...state, wanted: next };
+  }
+  if ("money" in effect) {
+    const next = Math.max(0, (state.money ?? 0) + effect.money);
+    if (next === (state.money ?? 0)) return state;
+    return { ...state, money: next };
   }
   if ("advance_day" in effect) {
     return { ...state, day: (state.day ?? 1) + 1, phase: 0 };
@@ -136,9 +142,10 @@ export function visibleHotspotKeys(state: GameState, content: GameContent): Set<
   return keys;
 }
 
-export type Verb = "sprechen" | "sprühen" | "untersuchen" | "gehen";
+export type Verb = "sprechen" | "kaufen" | "sprühen" | "untersuchen" | "gehen";
 export const VERB_LABELS: Record<Verb, string> = {
   sprechen: "Sprechen",
+  kaufen: "Kaufen",
   sprühen: "Sprühen",
   untersuchen: "Untersuchen",
   gehen: "Gehen",
@@ -149,6 +156,7 @@ export const VERB_LABELS: Record<Verb, string> = {
 export function availableVerbs(hotspot: Hotspot, state?: GameState, content?: GameContent): Verb[] {
   const verbs: Verb[] = [];
   if (hotspot.sprechen !== undefined) verbs.push("sprechen");
+  if (hotspot.kaufen === true && content?.economy) verbs.push("kaufen");
   if (hotspot.sprühen !== undefined) {
     const spot = content?.spots[hotspot.sprühen];
     const known = !state || !content || (spot !== undefined && evaluateAll(spot.if, state, { content }));

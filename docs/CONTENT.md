@@ -1470,3 +1470,37 @@ schlägt Tageszeit, Tageszeit schlägt den Normalfall.
 - `content/spots.yaml`: der Waggon am Abstellgleis geht nur nachts (`{phase: nacht}`).
 - `content/npcs/mentor.yaml`: neue Antwort bei Kalle „Ich muss ein paar Tage weg vom Fenster"
   (`if: [{wanted_min: 1}]`), Knoten `untertauchen` mit den Effekten `wanted: -1` und `advance_day`.
+
+## 9. M5a – Material und Geld
+
+Werte in `content/economy.yaml`, Preise an den Gegenständen in `content/items.yaml`
+(siehe `SPEC-M5a.md`, Abschnitt 4).
+
+### 9.1 Die drei Marker
+
+Ein Marker ist Dose, Cap und Farbe in einem. Im Sketch wählt man nur den Marker.
+
+| Marker | Breite | Fluss | Farbe | Preis | Eigenheit |
+|--------|--------|-------|-------|-------|-----------|
+| T-Tip | 1 | 5 | schwarz | 4 € | sauber, tropft nicht – der Anfänger-Marker |
+| Dripper | 3 | 12 | schwarz | 6 € | breit und nass, läuft beim Stehenbleiben |
+| Wachsmarker | 4 | 7 | weiß | 9 € | tropft nie, hält den Buff aus (`keeps`) |
+
+Kalle gibt den T-Tip im ersten Gespräch: „Hier. Der lag noch rum."
+
+### 9.2 Die vier Marker-Spots
+
+Alle auf vorhandenen Hotspots, kein neues Raumbild:
+
+| Spot | Raum | Hotspot | Bedingung |
+|------|------|---------|-----------|
+| Laternenmast | Straße | `laterne` | – |
+| Stromkasten | Hinterhof | `stromkasten` | – |
+| Waggontür | Abstellgleis | `waggontuer` (neu) | Info „zaun" |
+| Zaunschild | Unterführung | `zaunloch` | Info „zaun" |
+
+### 9.3 Ergänzungen an bestehenden Inhalten
+
+- `content/spray.yaml`: der Tag-Style hat `tool: marker`, ideales Werkzeug ist der T-Tip.
+- `content/rooms/farbenladen.yaml`: Sibels Theke hat `kaufen: true`.
+- `content/progress.yaml`: Toy heißt jetzt „Du hast einen Marker und einen Namen."

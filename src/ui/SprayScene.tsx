@@ -99,6 +99,13 @@ export function SprayScene(props: {
 
   const styleChoice = choices.styles.find((s) => s.id === style);
   const isTag = styleChoice?.look === "tag";
+  // Marker (M5a): ein Werkzeug statt Farbe + Dose + Cap.
+  const isMarker = styleChoice?.tool === "marker";
+  const pickMarker = (id: string) => {
+    setLine(id);
+    setDose(id);
+    setCaps((c) => ({ ...c, line: id }));
+  };
   const decor = styleChoice ? decorFor(styleChoice.look) : null;
   const colors = useMemo<WorkColors>(
     () => ({
@@ -109,7 +116,10 @@ export function SprayScene(props: {
     [isTag, line, fill, outline, decor?.second, decor?.background, second, background],
   );
   const passKinds: PassKind[] = styleChoice?.passes ?? [];
-  const ready = !!styleChoice?.available && !!dose && (isTag ? !!line : fill.length > 0 && !!outline);
+  const ready =
+    !!styleChoice?.available &&
+    !!dose &&
+    (isMarker ? line === dose : isTag ? !!line : fill.length > 0 && !!outline);
 
   const toggleFill = (id: string) =>
     setFill((list) => (list.includes(id) ? list.filter((c) => c !== id) : [...list, id].slice(-2)));
@@ -367,7 +377,22 @@ export function SprayScene(props: {
                 </button>
               ))}
             </div>
-            {isTag ? (
+            {isMarker ? (
+              <Row
+                label="Marker"
+                value={choices.markers.find((m) => m.id === line)?.name ?? "keiner"}
+              >
+                {choices.markers.map((m) => (
+                  <button
+                    key={m.id}
+                    className={`chip ${line === m.id ? "on" : ""}`}
+                    onPointerUp={() => pickMarker(m.id)}
+                  >
+                    {m.name}
+                  </button>
+                ))}
+              </Row>
+            ) : isTag ? (
               <Row label="Farbe" value={colorName(line)}>
                 {choices.colors.map((c) => (
                   <Swatch key={c.id} id={c.id} on={line === c.id} onPick={() => setLine(c.id)} />
@@ -420,7 +445,7 @@ export function SprayScene(props: {
               </Row>
             )}
           </div>
-          <div className="sketch-dose">
+          <div className="sketch-dose" hidden={isMarker}>
             <Row label="Dose">
               {choices.doses.map((d) => (
                 <button
@@ -473,14 +498,16 @@ export function SprayScene(props: {
               {passKinds.length > 1 ? ` ${phase.index + 1}/${passKinds.length}` : ""}
             </span>
             <span className="pass-colors">
-              {(passKind === "line" ? [line] : passKind === "fill" ? fill : [outline]).map((id) => (
-                <i
-                  key={id}
-                  style={{ background: rgbCss(choices.colors.find((c) => c.id === id)?.color ?? 0) }}
-                />
-              ))}
+              {(passKind === "line" ? [line] : passKind === "fill" ? fill : [outline]).map((id) => {
+                const pick = isMarker
+                  ? choices.markers.find((m) => m.id === id)
+                  : choices.colors.find((c) => c.id === id);
+                return <i key={id} style={{ background: rgbCss(pick?.color ?? 0) }} />;
+              })}
             </span>
-            {!started ? (
+            {isMarker ? (
+              <span className="pass-cap">{choices.markers.find((m) => m.id === line)?.name}</span>
+            ) : !started ? (
               <div className="chips">
                 {choices.caps.map((c) => (
                   <button
