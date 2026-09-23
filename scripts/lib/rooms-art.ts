@@ -16,11 +16,11 @@ import {
   dither,
   frame,
   gradient,
+  graffiti,
   grain,
   hline,
   line,
   newArt,
-  piece,
   pipe,
   poster,
   puddle,
@@ -99,7 +99,10 @@ const hinterhof: Scene = (R) => {
   windowAt(a, 70, 30, 14, 16, true, R);
   pipe(a, 96, 22, 128, C.grey, C.light_grey, C.dark_grey);
   cable(a, 0, 30, 96, 26, 6, C.black);
-  tags(a, 214, 126, 80, 22, [C.black, C.white], 3, R);
+  // Throw-up auf der Backsteinwand, dazu ein paar Handstyles.
+  graffiti(a, 22, 64, 22, "SANS", "throwup", { fill: C.light_red, fill2: C.red, outline: C.black }, R);
+  tags(a, 22, 88, 74, 20, [C.black, C.white], 2, R);
+  tags(a, 252, 60, 62, 30, [C.black, C.purple], 2, R);
 
   // Mülltonnen [20,110,70,50]
   for (let k = 0; k < 3; k++) {
@@ -126,7 +129,9 @@ const hinterhof: Scene = (R) => {
   frame(a, 110, 60, 90, 90, C.black);
   rect(a, 126, 74, 60, 46, C.light_grey);
   dither(a, 126, 74, 60, 46, C.light_grey, C.grey, 0.35);
-  word(a, 132, 84, 22, "TOY", C.grey, C.light_grey, 0.2);
+  // Fremdes Throw-up auf dem Rolltor – halb übergerollt, deshalb blass.
+  graffiti(a, 131, 82, 22, "HBF", "throwup", { fill: C.white, outline: C.blue, fill2: C.cyan }, R);
+  grain(a, 128, 78, 56, 38, C.light_grey, 0.28, R);
   rect(a, 148, 142, 14, 4, C.dark_grey);
   disc(a, 155, 144, 2, C.black);
 
@@ -196,6 +201,7 @@ const strasse: Scene = (R) => {
   frame(a, 55, 166, 11, 9, C.dark_grey);
 
   // Rolltore [40,60,90,80]
+  tags(a, 44, 28, 86, 22, [C.black, C.white], 2, R);
   rect(a, 36, 52, 98, 9, C.dark_grey);
   hline(a, 36, 52, 98, C.grey);
   shutter(a, 40, 60, 90, 80, C.grey, C.light_grey, C.dark_grey);
@@ -211,30 +217,37 @@ const strasse: Scene = (R) => {
   vline(a, 145, 26, 130, C.grey);
   box(a, 136, 20, 24, 7, C.light_grey, C.white, C.grey);
   rect(a, 139, 27, 18, 4, C.yellow);
-  lightCone(a, 147, 31, 64, 44, C.yellow);
+  lightCone(a, 147, 31, 44, 32, C.yellow);
   rect(a, 140, 150, 15, 6, C.dark_grey);
 
-  // Farbenladen [180,50,50,90]
-  box(a, 176, 42, 58, 11, C.red, C.light_red, C.black);
-  word(a, 181, 44, 8, "FARBEN", C.white, C.black);
+  // Graffitistore [180,50,50,90] – der Laden heißt wie das Vorbild in Köln.
+  box(a, 172, 40, 64, 13, C.black, C.dark_grey, C.black);
+  word(a, 177, 43, 7, "DEDICATED", C.white, C.black);
   box(a, 178, 56, 54, 56, C.dark_grey, C.grey, C.black);
   rect(a, 182, 60, 46, 48, C.cyan);
   dither(a, 182, 60, 46, 48, C.cyan, C.white, 0.3);
-  for (let row = 0; row < 3; row++) {
-    hline(a, 182, 72 + row * 14, 46, C.dark_grey);
-    for (let k = 0; k < 6; k++) {
-      const cx = 185 + k * 7;
-      rect(
-        a,
-        cx,
-        64 + row * 14,
-        5,
-        8,
-        [C.red, C.yellow, C.purple, C.green, C.orange, C.light_blue][(k + row) % 6]!,
-      );
-      hline(a, cx, 64 + row * 14, 5, C.light_grey);
-    }
+  // Im Schaufenster: Schuhkartons, aufgehängte Shirts, ein Deck an der Rückwand.
+  hline(a, 182, 88, 46, C.dark_grey);
+  for (let k = 0; k < 4; k++) {
+    const bx = 184 + k * 11;
+    box(a, bx, 78, 9, 10, [C.white, C.light_red, C.yellow, C.light_blue][k]!, C.white, C.grey);
+    hline(a, bx + 1, 83, 7, C.dark_grey);
   }
+  for (let k = 0; k < 3; k++) {
+    const sx = 186 + k * 14;
+    hline(a, sx - 3, 63, 9, C.dark_grey);
+    rect(a, sx - 2, 64, 7, 9, [C.purple, C.green, C.orange][k]!);
+    px(a, sx - 3, 65, [C.purple, C.green, C.orange][k]!);
+    px(a, sx + 5, 65, [C.purple, C.green, C.orange][k]!);
+  }
+  rect(a, 186, 92, 38, 5, C.dark_brown);
+  hline(a, 186, 92, 38, C.tan);
+  for (const wx of [191, 219]) disc(a, wx, 98, 2, C.black);
+  // Aufkleber an der Scheibe
+  rect(a, 196, 100, 20, 6, C.white);
+  frame(a, 196, 100, 20, 6, C.grey);
+  hline(a, 198, 102, 16, C.black);
+  hline(a, 198, 104, 11, C.black);
   box(a, 196, 112, 22, 38, C.tan, C.orange, C.dark_brown);
   disc(a, 213, 132, 2, C.yellow);
   rect(a, 176, 112, 20, 38, C.dark_grey);
@@ -247,6 +260,9 @@ const strasse: Scene = (R) => {
   px(a, 201, 34, C.light_grey);
   px(a, 205, 33, C.red);
   px(a, 206, 33, C.red);
+
+  // Handstyle an der Hauswand rechts
+  tags(a, 262, 108, 26, 32, [C.black], 1, R);
 
   character(a, 242, 86, 74, BRANDT);
 
@@ -317,23 +333,39 @@ const farbenladen: Scene = (R) => {
   }
 
   // Pinnwand [220,25,50,50]
-  box(a, 220, 25, 50, 50, C.tan, C.orange, C.dark_brown);
-  poster(a, 223, 29, 15, 18, C.white, C.dark_grey, R);
-  poster(a, 241, 29, 16, 14, C.yellow, C.black, R);
-  poster(a, 223, 50, 20, 20, C.white, C.dark_grey, R);
-  poster(a, 247, 46, 19, 24, C.cyan, C.blue, R);
+  box(a, 234, 25, 50, 50, C.tan, C.orange, C.dark_brown);
+  poster(a, 237, 29, 15, 18, C.white, C.dark_grey, R);
+  poster(a, 255, 29, 16, 14, C.yellow, C.black, R);
+  poster(a, 237, 50, 20, 20, C.white, C.dark_grey, R);
+  poster(a, 261, 46, 19, 24, C.cyan, C.blue, R);
   for (const [x, y] of [
-    [229, 29],
-    [248, 29],
-    [231, 50],
-    [255, 46],
+    [243, 29],
+    [262, 29],
+    [245, 50],
+    [269, 46],
   ] as [number, number][])
     px(a, x, y, C.red);
+
+  // Schild an der Wand: der Ladenname als Schriftzug in unserem Pixelstil.
+  box(a, 162, 24, 68, 15, C.black, C.dark_grey, C.black);
+  word(a, 167, 28, 7, "DEDICATED", C.white, C.black);
+  hline(a, 165, 37, 62, C.grey);
+  disc(a, 165, 27, 1, C.grey);
+  disc(a, 227, 27, 1, C.grey);
 
   // Theke [215,120,...] und Sibel [240,85,35,70]
   character(a, 243, 82, 68, SIBEL);
   box(a, 214, 118, 106, 26, C.tan, C.orange, C.dark_brown);
   hline(a, 216, 123, 102, C.dark_grey);
+  // Die Theke klebt voll mit Stickern, wie in jedem Laden.
+  for (let k = 0; k < 9; k++) {
+    const sx = 217 + k * 11;
+    const sy = 127 + (k % 3) * 5;
+    const c = [C.white, C.light_red, C.yellow, C.cyan, C.purple, C.light_green][k % 6]!;
+    rect(a, sx, sy, 9, 5, c);
+    frame(a, sx, sy, 9, 5, C.dark_brown);
+    hline(a, sx + 2, sy + 2, 5, C.black);
+  }
   box(a, 286, 102, 28, 17, C.light_grey, C.white, C.grey);
   rect(a, 289, 105, 22, 6, C.dark_grey);
   for (let k = 0; k < 3; k++) rect(a, 290 + k * 7, 113, 5, 3, C.grey);
@@ -369,8 +401,25 @@ const unterfuehrung: Scene = (R) => {
   puddle(a, 120, 166, 22, 5, C.black, C.grey);
   puddle(a, 250, 172, 16, 4, C.black, C.grey);
 
-  tags(a, 18, 30, 68, 108, [C.black, C.white, C.light_red, C.cyan, C.yellow], 9, R);
-  piece(a, 90, 34, 120, 82, "KRUX", C.purple, C.black, R, C.blue);
+  tags(a, 18, 30, 66, 108, [C.black, C.white, C.light_red, C.cyan, C.yellow], 9, R);
+  // KRUX steht hier als Wildstyle: verschachtelt, mit Arrows und Connections.
+  graffiti(
+    a,
+    94,
+    44,
+    40,
+    "KRUX",
+    "wildstyle",
+    {
+      fill: C.purple,
+      fill2: C.blue,
+      outline: C.black,
+      second: C.white,
+      shade: C.navy,
+      background: C.light_blue,
+    },
+    R,
+  );
   tags(a, 92, 120, 116, 24, [C.black, C.white], 3, R);
   rect(a, 0, 40, 16, 100, C.light_grey);
   dither(a, 0, 40, 16, 100, C.light_grey, C.grey, 0.3);
@@ -409,20 +458,41 @@ const jugendzentrum: Scene = (R) => {
   ground(a, 150, C.grey_mid, C.grey_soft, R);
   for (let x = 6; x < ART_W; x += 46) rect(a, x, 170, 24, 2, C.light_grey);
 
-  const fills = [C.yellow, C.light_red, C.cyan, C.light_green];
-  const backs = [C.purple, C.blue, C.red, C.green];
-  const names = ["SEB", "ZINK", "MOA", "ARO"];
-  let x = 20;
-  for (let k = 0; k < 4; k++) {
-    const w = 44 + Math.floor(R() * 8);
-    piece(a, x, 32 + Math.floor(R() * 6), w, 62, names[k]!, fills[k]!, C.black, R, backs[k]!);
-    x += w + 2;
-  }
-  tags(a, 22, 110, 186, 30, [C.black, C.white, C.purple], 5, R);
-  piece(a, 220, 38, 80, 64, "TOY", C.orange, C.brown, R, C.light_grey);
-  // Verblasst: nur einzelne Pixel ausbleichen, nicht die Fläche übermalen
-  grain(a, 222, 40, 76, 60, C.light_grey, 0.3, R);
-  grain(a, 222, 40, 76, 60, C.grey, 0.12, R);
+  // Hall of Fame: verschiedene Styles nebeneinander, unten drunter die Handstyles.
+  // Ältestes zuerst, damit das Neue drüberliegt – so wächst eine Wand wirklich.
+  graffiti(a, 64, 60, 26, "HBF", "throwup", { fill: C.light_grey, fill2: C.grey, outline: C.dark_grey }, R);
+  grain(a, 58, 54, 72, 38, C.grey_pale, 0.32, R);
+  grain(a, 58, 54, 72, 38, C.grey_soft, 0.14, R);
+
+  graffiti(
+    a,
+    14,
+    34,
+    38,
+    "TREN",
+    "wildstyle",
+    {
+      fill: C.yellow,
+      fill2: C.orange,
+      outline: C.black,
+      second: C.light_red,
+      shade: C.brown,
+      background: C.purple,
+    },
+    R,
+  );
+  graffiti(
+    a,
+    140,
+    40,
+    30,
+    "SANS",
+    "throwup",
+    { fill: C.cyan, fill2: C.light_blue, outline: C.black, second: C.white },
+    R,
+  );
+  graffiti(a, 244, 44, 26, "HBF", "throwup", { fill: C.light_green, fill2: C.green, outline: C.black }, R);
+  tags(a, 24, 108, 192, 30, [C.black, C.white, C.purple], 4, R);
 
   box(a, 225, 120, 46, 34, C.tan, C.orange, C.dark_brown);
   rect(a, 227, 122, 42, 4, C.dark_grey);
@@ -442,64 +512,183 @@ const jugendzentrum: Scene = (R) => {
   return a;
 };
 
+// Turmspitze: läuft nach oben spitz zu.
+function spire(a: Art, cx: number, top: number, h: number, w: number, c: number): void {
+  for (let j = 0; j < h; j++) {
+    const half = Math.max(0, Math.round((w / 2) * (j / h)));
+    hline(a, cx - half, top + j, half * 2 + 1, c);
+  }
+}
+
+// Der Dom als Silhouette: zwei Türme mit Spitzen, rechts daneben das Langhaus.
+function dom(a: Art, x: number, base: number): void {
+  const body = C.dark_brown;
+  const lit = C.tan;
+  const dark = C.grey_darker;
+  // Langhaus mit Satteldach
+  rect(a, x + 32, base - 26, 26, 26, body);
+  for (let j = 0; j < 9; j++) hline(a, x + 32 + j, base - 26 - j, 26 - 2 * j, dark);
+  vline(a, x + 32, base - 26, 26, lit);
+  for (let k = 0; k < 5; k++) {
+    vline(a, x + 36 + k * 5, base - 22, 22, dark);
+    px(a, x + 36 + k * 5, base - 10, C.yellow);
+    px(a, x + 37 + k * 5, base - 20, lit);
+  }
+  // Zwei Türme
+  for (const cx of [x + 8, x + 24]) {
+    rect(a, cx - 7, base - 58, 15, 58, body);
+    vline(a, cx - 7, base - 58, 58, lit);
+    vline(a, cx + 7, base - 58, 58, dark);
+    spire(a, cx, base - 76, 19, 15, body);
+    for (let j = 0; j < 19; j++) px(a, cx - Math.round((7 * j) / 19), base - 76 + j, lit);
+    for (const vx of [cx - 4, cx, cx + 4]) vline(a, vx, base - 54, 48, dark);
+    hline(a, cx - 7, base - 58, 15, dark);
+    hline(a, cx - 7, base - 34, 15, dark);
+    px(a, cx, base - 77, C.light_grey);
+    px(a, cx - 2, base - 30, C.yellow);
+    px(a, cx + 2, base - 44, C.yellow);
+  }
+}
+
 const bruecke: Scene = (R) => {
-  const a = newArt(C.blue);
-  gradient(a, 0, 0, ART_W, 60, C.purple, C.navy);
-  dither(a, 0, 40, ART_W, 26, C.blue, C.black, 0.4);
-  for (let k = 0; k < 40; k++) px(a, Math.floor(R() * ART_W), Math.floor(R() * 36), C.white);
-  disc(a, 280, 20, 7, C.light_grey);
-  disc(a, 277, 18, 6, C.blue);
+  const a = newArt(C.navy);
+  gradient(a, 0, 0, ART_W, 56, C.navy, C.steel);
+  gradient(a, 0, 56, ART_W, 24, C.steel, C.purple);
+  for (let k = 0; k < 44; k++) px(a, Math.floor(R() * ART_W), Math.floor(R() * 42), C.white);
+  disc(a, 28, 50, 6, C.light_grey);
+  px(a, 26, 48, C.grey_soft);
+  px(a, 30, 52, C.grey_soft);
+  px(a, 29, 47, C.grey_soft);
 
-  for (let x = 0; x < ART_W; x += 13) {
-    const h = 16 + Math.floor(R() * 30);
-    rect(a, x, 100 - h, 11, h, C.black);
-    dither(a, x, 100 - h, 11, h, C.black, C.dark_grey, 0.3);
-    for (let wy = 100 - h + 3; wy < 96; wy += 6)
-      for (let wx = x + 2; wx < x + 9; wx += 4) if (R() < 0.45) rect(a, wx, wy, 2, 3, C.yellow);
+  // Skyline am anderen Ufer, rechts der Dom (Hotspot „Aussicht" [250,20,60,50]).
+  for (let x = 0; x < ART_W; x += 11) {
+    const h = 8 + Math.floor(R() * 22);
+    rect(a, x, 92 - h, 10, h, C.grey_darker);
+    dither(a, x, 92 - h, 10, h, C.grey_darker, C.black, 0.35);
+    for (let wy = 92 - h + 3; wy < 88; wy += 6)
+      for (let wx = x + 2; wx < x + 9; wx += 3) if (R() < 0.35) px(a, wx, wy, C.yellow);
   }
-  rect(a, 0, 100, ART_W, 14, C.black);
-  for (let k = 0; k < 6; k++) {
+  dom(a, 252, 92);
+
+  // Straße unter der Brücke
+  rect(a, 0, 92, ART_W, 24, C.grey_darker);
+  hline(a, 0, 92, ART_W, C.dark_grey);
+  dither(a, 0, 94, ART_W, 22, C.grey_darker, C.navy, 0.35);
+  for (let k = 0; k < 8; k++) {
     const cx = Math.floor(R() * ART_W);
-    rect(a, cx, 104, 4, 2, C.yellow);
-    rect(a, cx + 10, 108, 4, 2, C.light_red);
+    rect(a, cx, 98, 4, 2, C.yellow);
+    rect(a, cx + 9, 106, 4, 2, C.light_red);
   }
 
-  rect(a, 0, 112, ART_W, 68, C.dark_grey);
-  dither(a, 0, 112, ART_W, 20, C.dark_grey, C.grey, 0.3);
-  dither(a, 0, 150, ART_W, 30, C.dark_grey, C.black, 0.4);
-  rect(a, 46, 30, 208, 84, C.grey);
-  frame(a, 46, 30, 208, 84, C.black);
-  dither(a, 46, 30, 208, 12, C.grey, C.light_grey, 0.4);
-  for (let x = 52; x < 250; x += 26) {
-    vline(a, x, 32, 80, C.dark_grey);
-    vline(a, x + 1, 32, 80, C.light_grey);
+  // Stahlbogen in Grün, wie an den Kölner Rheinbrücken: zwei Gurtungen mit Diagonalen.
+  const archY = (x: number) => 24 - 22 * Math.sin((Math.PI * x) / ART_W);
+  for (let x = 0; x < ART_W; x++) {
+    const y = Math.round(archY(x));
+    rect(a, x, y, 1, 3, C.forest);
+    px(a, x, y, C.moss);
+    rect(a, x, y + 11, 1, 3, C.forest);
+    px(a, x, y + 11, C.moss);
+  }
+  for (let x = 0; x < ART_W; x += 14) {
+    const y1 = Math.round(archY(x));
+    const y2 = Math.round(archY(x + 14));
+    line(a, x, y1 + 3, x + 14, y2 + 11, C.forest);
+    line(a, x + 14, y2 + 3, x, y1 + 11, C.moss);
+    vline(a, x, y1, 14, C.forest);
+  }
+  // Hänger vom Bogen hinunter zum Fahrbahnträger. Rechts nur einer, damit der Blick
+  // auf den Dom frei bleibt („Aussicht").
+  for (const x of [8, 26, 316]) {
+    const y = Math.round(archY(x)) + 13;
+    rect(a, x - 1, y, 4, 114 - y, C.forest);
+    vline(a, x - 1, y, 114 - y, C.moss);
+    vline(a, x + 2, y, 114 - y, C.black);
+    for (let j = y + 6; j < 112; j += 18) hline(a, x - 1, j, 4, C.grey_darker);
+  }
+
+  // Brüstung: Stahlrahmen mit Nieten, innen das Blech [60,40,180,60].
+  box(a, 46, 30, 208, 84, C.forest, C.moss, C.grey_darker, C.black);
+  dither(a, 48, 94, 204, 18, C.forest, C.grey_darker, 0.4);
+  for (let x = 52; x < 250; x += 8) {
+    px(a, x, 34, C.moss);
+    px(a, x, 110, C.grey_darker);
+  }
+  for (let x = 58; x < 246; x += 26) {
+    vline(a, x, 32, 80, C.grey_darker);
+    vline(a, x + 1, 32, 80, C.moss);
   }
   rect(a, 60, 40, 180, 60, C.light_grey);
-  dither(a, 60, 40, 180, 60, C.light_grey, C.grey, 0.25);
-  frame(a, 60, 40, 180, 60, C.dark_grey);
-  for (let x = 64; x < 238; x += 22) {
-    disc(a, x, 44, 1, C.dark_grey);
-    disc(a, x, 96, 1, C.dark_grey);
+  dither(a, 60, 40, 180, 60, C.light_grey, C.grey, 0.28);
+  frame(a, 60, 40, 180, 60, C.grey_darker);
+  frame(a, 59, 39, 182, 62, C.black);
+  for (let x = 64; x < 238; x += 11) {
+    disc(a, x, 43, 1, C.grey_mid);
+    disc(a, x, 97, 1, C.grey_mid);
   }
-  for (let k = 0; k < 3; k++) crack(a, 80 + Math.floor(R() * 140), 46, 8 + Math.floor(R() * 8), C.grey, R);
-  rect(a, 0, 24, ART_W, 5, C.dark_grey);
-  hline(a, 0, 24, ART_W, C.light_grey);
-  for (let x = 6; x < ART_W; x += 18) vline(a, x, 29, 6, C.dark_grey);
+  // Blechstoß in der Mitte und ein paar Roststellen an den Kanten
+  hline(a, 61, 70, 178, C.grey_mid);
+  hline(a, 61, 71, 178, C.grey_pale);
+  for (let x = 66; x < 238; x += 14) px(a, x, 70, C.grey_darker);
+  for (const sx of [120, 180]) {
+    vline(a, sx, 41, 58, C.grey_mid);
+    vline(a, sx + 1, 41, 58, C.grey_pale);
+    for (let y = 45; y < 98; y += 11) px(a, sx, y, C.grey_darker);
+  }
+  for (let k = 0; k < 3; k++) crack(a, 80 + Math.floor(R() * 130), 46, 8 + Math.floor(R() * 8), C.grey, R);
+  for (const [rx, ry] of [
+    [62, 92],
+    [148, 41],
+    [232, 84],
+  ] as [number, number][])
+    grain(a, rx, ry, 8, 7, C.rust, 0.35, R);
 
-  box(a, 250, 20, 60, 50, C.black, C.grey, C.black);
-  rect(a, 252, 22, 56, 46, C.blue);
-  dither(a, 252, 22, 56, 46, C.blue, C.black, 0.45);
-  for (let k = 0; k < 26; k++) px(a, 254 + Math.floor(R() * 52), 24 + Math.floor(R() * 42), C.yellow);
-  hline(a, 252, 56, 56, C.dark_grey);
+  // Fahrbahnträger, darauf die Handstyles – das Blech selbst ist frei.
+  rect(a, 0, 114, ART_W, 20, C.forest);
+  hline(a, 0, 114, ART_W, C.moss);
+  hline(a, 0, 133, ART_W, C.black);
+  for (let x = 0; x < ART_W; x += 20) {
+    line(a, x, 116, x + 20, 132, C.grey_darker);
+    line(a, x + 20, 116, x, 132, C.moss);
+  }
+  dither(a, 0, 126, ART_W, 8, C.forest, C.grey_darker, 0.4);
+  tags(a, 50, 115, 160, 18, [C.black, C.white], 3, R);
+  tags(a, 258, 115, 56, 18, [C.black], 1, R);
 
+  // Laufsteg und Gleis
+  rect(a, 0, 134, ART_W, 46, C.grey_darker);
+  for (let x = -6; x < ART_W; x += 15) {
+    rect(a, x, 136, 11, 20, C.dark_brown);
+    hline(a, x, 136, 11, C.tan);
+    hline(a, x, 155, 11, C.black);
+  }
+  for (const ry of [138, 150]) {
+    rect(a, 0, ry, ART_W, 4, C.grey);
+    hline(a, 0, ry, ART_W, C.white);
+    hline(a, 0, ry + 1, ART_W, C.light_grey);
+    hline(a, 0, ry + 3, ART_W, C.black);
+  }
+  rect(a, 0, 158, ART_W, 22, C.grey_mid);
+  hline(a, 0, 158, ART_W, C.grey_soft);
+  hline(a, 0, 159, ART_W, C.black);
+  dither(a, 0, 172, ART_W, 8, C.grey_mid, C.dark_grey, 0.35);
+  grain(a, 0, 160, ART_W, 20, C.dark_grey, 0.06, R);
+  for (let x = 6; x < ART_W; x += 22) {
+    disc(a, x, 164, 1, C.grey_soft);
+    disc(a, x + 11, 174, 1, C.grey_soft);
+  }
+  puddle(a, 210, 172, 20, 4, C.black, C.grey);
+  weeds(a, 124, 158, 4, C.moss, R);
+
+  // Treppe runter zur Straße [0,110,40,70]
+  rect(a, 0, 110, 46, 70, C.dark_grey);
   for (let k = 0; k < 8; k++) {
-    const w = 40 - k * 4;
-    rect(a, 0, 112 + k * 8, w, 5, C.grey);
+    const w = 44 - k * 4;
+    rect(a, 0, 112 + k * 8, w, 6, C.grey);
     hline(a, 0, 112 + k * 8, w, C.light_grey);
-    hline(a, 0, 116 + k * 8, w, C.dark_grey);
+    hline(a, 0, 117 + k * 8, w, C.dark_grey);
   }
-  line(a, 40, 108, 4, 172, C.light_grey);
-  line(a, 41, 108, 5, 172, C.dark_grey);
+  line(a, 42, 108, 6, 176, C.light_grey);
+  line(a, 43, 108, 7, 176, C.dark_grey);
   return a;
 };
 
@@ -540,7 +729,7 @@ const abstellgleis: Scene = (R) => {
     disc(a, cx, 140, 6, C.dark_grey);
     disc(a, cx, 140, 3, C.black);
   }
-  tags(a, 158, 102, 74, 24, [C.white, C.light_red], 2, R);
+  tags(a, 144, 100, 94, 22, [C.white, C.light_red], 2, R);
 
   // Gleise [250,120,60,50]
   for (let k = 0; k < 7; k++) {

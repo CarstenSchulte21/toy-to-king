@@ -3,6 +3,7 @@
 // Jede Szene richtet sich nach den Hotspot-Rechtecken aus content/rooms/*.yaml: Was man antippen kann,
 // muss man auch sehen.
 import { glyph, letteringChars } from "../../src/engine/lettering/glyphs";
+import type { Pt } from "../../src/engine/lettering/raster";
 import { PALETTE, type PaletteKey } from "../../src/engine/lettering/palette";
 import { STAGE_HEIGHT, STAGE_WIDTH } from "../../src/engine/content-schema";
 
@@ -192,44 +193,166 @@ export function word(
   return chars.length * adv;
 }
 
-// Ein fremdes Werk an der Wand: farbiger Block mit Outline – Deko, kein eigenes Werk.
-export function piece(
+// Fremde Werke an den Wänden: Tag, Throw-up oder Wildstyle – gezeichnet aus denselben
+// Buchstaben-Skeletten wie die Werke des Spielers, nur direkt in der Szene und in jeder Größe.
+export type GraffitiStyle = "tag" | "throwup" | "wildstyle";
+
+export type GraffitiColors = {
+  fill: number;
+  fill2?: number; // zweite Farbe für einen Fade
+  outline: number;
+  second?: number; // Second Outline
+  shade?: number; // 3D
+  background?: number;
+};
+
+type Seg = [Pt, Pt];
+
+// Ecken abrunden (für Bubble-Formen).
+function smooth(pts: Pt[], iterations: number): Pt[] {
+  let out = pts;
+  for (let k = 0; k < iterations; k++) {
+    if (out.length < 3) return out;
+    const next: Pt[] = [out[0]!];
+    for (let i = 0; i < out.length - 1; i++) {
+      const [ax, ay] = out[i]!;
+      const [bx, by] = out[i + 1]!;
+      next.push([ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25], [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75]);
+    }
+    next.push(out[out.length - 1]!);
+    out = next;
+  }
+  return out;
+}
+
+const STYLE = {
+  tag: { r: 0.16, adv: 4.3, slant: 0.34, round: 0, jitter: 0.12, arrows: false, swoosh: true },
+  throwup: { r: 1.05, adv: 4.7, slant: 0.06, round: 3, jitter: 0.04, arrows: false, swoosh: false },
+  wildstyle: { r: 0.42, adv: 4.2, slant: 0.3, round: 0, jitter: 0.06, arrows: true, swoosh: false },
+} as const;
+
+export function graffiti(
   a: Art,
   x: number,
   y: number,
-  w: number,
   h: number,
   text: string,
-  fill: number,
-  outline: number,
+  style: GraffitiStyle,
+  colors: GraffitiColors,
   R: () => number,
-  background?: number,
-): void {
-  if (background !== undefined) {
-    rect(a, x + 3, y, w - 6, h, background);
-    rect(a, x, y + 3, w, h - 6, background);
-    for (const [cx, cy] of [
-      [x + 3, y + 3],
-      [x + w - 4, y + 3],
-      [x + 3, y + h - 4],
-      [x + w - 4, y + h - 4],
-    ] as [number, number][])
-      disc(a, cx, cy, 3.5, background);
+): number {
+  const P = STYLE[style];
+  const chars = letteringChars(text);
+  const u = h / 6;
+  const adv = P.adv * u;
+  // Tags sind Striche aus einer dünnen Cap: gleichbleibend schmal, sonst werden sie zu Klecksen.
+  const radius = style === "tag" ? Math.max(0.9, 0.09 * h) : P.r * u;
+  const width = chars.length * adv;
+
+  // Alle Striche einsammeln – inklusive Arrows und Connections.
+  const segs: Seg[] = [];
+  const push = (pts: Pt[]) => {
+    const smoothed = P.round ? smooth(pts, P.round) : pts;
+    for (let i = 0; i < smoothed.length - 1; i++) segs.push([smoothed[i]!, smoothed[i + 1]!]);
+  };
+  chars.forEach((ch, i) => {
+    const cx = x + i * adv + 2 * u;
+    const jitter = () => (R() - 0.5) * 2 * P.jitter * u;
+    const tf = ([gx, gy]: Pt): Pt => {
+      const py = (gy - 3) * u;
+      return [cx + (gx - 2) * u - py * P.slant + jitter(), y + h / 2 + py + jitter()];
+    };
+    for (const stroke of glyph(ch)!) {
+      const pts = stroke.map(tf);
+      push(pts);
+      if (!P.arrows) continue;
+      const closed = Math.hypot(pts[0]![0] - pts[pts.length - 1]![0], pts[0]![1] - pts[pts.length - 1]![1]) < 1;
+      if (closed) continue;
+      // Arrows: Spitze verlängern, dazu zwei Widerhaken
+      for (const [inner, tip] of [
+        [pts[1], pts[0]],
+        [pts[pts.length - 2], pts[pts.length - 1]],
+      ] as [Pt | undefined, Pt][]) {
+        if (!inner || R() > 0.55) continue;
+        const dx = tip[0] - inner[0];
+        const dy = tip[1] - inner[1];
+        const len = Math.hypot(dx, dy) || 1;
+        const ux = dx / len;
+        const uy = dy / len;
+        const end: Pt = [tip[0] + ux * 1.5 * u, tip[1] + uy * 1.5 * u];
+        segs.push([tip, end]);
+        for (const sign of [-1, 1]) {
+          const bx = end[0] - ux * 1.1 * u + sign * uy * 0.9 * u;
+          const by = end[1] - uy * 1.1 * u - sign * ux * 0.9 * u;
+          segs.push([end, [bx, by]]);
+        }
+      }
+    }
+    // Connections zwischen den Buchstaben
+    if (P.arrows && i < chars.length - 1) {
+      segs.push([
+        [cx + 1.6 * u, y + h * 0.62],
+        [cx + adv - 1.6 * u, y + h * 0.42],
+      ]);
+    }
+  });
+
+  const stroke = (r: number, color: number, dx = 0, dy = 0) => {
+    for (const [p0, p1] of segs) {
+      const steps = Math.max(1, Math.ceil(Math.hypot(p1[0] - p0[0], p1[1] - p0[1])));
+      for (let t = 0; t <= steps; t++)
+        disc(a, p0[0] + ((p1[0] - p0[0]) * t) / steps + dx, p0[1] + ((p1[1] - p0[1]) * t) / steps + dy, r, color);
+    }
+  };
+
+  if (colors.background !== undefined) {
+    const pad = Math.max(3, u);
+    rect(a, x - pad, y - pad / 2, width + pad, h + pad, colors.background);
     for (let k = 0; k < 4; k++) {
-      const sx = x + 4 + Math.floor(R() * (w - 8));
-      const sy = y + 4 + Math.floor(R() * (h - 8));
+      const sx = Math.round(x - pad + R() * (width + pad));
+      const sy = Math.round(y - pad / 2 + R() * (h + pad));
       hline(a, sx - 1, sy, 3, C.white);
       vline(a, sx, sy - 1, 3, C.white);
     }
   }
-  const chars = letteringChars(text).length;
-  const letterH = Math.max(10, Math.min(h - 10, ((w - 10) / (chars * 5)) * 6, 30));
-  const used = chars * 5 * (letterH / 6);
-  word(a, x + (w - used) / 2 + 1, y + (h - letterH) / 2, letterH, text, fill, outline, 0.12);
+  if (colors.shade !== undefined) stroke(radius + 1.4, colors.shade, Math.max(2, u * 0.5), Math.max(2, u * 0.5));
+  if (colors.second !== undefined) stroke(radius + 2.8, colors.second);
+  if (style !== "tag") stroke(radius + 1.4, colors.outline);
+  else if (colors.outline !== colors.fill) stroke(radius + 0.8, colors.outline);
+  stroke(radius, colors.fill);
+
+  // Fade: untere Hälfte der Füllung umfärben
+  if (colors.fill2 !== undefined) {
+    for (let j = Math.floor(y); j < y + h; j++) {
+      const t = (j - y) / h;
+      for (let i = Math.floor(x - u); i < x + width + u; i++) {
+        if (get(a, i, j) !== colors.fill) continue;
+        const thr = (BAYER[(j % 4) * 4 + (i % 4)]! + 0.5) / 16;
+        if (t > thr) px(a, i, j, colors.fill2);
+      }
+    }
+  }
+  // Highlights auf der Füllung
+  if (style !== "tag") {
+    for (let j = Math.floor(y); j < y + h * 0.5; j++)
+      for (let i = Math.floor(x); i < x + width; i++)
+        if (get(a, i, j) === colors.fill && get(a, i - 1, j - 1) === colors.outline && R() < 0.5) px(a, i, j, C.white);
+  }
+  // Schwung unter dem Tag
+  if (P.swoosh) {
+    const by = y + h + Math.max(1, u * 0.6);
+    for (let k = 0; k <= 20; k++) {
+      const t = k / 20;
+      const sx = x - u + (width + 2 * u) * t;
+      const sy = by + Math.sin(Math.PI * t) * u * 0.9 - t * u * 0.8;
+      disc(a, sx, sy, radius, colors.fill);
+    }
+  }
+  return width;
 }
 
 // Tags an einer Wand: kleine Handstyles, dazwischen ein paar Kritzel.
-const TAG_WORDS = ["SEB", "ZINK", "MOA", "ARO", "KEV", "NIL", "RAS", "TOY", "EMI", "LUK"];
+const TAG_WORDS = ["TREN", "SANS", "HBF"];
 export function tags(
   a: Art,
   x: number,
@@ -246,16 +369,15 @@ export function tags(
   for (let k = 0; k < count; k++) {
     const c = colors[Math.floor(R() * colors.length)]!;
     const text = TAG_WORDS[Math.floor(R() * TAG_WORDS.length)]!;
-    const size = Math.min(8 + Math.floor(R() * 6), Math.max(7, rowH - 4));
-    const used = text.length * 5 * (size / 6);
+    const size = Math.min(12 + Math.floor(R() * 6), Math.max(10, rowH - 3));
+    const used = text.length * 4.3 * (size / 6);
     const row = k % rows;
     const col = Math.floor(k / rows);
     const perRow = Math.ceil(count / rows);
     const slot = w / perRow;
     const tx = x + col * slot + R() * Math.max(1, slot - used);
-    const ty = y + row * rowH + R() * Math.max(1, rowH - size - 2);
-    word(a, tx, ty, size, text, c, c, 0.3 + R() * 0.2, true);
-    if (R() < 0.5) line(a, tx - 2, ty + size + 1, tx + used, ty + size - 1, c);
+    const ty = y + row * rowH + R() * Math.max(1, rowH - size - 4);
+    graffiti(a, tx, ty, size, text, "tag", { fill: c, outline: c }, R);
   }
 }
 

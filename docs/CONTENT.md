@@ -105,7 +105,7 @@ hotspots:
 id: strasse
 name: Straße
 background: strasse.png
-description: "Die Ladenzeile. Kiosk, Handyladen, Farbenladen. Und eine Streife, die hier öfter steht als der Bus."
+description: "Die Ladenzeile. Kiosk, Handyladen, der Graffitistore. Und eine Streife, die hier öfter steht als der Bus."
 hotspots:
   - id: rolltore
     label: Rolltore
@@ -129,7 +129,7 @@ hotspots:
     label: Kamera
     rect: [200, 28, 20, 16]
     if: [{fact: kamera}]
-    untersuchen: "Die neue Kamera über dem Farbenladen. Sie zeigt genau auf die Rolltore."
+    untersuchen: "Die neue Kamera über dem Graffitistore. Sie zeigt genau auf die Rolltore."
 
   - id: brandt
     label: Polizistin
@@ -143,7 +143,7 @@ hotspots:
     gehen: hinterhof
 
   - id: zum_laden
-    label: Farbenladen
+    label: Graffitistore
     rect: [180, 50, 50, 90]
     gehen: farbenladen
 
@@ -153,11 +153,11 @@ hotspots:
     gehen: unterfuehrung
 ```
 
-### 2.3 Farbenladen (M2)
+### 2.3 Graffitistore (M2)
 
 ```yaml
 id: farbenladen
-name: Farbenladen
+name: Graffitistore
 background: farbenladen.png
 description: "Regale bis unter die Decke, Dosen nach Farben sortiert. Riecht nach Lack."
 hotspots:
@@ -295,7 +295,7 @@ hotspots:
 - id: kamera
   category: risiko
   title: Kamera am Laden
-  text: "Über dem Farbenladen hängt seit letzter Woche eine Kamera. Sie zeigt auf die Rolltore."
+  text: "Über dem Graffitistore hängt seit letzter Woche eine Kamera. Sie zeigt auf die Rolltore."
   source: laden
 
 - id: krux_kauft_nicht
@@ -512,15 +512,15 @@ dialogue:
       next: hub
 ```
 
-### 4.2 Sibel – Farbenladen
+### 4.2 Sibel – Graffitistore
 
-Führt den Farbenladen. Sachlich-freundlich, Materialnerd, kennt die Kaufgewohnheiten jedes Writers in der Gegend.
+Führt den Graffitistore. Sachlich-freundlich, Materialnerd, kennt die Kaufgewohnheiten jedes Writers in der Gegend.
 Vertrauen: +1 für die erste echte Materialfrage, +1, wenn man sich mit ihr über die Kamera ärgert. −1 für die Frage nach Klauen. Ab 2 redet sie über Kunden.
 
 ```yaml
 id: laden
 name: Sibel
-role: Farbenladen
+role: Graffitistore
 room: farbenladen
 hotspot: sibel
 trust:

@@ -1,6 +1,6 @@
 # SPEC – TOY TO KING, Grafik-Schritt „Räume"
 
-**Stand 22.09.2026:** umgesetzt auf Branch `grafik` (136 Tests grün, Build grün). Vor dem Einbauen bewertet der Tester den Bilder-Prototyp (Artifact „Raum-Check").
+**Stand 23.09.2026:** umgesetzt auf Branch `grafik` (136 Tests grün, Build grün), Runde 4 eingearbeitet. Vor dem Einbauen bewertet der Tester den Bilder-Prototyp (Artifact „Raum-Check").
 
 Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M4b).
 
@@ -18,7 +18,7 @@ Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M
 | Palette | 32 Farben: die 16 C64-Farben plus 16 Zwischentöne für Haut, Mauerwerk, Metall und Nacht. Die ersten 16 bleiben unverändert, gespeicherte Werke sehen genauso aus wie vorher. | 16 Farben reichten für Gesichter und Schattierungen nicht (Tester). Der Retro-Look bleibt. |
 | Größe | 320×180, genau die Bühne | Keine Skalierung, keine unscharfen Kanten. |
 | Motive | Jede Szene richtet sich nach den Hotspot-Rechtecken der Room-Datei | Wer etwas sieht, kann es auch antippen – und umgekehrt. |
-| Fremde Werke | Die Pieces und Tags an den Wänden entstehen aus denselben Buchstaben-Skeletten wie die eigenen Werke, nur klein: KRUX in der Unterführung, SEB, ZINK, MOA und ARO an der Hall, ein verblasstes TOY daneben. | Die Wände zeigen echte Namen statt bunter Kästen. |
+| Fremde Werke | Die Werke an den Wänden entstehen aus denselben Buchstaben-Skeletten wie die eigenen. Es sind immer dieselben drei Namen: **TREN, SANS, HBF** – klein als Handstyle, groß als Throw-up oder Wildstyle. Dazu KRUX als Wildstyle in der Unterführung. | Der Tester will wiedererkennbare Namen statt erfundener Kürzel: drei Namen, die überall auftauchen, machen aus den Räumen eine Stadt. |
 | Freie Flächen | Wo man selbst malen darf (Rolltore, linke Wand, Hall, Brückenblech, Waggon), ist die Fläche leer und ruhig. | Das eigene Werk soll wirken. |
 | Hotspots finden | Neuer HUD-Knopf „Blick": zeigt 2,5 Sekunden lang die Umrisse mit Namen. | Gegen Pixel-Sucherei (Backlog F1.5), ohne die Bilder mit Markierungen zu verschandeln. |
 
@@ -41,8 +41,7 @@ Bezug: `backlog.md` (F1.5, E10), `MEILENSTEINE.md` (Schritt G zwischen M4a und M
 
 ## 5. Offene Punkte
 
-- Die Figuren sind einfache Silhouetten. Reicht das, oder brauchen Kalle, Sibel, KRUX und Frau Brandt mehr Eigenheiten?
-- Die Brücke ist bewusst leer, damit das eigene Werk wirkt. Vielleicht wirkt sie dadurch zu leer.
+- Das Brückenblech ist bewusst leer, damit das eigene Werk wirkt. Vielleicht wirkt es dadurch zu leer.
 - Später: Tag und Nacht (M4b) braucht je Szene eine dunkle Fassung.
 
 ## 6. Runde 2 nach Tester-Feedback
@@ -77,3 +76,20 @@ Punkte als Augen, ein Strich als Mund. Dazu der Wunsch nach 32 Farben. Geändert
 
 Offen für später: Die neuen Farben stehen auch dem Spiel zur Verfügung. Damit könnte es in M5 mehr
 Dosenfarben im Laden geben.
+
+## 8. Runde 4 nach Tester-Feedback
+
+Der Tester wollte echte Namen an allen Wänden, den Kölner Laden und eine Kölner Brücke. Geändert:
+
+| Thema | Vorher | Jetzt |
+|-------|--------|-------|
+| Namen an den Wänden | SEB, ZINK, MOA, ARO, ein verblasstes TOY | Überall nur noch TREN, SANS und HBF. Klein als Handstyle, groß als Throw-up oder Wildstyle. Kein TOY mehr als Graffiti. |
+| Graffiti-Zeichner | `piece()` – eckige Kästen mit Schriftzug | Neuer `graffiti()` in `scripts/lib/art.ts` mit drei Formen: `tag` (dünne Cap, Schräge, Schwung), `throwup` (runde Bubble-Formen, Verlauf, Highlight), `wildstyle` (Arrows, Widerhaken, Connections, Second Outline, 3D-Schatten, Background) |
+| Unterführung | KRUX als Kasten-Piece | KRUX als Wildstyle mit Arrows, weißer Second Outline und 3D |
+| Hall of Fame | Vier gleich aussehende Pieces | Drei Styles nebeneinander: TREN als Wildstyle, SANS und HBF als Throw-up, dazu ein altes, verblasstes Werk darunter |
+| Laden | „FARBEN" | Heißt **DEDICATED**, nach dem Laden in Köln. Keine Sprühdosen mehr im Schaufenster, stattdessen Schuhkartons, Shirts und ein Deck. Innen ein Schild an der Wand und eine mit Stickern zugeklebte Theke. |
+| Raumname | Farbenladen | **Graffitistore** (`content/rooms/farbenladen.yaml`, `content/npcs/laden.yaml`, `content/facts.yaml`, `content/rooms/strasse.yaml`) |
+| Eisenbahnbrücke | Graue Wand vor Skyline | Grüner Stahlbogen mit zwei Gurtungen und Diagonalen wie an den Kölner Rheinbrücken, Hänger zum Fahrbahnträger, dahinter der Dom mit zwei Türmen, unten die Straße, vorn Gleis und Laufsteg |
+
+**Fremde Logos:** Der Ladenname steht als Schriftzug in unserem eigenen Pixel-Alphabet. Das echte Logo
+der Firma wird nicht nachgezeichnet – auch nicht in Pixeln.
