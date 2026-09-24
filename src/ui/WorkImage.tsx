@@ -1,13 +1,13 @@
 "use client";
 // Das eigene Werk am Spot: aus Sketch und Fingerbahnen neu berechnet, verkleinert im Hotspot.
 import { useEffect, useMemo, useRef } from "react";
-import { TRANSPARENT, WORK_W, renderWork, type GameContent, type Work } from "@/engine";
+import { TRANSPARENT, WORK_W, frameOf, renderWork, type GameContent, type Spot, type Work } from "@/engine";
 import { PALETTE } from "@/engine";
 
-export function WorkImage(props: { content: GameContent; name: string; work: Work }) {
+export function WorkImage(props: { content: GameContent; name: string; work: Work; spot?: Spot }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const image = useMemo(() => {
-    const result = renderWork(props.content, props.name, props.work);
+    const result = renderWork(props.content, props.name, props.work, frameOf(props.spot));
     if (!result) return null;
     const px = result.pixels;
     let x0 = WORK_W;
@@ -40,7 +40,7 @@ export function WorkImage(props: { content: GameContent; name: string; work: Wor
       }
     }
     return { buf, w, h };
-  }, [props.content, props.name, props.work]);
+  }, [props.content, props.name, props.work, props.spot]);
 
   useEffect(() => {
     const canvas = ref.current;

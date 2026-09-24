@@ -82,6 +82,8 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 - [x] Der Durchlauf-Test belegt: Mit dem verdienten Geld bleibt King erreichbar, und man kann sich
       nicht festspielen (ohne Farbe geht immer noch der Marker).
 - [x] Untersuchen lohnt sich: Sieben Hotspots geben beim ersten Mal etwas her, jeder nur einmal.
+- [x] Jedes Marker-Werk sitzt auf seinem Ding und ist kleiner als der Hotspot: ein Tag auf **einer**
+      Tonne, ein Tag längs am Mast.
 
 ## 7. Offene Fragen an den Tester
 
@@ -89,6 +91,9 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 - Reicht Taschengeld einmal die Woche, oder ist das zu zäh?
 - Fehlt ein Weg, sich Geld zu verdienen?
 - Sind sieben Funde zu wenig, um das Absuchen der Räume zur Gewohnheit zu machen?
+- Ist der Tag am Mast jetzt zu klein? Er ist so breit wie der Mast – mehr geht nicht, ohne dass er
+  wieder daneben steht.
+- Ist „quer taggen" am Mast eine Herausforderung oder nur fummelig?
 
 ## 8. Abweichungen bei der Umsetzung
 
@@ -103,6 +108,8 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 | Toy-Text | „Du hast eine Dose und einen Namen" heißt jetzt „Du hast einen Marker und einen Namen". | Stimmte sonst nicht mehr. |
 | Funde beim Untersuchen | Sieben Hotspots geben beim ersten Untersuchen etwas her: Chrom, Weiß, Skinny Cap, NY Fat, Fat Cap, 5 € und die Info „NOX". Jeder genau einmal, abgesichert über eine Flagge. | Nach Tester-Feedback: Bisher kam alles aus Gesprächen. Jetzt lohnt es sich, einen Raum abzusuchen – und das frühe Geld-Problem hat einen zweiten Ausweg neben Samstag. |
 | Info ohne NPC | `source` an einer Info ist jetzt optional. Fehlt sie, steht im Blackbook „selbst gesehen". | Die Crew NOX sieht man an der Wand, sie erzählt einem keiner. |
+| Bemalbare Fläche | Neue Felder am Spot: `frame` (welcher Teil der Arbeitsfläche das Ding überhaupt ist), `rot: 90` (der Schriftzug steht quer) und `place` (wo das Werk im Raum sitzt). | Nach Tester-Feedback: Der Tag lief über alle drei Mülltonnen und ragte über den Laternenmast hinaus. Ein Werk war bisher immer so groß wie sein Hotspot. |
+| Hellere Flächen | Laternenmast und Waggontür sind jetzt verzinktes bzw. lackiertes Blech statt fast schwarz. Am Zaun hängt ein Schild – vorher gab es das nur im Text. | Ein schwarzer Marker auf dunkelgrauem Grund ist nicht zu sehen. Und der Spot hieß „Zaunschild", ohne dass eines im Bild war. |
 
 ## 9. Was der Tester wissen muss
 

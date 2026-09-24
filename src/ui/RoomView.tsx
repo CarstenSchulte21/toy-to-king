@@ -2,7 +2,7 @@
 // Zeigt einen Room mit seinen Hotspots und dem Verbmenü.
 // Ohne Hintergrundbild (M1/M2) werden Hotspots als beschriftete Platzhalter-Kästen gezeichnet,
 // sonst wäre auf einem leeren Bildschirm nichts zu finden.
-import { useEffect, useState, type PointerEvent } from "react";
+import { useEffect, useState, type CSSProperties, type PointerEvent } from "react";
 import {
   STAGE_HEIGHT,
   STAGE_WIDTH,
@@ -13,12 +13,21 @@ import {
   type GameState,
   type Hotspot,
   type Room,
+  type Spot,
   type Verb,
 } from "@/engine";
 import { Pips } from "./MapView";
 import { WorkImage } from "./WorkImage";
 
 type Menu = { hotspot: Hotspot; x: number; y: number } | null;
+
+// Wo das Werk sitzt: auf der mittleren Tonne, längs am Mast – nicht über dem ganzen Hotspot.
+// Ohne `place` bleibt es wie bisher im Rechteck des Hotspots.
+function placeStyle(spot: Spot | undefined, rect: Hotspot["rect"]): CSSProperties | undefined {
+  if (!spot?.place) return undefined;
+  const [px, py, pw, ph] = spot.place;
+  return { left: px - rect[0], top: py - rect[1], width: pw, height: ph, inset: "auto" };
+}
 
 const MENU_WIDTH = 84;
 const MENU_ITEM_HEIGHT = 18;
@@ -97,10 +106,19 @@ export function RoomView(props: {
           >
             {(placeholder || outlines) && <span className="hotspot-label">{h.label}</span>}
             {h.sprühen && state.works[h.sprühen] && (
-              <span className="work">
-                <WorkImage content={content} name={state.player.name} work={state.works[h.sprühen]!} />
-                <Pips value={state.works[h.sprühen]!.quality} />
-              </span>
+              <>
+                <span className="work" style={placeStyle(content.spots[h.sprühen], h.rect)}>
+                  <WorkImage
+                    content={content}
+                    name={state.player.name}
+                    work={state.works[h.sprühen]!}
+                    spot={content.spots[h.sprühen]}
+                  />
+                </span>
+                <span className="work-pips">
+                  <Pips value={state.works[h.sprühen]!.quality} />
+                </span>
+              </>
             )}
           </button>
         );

@@ -1016,11 +1016,22 @@ body {
 }
 .work-image {
   max-width: 100%;
-  max-height: calc(100% - 5px);
+  max-height: 100%;
   object-fit: contain;
 }
 .work .quality {
   margin-top: 1px;
+}
+/* Werke mit eigener Fläche (Tonne, Mast): die Qualität steht unten am Hotspot,
+   sonst wäre für die Punkte neben einem 7 Pixel breiten Mast kein Platz. */
+.work-pips {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
 }
 
 /* Risiko im Sketch (M4b) */

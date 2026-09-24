@@ -126,13 +126,15 @@ export const textVariantsSchema = z
   })
   .transform((v) => v as TextVariants);
 
+const rect = z.tuple([z.number().int(), z.number().int(), z.number().int(), z.number().int()], {
+  error: "Ein Rechteck braucht genau vier ganze Zahlen: [x, y, breite, höhe].",
+});
+
 export const hotspotSchema = z
   .strictObject({
     id,
     label: text,
-    rect: z.tuple([z.number().int(), z.number().int(), z.number().int(), z.number().int()], {
-      error: "rect braucht genau vier ganze Zahlen: [x, y, breite, höhe].",
-    }),
+    rect,
     if: z.array(conditionSchema).optional(),
     untersuchen: textVariantsSchema.optional(),
     gehen: id.optional(),
@@ -266,6 +268,12 @@ export const spotSchema = z.strictObject({
   risk: z.enum(RISK_LEVELS, { error: `risk muss eine von ${RISK_LEVELS.join(", ")} sein.` }),
   tool: z.enum(TOOLS).optional(), // M5a: Auf glatten Flächen geht nur der Marker
   surface: z.enum(SURFACES).optional(), // M5a: Untergrund im Sprüh-Bildschirm
+  // Bemalbare Fläche innerhalb der Arbeitsfläche (320×180). Ohne Angabe: die ganze Fläche.
+  // Ein Mast oder eine Tonne ist kleiner als eine Wand – sonst ragt der Tag darüber hinaus.
+  frame: rect.optional(),
+  rot: z.literal(90).optional(), // Der Schriftzug steht quer, z. B. längs am Mast
+  // Wo das fertige Werk im Raum sitzt (Raumkoordinaten). Ohne Angabe: das Rechteck des Hotspots.
+  place: rect.optional(),
   if: z.array(conditionSchema).optional(),
 });
 export const spotsFileSchema = z.array(spotSchema);

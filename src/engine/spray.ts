@@ -8,6 +8,11 @@ import {
   passesFor,
   renderLettering,
   renderPreview,
+  TRANSPARENT,
+  WORK_H,
+  WORK_W,
+  inFrame,
+  type Frame,
   type Lettering,
   type PassKind,
   type PassStats,
@@ -86,9 +91,7 @@ export function styleBlocker(
     return spot.tool === "marker" ? "Darauf malst du mit dem Marker." : "Dafür brauchst du die Dose.";
   }
   const kind = style.tool === "marker" ? "marker" : "dose";
-  const hasTool = Object.values(content.items).some(
-    (i) => i.kind === kind && (state.items[i.id] ?? 0) > 0,
-  );
+  const hasTool = Object.values(content.items).some((i) => i.kind === kind && (state.items[i.id] ?? 0) > 0);
   if (!hasTool) return style.tool === "marker" ? "Dafür brauchst du einen Marker." : "Dir fehlt eine Dose.";
   // Ohne Farbe kein Werk – Marker brauchen keine.
   if (style.tool !== "marker") {
@@ -146,14 +149,22 @@ export function styleOf(content: GameContent, styleId: string): Style | undefine
   return content.spray?.styles.find((s) => s.id === styleId);
 }
 
+// Die bemalbare Fläche eines Spots. Ohne Angabe ist das die ganze Arbeitsfläche – eine Wand.
+export function frameOf(spot: Spot | undefined): Frame | undefined {
+  if (!spot?.frame) return undefined;
+  const [x, y, w, h] = spot.frame;
+  return { x, y, w, h, rot: spot.rot === 90 ? 90 : 0 };
+}
+
 export function letteringFor(
   content: GameContent,
   playerName: string,
   styleId: string,
   seed: number,
+  frame?: Frame,
 ): Lettering | null {
   const style = styleOf(content, styleId);
-  return style ? buildLettering(playerName, style.look, seed) : null;
+  return style ? buildLettering(playerName, style.look, seed, frame) : null;
 }
 
 export type WorkDraft = {
@@ -165,15 +176,28 @@ export type WorkDraft = {
   ideal?: true;
 };
 
+// Alles, was neben der Fläche landet, ist daneben und bleibt nicht kleben:
+// Overspray auf der Tonne trifft den Hof, nicht die Tonne.
+function clipToFrame(px: Uint8Array, frame: Frame | undefined): Uint8Array {
+  if (!frame) return px;
+  for (let y = 0; y < WORK_H; y++) {
+    for (let x = 0; x < WORK_W; x++) {
+      if (!inFrame(frame, x, y)) px[y * WORK_W + x] = TRANSPARENT;
+    }
+  }
+  return px;
+}
+
 // Das Bild eines Werks (auch halb fertig, für die Live-Ansicht beim Nachfahren).
 export function renderWork(
   content: GameContent,
   playerName: string,
   work: WorkDraft | Work,
+  frame?: Frame,
 ): RenderResult | null {
-  const l = letteringFor(content, playerName, work.style, work.seed);
+  const l = letteringFor(content, playerName, work.style, work.seed, frame);
   if (!l) return null;
-  return renderLettering(l, {
+  const result = renderLettering(l, {
     colors: resolveColors(content, work.colors),
     flow: content.items[work.dose]?.flow ?? 4,
     seed: work.seed,
@@ -184,6 +208,8 @@ export function renderWork(
       strokes: p.strokes,
     })),
   });
+  clipToFrame(result.pixels, frame);
+  return result;
 }
 
 // Vorschau im Sketch: so sähe das Werk ohne Fehler aus.
@@ -193,9 +219,14 @@ export function renderSketch(
   styleId: string,
   colors: WorkColors,
   seed: number,
+  frame?: Frame,
 ): Uint8Array | null {
   const style = styleOf(content, styleId);
-  return style ? renderPreview(playerName, style.look, seed, resolveColors(content, colors)) : null;
+  if (!style) return null;
+  return clipToFrame(
+    renderPreview(playerName, style.look, seed, resolveColors(content, colors), frame),
+    frame,
+  );
 }
 
 // ---------- Bewerten ----------

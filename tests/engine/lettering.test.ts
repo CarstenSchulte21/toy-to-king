@@ -132,3 +132,59 @@ describe("Nachfahren", () => {
     expect(r.stats[0]!.coverage).toBe(0);
   });
 });
+
+// Bemalbare Fläche (M5a-Nachbesserung): Ein Tag auf einer Mülltonne ist so groß wie die Tonne,
+// und am Mast steht er quer.
+describe("Bemalbare Fläche", () => {
+  const box = (l: ReturnType<typeof buildLettering>) => {
+    let x0 = Infinity;
+    let y0 = Infinity;
+    let x1 = -Infinity;
+    let y1 = -Infinity;
+    for (let k = 0; k < l.nodeCount; k++) {
+      const x = l.nodes[k * 2]!;
+      const y = l.nodes[k * 2 + 1]!;
+      x0 = Math.min(x0, x);
+      x1 = Math.max(x1, x);
+      y0 = Math.min(y0, y);
+      y1 = Math.max(y1, y);
+    }
+    return { x0, y0, x1, y1, w: x1 - x0, h: y1 - y0 };
+  };
+
+  it("ohne Fläche bleibt alles wie vorher", () => {
+    const a = buildLettering("RUBIX", "tag", 5);
+    const b = buildLettering("RUBIX", "tag", 5, undefined);
+    expect(box(a)).toEqual(box(b));
+  });
+
+  it("der Schriftzug bleibt in der Fläche", () => {
+    const frame = { x: 125, y: 14, w: 70, h: 156, rot: 0 } as const;
+    const b = box(buildLettering("RUBIX", "tag", 5, frame));
+    expect(b.x0).toBeGreaterThanOrEqual(frame.x);
+    expect(b.y0).toBeGreaterThanOrEqual(frame.y);
+    expect(b.x1).toBeLessThanOrEqual(frame.x + frame.w);
+    expect(b.y1).toBeLessThanOrEqual(frame.y + frame.h);
+  });
+
+  it("auf einer kleinen Fläche wird der Tag kleiner, nicht abgeschnitten", () => {
+    const gross = box(buildLettering("RUBIX", "tag", 5));
+    const klein = box(buildLettering("RUBIX", "tag", 5, { x: 125, y: 14, w: 70, h: 156, rot: 0 }));
+    expect(klein.w).toBeLessThan(gross.w * 0.5);
+    // Das Seitenverhältnis bleibt – sonst wäre der Name verzerrt.
+    expect(klein.w / klein.h).toBeCloseTo(gross.w / gross.h, 1);
+  });
+
+  it("quer heißt hochkant: am Mast ist der Tag höher als breit", () => {
+    const quer = box(buildLettering("RUBIX", "tag", 5, { x: 122, y: 8, w: 76, h: 164, rot: 90 }));
+    expect(quer.h).toBeGreaterThan(quer.w * 2);
+    expect(quer.x1).toBeLessThanOrEqual(122 + 76);
+    expect(quer.y1).toBeLessThanOrEqual(8 + 164);
+  });
+
+  it("die Führungslinie wird mitverkleinert, nicht nur das Bild", () => {
+    const gross = buildLettering("RUBIX", "tag", 5);
+    const klein = buildLettering("RUBIX", "tag", 5, { x: 125, y: 14, w: 70, h: 156, rot: 0 });
+    expect(klein.guideLength).toBeLessThan(gross.guideLength);
+  });
+});

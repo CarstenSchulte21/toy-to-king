@@ -11,6 +11,7 @@ import {
   decorFor,
   WORK_H,
   WORK_W,
+  frameOf,
   letteringFor,
   passTimeLimit,
   renderSketch,
@@ -126,12 +127,13 @@ export function SprayScene(props: {
 
   // ---------- Nachfahren ----------
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const area = useMemo(() => frameOf(choices.spot), [choices.spot]);
   const wall = useMemo(() => {
     const buf = new Uint8ClampedArray(WORK_W * WORK_H * 4);
-    paintWall(buf, choices.spot.surface ?? choices.spot.type, 7);
+    paintWall(buf, choices.spot.surface ?? choices.spot.type, 7, area);
     return buf;
-  }, [choices.spot.surface, choices.spot.type]);
-  const lettering = style ? letteringFor(content, name, style, seed) : null;
+  }, [choices.spot.surface, choices.spot.type, area]);
+  const lettering = style ? letteringFor(content, name, style, seed, area) : null;
   const flow = dose ? (content.items[dose]?.flow ?? 4) : 4;
   const limit = lettering ? passTimeLimit(lettering, flow) : 10000;
 
@@ -190,8 +192,8 @@ export function SprayScene(props: {
 
   // Sketch-Vorschau
   const preview = useMemo(
-    () => (style && phase.kind === "sketch" ? renderSketch(content, name, style, colors, seed) : null),
-    [content, name, style, colors, seed, phase.kind],
+    () => (style && phase.kind === "sketch" ? renderSketch(content, name, style, colors, seed, area) : null),
+    [content, name, style, colors, seed, phase.kind, area],
   );
   useEffect(() => {
     if (phase.kind === "sketch") drawFrame(preview);
@@ -236,7 +238,7 @@ export function SprayScene(props: {
     const loop = () => {
       if (dirty.current) {
         dirty.current = false;
-        const result = renderWork(content, name, draft(true));
+        const result = renderWork(content, name, draft(true), area);
         const current = result?.stats[phase.index];
         drawFrame(result?.pixels ?? null, current ? { exposure: current.exposure } : undefined);
       }
@@ -263,14 +265,14 @@ export function SprayScene(props: {
       cancelAnimationFrame(frame);
       clearInterval(hold);
     };
-  }, [phase, content, name, draft, drawFrame, limit, finishPass]);
+  }, [phase, content, name, draft, drawFrame, limit, finishPass, area]);
 
   // Ergebnis anzeigen
   useEffect(() => {
     if (phase.kind !== "result") return;
-    const result = renderWork(content, name, draft(false));
+    const result = renderWork(content, name, draft(false), area);
     drawFrame(result?.pixels ?? null);
-  }, [phase.kind, content, name, draft, drawFrame]);
+  }, [phase.kind, content, name, draft, drawFrame, area]);
 
   const toWork = (e: PointerEvent<HTMLCanvasElement>): [number, number] => {
     const rect = e.currentTarget.getBoundingClientRect();
