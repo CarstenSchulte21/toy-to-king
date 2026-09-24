@@ -46,7 +46,7 @@ hotspots:
 
   - id: zaunloch
     label: Aufgebogener Zaun
-    rect: [266, 90, 35, 60]
+    rect: [266, 58, 35, 92]
     if: [{fact: zaun}]
     sprühen: zaunblech
     untersuchen:

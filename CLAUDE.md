@@ -37,4 +37,5 @@ npm run build          # Produktionsbuild (prüft vorher den Content)
 npm test               # Tests
 npm run lint           # Code-Regeln
 npm run content:check  # nur die Inhalte prüfen
+npm run spots          # Kontrollbilder der Marker-Spots (Fläche und Platz im Raum)
 ```

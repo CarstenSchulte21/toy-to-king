@@ -14,6 +14,7 @@ import {
   passesFor,
   ringOf,
   tagBody,
+  type Frame,
   type Lettering,
   type Look,
   type PassKind,
@@ -462,8 +463,9 @@ export function renderPreview(
   look: Look,
   seed: number,
   colors: RenderInput["colors"],
+  frame?: Frame,
 ): Uint8Array {
-  const l = buildLettering(name, look, seed);
+  const l = buildLettering(name, look, seed, frame);
   return renderLettering(l, {
     colors,
     flow: 1,

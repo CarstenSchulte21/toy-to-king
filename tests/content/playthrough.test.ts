@@ -7,6 +7,9 @@ import { validateContent } from "../../scripts/lib/validate-content";
 import {
   createNewGame,
   buildLettering,
+  frameOf,
+  TRANSPARENT,
+  WORK_W,
   comfortableSpeed,
   passesFor,
   hasRank,
@@ -609,6 +612,65 @@ describe("Funde beim Untersuchen", () => {
         if ("give" in e) expect(content.items[e.give], `${f.room}.${f.hotspot}`).toBeTruthy();
         if ("money" in e) expect(e.money).toBeGreaterThan(0);
       }
+    }
+  });
+});
+
+// Marker-Spots sitzen auf kleinen Dingen. Ohne Fläche und Platz ragt das Werk darüber hinaus
+// (Tester-Feedback: "der Tag reicht über alle drei Mülltonnen").
+describe("Marker-Spots haben eine Fläche", () => {
+  const content = loadContent();
+  const markerSpots = () => Object.values(content.spots).filter((s) => s.tool === "marker");
+
+  it("jeder Marker-Spot sagt, was davon bemalbar ist", () => {
+    for (const spot of markerSpots()) {
+      expect(spot.frame, `Spot ${spot.id} hat kein frame`).toBeDefined();
+      expect(spot.place, `Spot ${spot.id} hat kein place`).toBeDefined();
+    }
+  });
+
+  it("das Werk sitzt im Hotspot und ist kleiner als er", () => {
+    for (const spot of markerSpots()) {
+      const room = content.rooms[spot.room]!;
+      const hotspot = room.hotspots.find((h) => h.id === spot.hotspot)!;
+      const [px, py, pw, ph] = spot.place!;
+      const [hx, hy, hw, hh] = hotspot.rect;
+      expect(px).toBeGreaterThanOrEqual(hx);
+      expect(py).toBeGreaterThanOrEqual(hy);
+      expect(px + pw).toBeLessThanOrEqual(hx + hw);
+      expect(py + ph).toBeLessThanOrEqual(hy + hh);
+      expect(pw * ph, `Spot ${spot.id} bedeckt den ganzen Hotspot`).toBeLessThan(hw * hh);
+    }
+  });
+
+  it("das Werk bleibt auf der Fläche", () => {
+    for (const spot of markerSpots()) {
+      const result = renderWork(
+        content,
+        "RUBIX",
+        {
+          style: "tag",
+          colors: { fill: ["farbe_schwarz"], outline: "farbe_schwarz" },
+          dose: "t_tip",
+          seed: 3,
+          ideal: true,
+          passes: [{ kind: "line", cap: "t_tip", strokes: [] }],
+        },
+        frameOf(spot),
+      );
+      expect(result, `Spot ${spot.id} rendert nicht`).not.toBeNull();
+      const [fx, fy, fw, fh] = spot.frame!;
+      let ink = 0;
+      result!.pixels.forEach((v, i) => {
+        if (v === TRANSPARENT) return;
+        ink++;
+        const x = i % WORK_W;
+        const y = (i / WORK_W) | 0;
+        expect(x >= fx && x < fx + fw && y >= fy && y < fy + fh, `Spot ${spot.id}: Farbe daneben`).toBe(
+          true,
+        );
+      });
+      expect(ink, `Spot ${spot.id} bleibt leer`).toBeGreaterThan(50);
     }
   });
 });

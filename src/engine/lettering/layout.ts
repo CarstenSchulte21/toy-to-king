@@ -111,6 +111,74 @@ const XSTYLE: Record<
 // Strichstärke eines Tags je Cap-Breite (1 Skinny … 4 NY Fat), als halber Durchmesser in Pixeln.
 export const TAG_RADIUS = [0.8, 1.15, 1.9, 2.7] as const;
 
+// Die bemalbare Fläche innerhalb der Arbeitsfläche (M5a-Nachbesserung). Ohne Fläche füllt der
+// Schriftzug wie bisher die ganze Arbeitsfläche. Mit Fläche wird er hineingerechnet – kleiner,
+// und bei rot 90 hochkant, damit ein Tag auf einen Mast passt statt darüber hinauszuragen.
+export type Frame = { x: number; y: number; w: number; h: number; rot: 0 | 90 };
+
+export const FRAME_PAD = 3;
+
+export function frameKey(frame: Frame | undefined): string {
+  return frame ? `${frame.x},${frame.y},${frame.w},${frame.h},${frame.rot}` : "-";
+}
+
+// Liegt der Punkt in der bemalbaren Fläche? Alles außerhalb ist nicht die Tonne, sondern der Hof.
+export function inFrame(frame: Frame | undefined, x: number, y: number): boolean {
+  if (!frame) return true;
+  return x >= frame.x && y >= frame.y && x < frame.x + frame.w && y < frame.y + frame.h;
+}
+
+// Rohe Gruppen so verschieben und verkleinern, dass sie in die Fläche passen.
+// Maßstab ergibt sich aus dem tatsächlich belegten Kasten, nicht aus der ganzen Arbeitsfläche –
+// sonst bliebe die Hälfte der Tonne ungenutzt.
+function fitToFrame(raw: RawGroup[], frame: Frame): RawGroup[] {
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  const see = (x: number, y: number, r: number) => {
+    x0 = Math.min(x0, x - r);
+    y0 = Math.min(y0, y - r);
+    x1 = Math.max(x1, x + r);
+    y1 = Math.max(y1, y + r);
+  };
+  for (const g of raw) {
+    for (const st of g.strokes) for (const [x, y] of st) see(x, y, g.r);
+    for (const [x, y, r] of g.discs) see(x, y, r);
+    for (const poly of g.polys) for (const [x, y] of poly) see(x, y, 0);
+  }
+  if (!Number.isFinite(x0)) return raw;
+
+  const bw = Math.max(1, x1 - x0);
+  const bh = Math.max(1, y1 - y0);
+  const turned = frame.rot === 90;
+  const needW = turned ? bh : bw;
+  const needH = turned ? bw : bh;
+  const room = (v: number) => Math.max(1, v - 2 * FRAME_PAD);
+  const s = Math.min(room(frame.w) / needW, room(frame.h) / needH);
+
+  const cx = (x0 + x1) / 2;
+  const cy = (y0 + y1) / 2;
+  const fx = frame.x + frame.w / 2;
+  const fy = frame.y + frame.h / 2;
+  // Quer heißt: im Uhrzeigersinn gedreht, der Schriftzug läuft von oben nach unten.
+  const map = ([x, y]: Pt): Pt => {
+    const dx = (x - cx) * s;
+    const dy = (y - cy) * s;
+    return turned ? [fx - dy, fy + dx] : [fx + dx, fy + dy];
+  };
+
+  return raw.map((g) => ({
+    strokes: g.strokes.map((st) => st.map(map)),
+    discs: g.discs.map(([x, y, r]) => {
+      const [mx, my] = map([x, y]);
+      return [mx, my, Math.max(0.6, r * s)] as [number, number, number];
+    }),
+    polys: g.polys.map((poly) => poly.map(map)),
+    r: Math.max(0.7, g.r * s),
+  }));
+}
+
 export type Group = {
   strokes: Pt[][];
   discs: [number, number, number][];
@@ -382,15 +450,15 @@ function strokeLength(strokes: Pt[][]): number {
 const memo = new Map<string, Lettering>();
 
 // Baut den Schriftzug. Gleicher Name, Style und Saat ergeben immer denselben Schriftzug.
-export function buildLettering(name: string, look: Look, seed: number): Lettering {
-  const key = `${name}|${look}|${seed}`;
+export function buildLettering(name: string, look: Look, seed: number, frame?: Frame): Lettering {
+  const key = `${name}|${look}|${seed}|${frameKey(frame)}`;
   const hit = memo.get(key);
   if (hit) return hit;
 
   const chars = letteringChars(name);
   const shape = shapeOf(look);
   const R = rng(seed);
-  const raw =
+  const plain =
     shape === "tag"
       ? layoutTag(chars, R)
       : shape === "bubble"
@@ -398,6 +466,13 @@ export function buildLettering(name: string, look: Look, seed: number): Letterin
         : shape === "straight"
           ? layoutStraight(chars, R)
           : layoutX(chars, shape, R);
+  // Quer am Mast fällt der Schwung unter dem Tag weg: Er läge quer über dem Schaft statt darunter,
+  // und ohne ihn wird der Schriftzug schlanker – er läuft den Mast herunter, statt darauf zu kleben.
+  const trimmed =
+    shape === "tag" && frame?.rot === 90 && plain[0] && plain[0].strokes.length > 1
+      ? [{ ...plain[0], strokes: plain[0].strokes.slice(0, -1) }, ...plain.slice(1)]
+      : plain;
+  const raw = frame ? fitToFrame(trimmed, frame) : trimmed;
 
   const allNodes: Pt[] = [];
   const groups: Group[] = raw.map((g) => {

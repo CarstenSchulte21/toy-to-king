@@ -366,6 +366,29 @@ export function validateContent(files: ContentFile[]): ValidationResult {
         `${where}: Der Hotspot "${spot.hotspot}" hat kein "sprühen: ${spot.id}" – dort kann man nicht sprühen.`,
       );
     }
+    // Bemalbare Fläche und Platz im Raum (M5a-Nachbesserung)
+    if (spot.frame) {
+      const [fx, fy, fw, fh] = spot.frame;
+      if (fw < 20 || fh < 20) {
+        errors.push(`${where}: "frame" ist ${fw}×${fh} – darauf kann man mit dem Finger nichts treffen.`);
+      }
+      if (fx < 0 || fy < 0 || fx + fw > 320 || fy + fh > 180) {
+        errors.push(`${where}: "frame" liegt außerhalb der Arbeitsfläche (320×180).`);
+      }
+    }
+    if (spot.rot !== undefined && !spot.frame) {
+      errors.push(`${where}: "rot" ohne "frame" – quer wovon?`);
+    }
+    if (spot.place && hotspot) {
+      const [px, py, pw, ph] = spot.place;
+      const [hx, hy, hw, hh] = hotspot.rect;
+      if (pw < 1 || ph < 1) errors.push(`${where}: "place" ist ${pw}×${ph} – da sieht man nichts.`);
+      if (px < hx || py < hy || px + pw > hx + hw || py + ph > hy + hh) {
+        warnings.push(
+          `${where}: "place" liegt nicht im Rechteck des Hotspots "${spot.hotspot}" – das Werk sitzt neben dem, was man antippt.`,
+        );
+      }
+    }
   }
   // --- Aufstieg (M4a) ---
   if (progress) {

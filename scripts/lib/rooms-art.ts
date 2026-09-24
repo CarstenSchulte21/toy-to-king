@@ -215,8 +215,9 @@ const strasse: Scene = (R) => {
   poster(a, 12, 104, 18, 20, C.yellow, C.black, R);
 
   // Laternenmast [140,20,16,130]
-  rect(a, 144, 26, 7, 130, C.dark_grey);
-  vline(a, 145, 26, 130, C.grey);
+  rect(a, 144, 26, 7, 130, C.grey);
+  vline(a, 145, 26, 130, C.light_grey);
+  vline(a, 150, 26, 130, C.dark_grey);
   box(a, 136, 20, 24, 7, C.light_grey, C.white, C.grey);
   rect(a, 139, 27, 18, 4, C.yellow);
   lightCone(a, 147, 31, 44, 32, C.yellow);
@@ -472,6 +473,9 @@ const unterfuehrung: Scene = (R) => {
   rect(a, 272, 104, 20, 40, C.black);
   line(a, 272, 104, 280, 96, C.light_grey);
   line(a, 292, 104, 286, 96, C.light_grey);
+  // Schild am Zaun: emailliertes Blech, längst nicht mehr zu lesen. Genau dafür da.
+  box(a, 267, 61, 32, 15, C.light_grey, C.white, C.dark_grey);
+  hline(a, 269, 63, 28, C.light_red);
   weeds(a, 270, 152, 4, C.green, R);
 
   rect(a, 304, 50, 16, 110, C.cyan);
@@ -888,8 +892,8 @@ const abstellgleis: Scene = (R) => {
     px(a, x, 100, C.light_grey);
     px(a, x, 128, C.dark_grey);
   }
-  box(a, 130, 96, 18, 34, C.dark_grey, C.grey, C.black);
-  vline(a, 139, 100, 26, C.black);
+  box(a, 130, 96, 18, 34, C.grey, C.light_grey, C.black);
+  vline(a, 139, 100, 26, C.dark_grey);
   rect(a, 48, 132, 40, 8, C.black);
   rect(a, 194, 132, 40, 8, C.black);
   for (const cx of [58, 78, 204, 224]) {

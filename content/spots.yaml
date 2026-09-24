@@ -15,7 +15,7 @@
   fits: [straight, bubble, bombing, piece, wildstyle]
   fit_hint: "An der Hall taggt man nicht. Da zählt, was Style hat."
   risk: kein
-  if: [{fact: hall}]
+  if: [{ fact: hall }]
 
 - id: linke_wand
   name: der linken Wand
@@ -25,7 +25,7 @@
   fits: [straight, bubble, bombing]
   fit_hint: "Neben KRUX' Piece wirkt das zu klein."
   risk: niedrig
-  if: [{fact: krux_frage}]
+  if: [{ fact: krux_frage }]
 
 - id: bruecke
   name: der Brücke
@@ -35,7 +35,7 @@
   fits: [straight, bubble, bombing]
   fit_hint: "Da oben zählt, was man von unten lesen kann. Groß und schnell."
   risk: hoch
-  if: [{fact: bruecke}]
+  if: [{ fact: bruecke }]
 
 - id: abstellgleis
   name: einem Waggon
@@ -45,7 +45,7 @@
   fits: [straight, bubble, bombing]
   fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
   risk: hoch
-  if: [{fact: zaun}, {phase: nacht}]
+  if: [{ fact: zaun }, { phase: nacht }]
 
 # Marker-Spots (M5a): glatte Flächen, auf denen nur der Marker geht. Kosten keine Farbe,
 # bringen wenig XP – aber sie kosten auch fast nichts an Risiko.
@@ -56,6 +56,10 @@
   hotspot: laterne
   tool: marker
   surface: mast
+  # Der Mast ist schmal: Der Tag steht quer und läuft am Schaft herunter.
+  frame: [122, 8, 76, 164]
+  rot: 90
+  place: [144, 48, 7, 76]
   fits: [tag]
   fit_hint: "Auf einem Mast ist kein Platz für mehr als einen Handstyle."
   risk: niedrig
@@ -67,6 +71,8 @@
   hotspot: stromkasten
   tool: marker
   surface: kasten
+  frame: [30, 30, 260, 120]
+  place: [258, 126, 24, 15]
   fits: [tag]
   fit_hint: "Der Kasten ist glatt und klein. Marker, sonst nichts."
   risk: kein
@@ -78,10 +84,12 @@
   hotspot: waggontuer
   tool: marker
   surface: blech
+  frame: [40, 20, 240, 140]
+  place: [132, 104, 16, 21]
   fits: [tag]
   fit_hint: "Auf dem lackierten Blech hält nur der Marker."
   risk: niedrig
-  if: [{fact: zaun}]
+  if: [{ fact: zaun }]
 
 - id: zaunblech
   name: dem Zaunschild
@@ -90,10 +98,12 @@
   hotspot: zaunloch
   tool: marker
   surface: kasten
+  frame: [50, 40, 220, 100]
+  place: [269, 63, 28, 11]
   fits: [tag]
   fit_hint: "Das Schild am Zaun ist handtellergroß."
   risk: kein
-  if: [{fact: zaun}]
+  if: [{ fact: zaun }]
 
 - id: muelltonnen
   name: den Mülltonnen
@@ -102,6 +112,9 @@
   hotspot: muelltonnen
   tool: marker
   surface: tonne
+  # Getaggt wird die mittlere Tonne, nicht alle drei auf einmal.
+  frame: [125, 14, 70, 156]
+  place: [46, 123, 19, 29]
   fits: [tag]
   fit_hint: "Auf eine Tonne passt ein Handstyle, mehr nicht."
   risk: kein

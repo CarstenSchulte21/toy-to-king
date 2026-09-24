@@ -159,3 +159,18 @@ ist, zahlt sich der Witz aus. Geprüft: Es gibt keinen bekannten Graffiti-Laden 
 Der Name steht nur in der Grafik (Fassadenschild an der Straße, Schild an der Wand im Laden). In den
 Texten heißt der Ort weiterhin neutral **Graffitistore** – wer den Namen ändern will, ändert zwei
 Zeilen in `scripts/lib/rooms-art.ts`.
+
+## 12. Flächen, auf denen man taggt
+
+Ein Marker-Spot sitzt auf einem Ding – einer Tonne, einem Mast, einem Schild. Drei Regeln, damit
+das im Bild aufgeht:
+
+1. **Das Ding muss hell genug sein.** Der erste Marker ist schwarz. Auf dunkelgrauem Blech sieht
+   man davon nichts. Laternenmast und Waggontür sind deshalb verzinkter bzw. lackierter Stahl.
+2. **Was im Text steht, muss im Bild sein.** Der Spot hieß „Zaunschild", ohne dass am Zaun ein
+   Schild hing. Solche Lücken fallen dem Tester auf, nicht dem Code.
+3. **Das Werk sitzt auf dem Ding, nicht auf dem Hotspot.** Ein Hotspot darf großzügig sein, damit
+   man ihn mit dem Daumen trifft. Das Werk darf das nicht – `place` am Spot sagt, wo es klebt.
+
+`npm run spots` zeigt beides: die bemalbare Fläche im Sprüh-Bildschirm und das Werk an seinem Platz
+im Raum.

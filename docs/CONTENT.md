@@ -1493,13 +1493,30 @@ Kalle gibt den T-Tip im ersten Gespräch: „Hier. Der lag noch rum."
 Alle auf vorhandenen Hotspots, kein neues Raumbild. `surface` bestimmt, was im
 Sprüh-Bildschirm hinter dem Werk zu sehen ist.
 
-| Spot | Raum | Hotspot | Untergrund | Bedingung |
-|------|------|---------|------------|-----------|
-| Mülltonnen | Hinterhof | `muelltonnen` | tonne | – |
-| Laternenmast | Straße | `laterne` | mast | – |
-| Stromkasten | Hinterhof | `stromkasten` | kasten | – |
-| Waggontür | Abstellgleis | `waggontuer` (neu) | blech | Info „zaun" |
-| Zaunschild | Unterführung | `zaunloch` | kasten | Info „zaun" |
+| Spot | Raum | Hotspot | Untergrund | Bemalbar | Bedingung |
+|------|------|---------|------------|----------|-----------|
+| Mülltonnen | Hinterhof | `muelltonnen` | tonne | die mittlere Tonne | – |
+| Laternenmast | Straße | `laterne` | mast | der Schaft, quer | – |
+| Stromkasten | Hinterhof | `stromkasten` | kasten | die Blechfront | – |
+| Waggontür | Abstellgleis | `waggontuer` (neu) | blech | das Türblatt | Info „zaun" |
+| Zaunschild | Unterführung | `zaunloch` | kasten | das Schild am Zaun | Info „zaun" |
+
+**Die bemalbare Fläche.** Ein Marker-Spot sitzt auf einem Ding, nicht auf einer Wand. Drei Felder
+sagen, wie groß das Ding ist:
+
+- `frame: [x, y, breite, höhe]` – welcher Teil der Arbeitsfläche (320×180) das Ding ist. Der
+  Schriftzug wird da hineingerechnet, alles daneben ist Hof oder Straße und nimmt keine Farbe an.
+- `rot: 90` – der Schriftzug steht quer. Am Laternenmast läuft der Tag den Schaft herunter; der
+  Schwung unter dem Tag fällt dabei weg, weil er quer über dem Mast läge.
+- `place: [x, y, breite, höhe]` – wo das fertige Werk im Raum sitzt. Ohne Angabe füllt es wie
+  bisher den ganzen Hotspot. Genau das war der Fehler: Der Tag lag über allen drei Tonnen.
+
+Damit ein schwarzer Marker überhaupt zu sehen ist, sind Laternenmast und Waggontür heller geworden
+(verzinkter Stahl, lackiertes Blech), und am Zaun hängt jetzt ein Schild – vorher hieß der Spot
+„Zaunschild", ohne dass eines im Bild war.
+
+`npm run spots` schreibt zwei Kontrollbilder: den Sprüh-Bildschirm mit der Fläche und die Räume mit
+den Werken an ihrem Platz.
 
 ### 9.3 Ergänzungen an bestehenden Inhalten
 
