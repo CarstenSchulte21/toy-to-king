@@ -9,6 +9,8 @@ import {
   nextRank,
   rankOf,
   phaseName,
+  stepsLeft,
+  stepsPerDay,
   weekdayName,
   wantedLabel,
   reduce,
@@ -366,6 +368,14 @@ export function Game() {
                   {content.risk && (
                     <span className="hud-time">
                       {weekdayName(content, state.day)} · {phaseName(content, state.phase)}
+                      <i
+                        className="hud-day"
+                        title={`Noch ${stepsLeft(state, content)} von ${stepsPerDay(content)} Schritten bis morgen`}
+                      >
+                        {Array.from({ length: stepsPerDay(content) }, (_, i) => (
+                          <i key={i} className={i < (state.step ?? 0) ? "tick used" : "tick"} />
+                        ))}
+                      </i>
                       {content.economy && <i className="hud-money">{state.money} €</i>}
                       {state.wanted > 0 && (
                         <i className="hud-wanted" title={wantedLabel(content, state.wanted)}>

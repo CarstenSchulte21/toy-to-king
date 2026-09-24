@@ -17,6 +17,17 @@ base:
 per_heat: 0.12
 per_wanted: 0.1
 per_phase: [0.15, 0, -0.15] # Tag, Abend, Nacht
+
+# Zeit: Ein Tag hat steps_per_day Schritte. Das erste Drittel ist Tag, das zweite Abend,
+# das letzte Nacht. Zeit kostet alles, was man wirklich tut – Umsehen, Kaufen und die
+# Tasche sind frei, sonst würde man dafür bestraft, sich in einem Raum umzuschauen.
+time:
+  steps_per_day: 12
+  room: 1 # einen Raum weiter
+  travel: 2 # quer durch den Bezirk über die Karte
+  talk: 1 # jemanden ansprechen
+  work: 3 # ein Werk mit der Dose
+  marker: 1 # ein Tag mit dem Marker
 slow_max: 0.15
 cap: 0.85
 caught_share: 0.34

@@ -115,3 +115,54 @@ sonst Rolltor 20 %, Hauswand 10 %, Heaven Spot 5 %, Zug 15 %, legale Wand 0 %.
 Das Wanted-Level geht **nicht** von allein weg. Wer es loswerden will, malt an der Hall (legal, kostet
 einen Abschnitt) oder fragt Kalle, ob er einen Tag unterkommen kann. Beides kostet Zeit – und Zeit ist
 in M4b das, was knapp ist.
+
+## 10. Nachtrag (24.09.2026): Zeit vergeht durch alles
+
+**Das Problem.** Bis hierher schob **nur ein fertiges Werk** die Uhr weiter, und zwar um einen ganzen
+Abschnitt. Laufen, Reden, Einkaufen kosteten nichts. Damit war der Tag-Nacht-Wechsel für den Spieler
+nicht nachvollziehbar – man sah die Uhr nur springen, wenn man gemalt hatte. Und schlimmer: Wer
+nachts ans Abstellgleis wollte, musste vorher zweimal irgendwo anders malen, ob er wollte oder nicht.
+Der Rhythmus war keine Entscheidung, sondern Buchhaltung. So gemeldet vom Product Owner: „ich versteh
+den tag nacht rhythmus nicht".
+
+**Die Lösung.** Ein Tag hat jetzt **12 Schritte**. Das erste Drittel ist Tag, das zweite Abend, das
+letzte Nacht. Zeit kostet alles, was man wirklich tut:
+
+| Was | Schritte |
+|-----|----------|
+| einen Raum weiter gehen | 1 |
+| über die Karte quer durch den Bezirk | 2 |
+| jemanden ansprechen (einmal je Gespräch, egal wie lang) | 1 |
+| ein Werk mit der Dose | 3 |
+| ein Tag mit dem Marker | 1 |
+| umsehen, Tasche, Blackbook, Karte ansehen, kaufen | 0 |
+
+Alle Werte stehen in `content/risk.yaml` unter `time:` und lassen sich ohne Code ändern.
+
+**Warum umsehen nichts kostet:** Sonst würde man dafür bestraft, sich in einem Raum umzuschauen –
+und genau das soll das Spiel belohnen (siehe die Funde in `SPEC-M5a.md`).
+
+**Warum ein Gespräch nur einmal zählt:** Wer nachfragt, soll nicht zahlen. Sonst redet man aus
+Sparsamkeit mit niemandem.
+
+Ein Werk, das kurz vor Mitternacht anfängt, läuft in den nächsten Tag hinein – man malt eben bis in
+die Nacht. Untertauchen bei Kalle und das Erwischtwerden setzen weiterhin hart auf den nächsten
+Morgen (Schritt 0).
+
+**Im HUD** steht neben Wochentag und Abschnitt jetzt eine Reihe kleiner Striche: ein Strich je
+Schritt, verbrauchte sind dunkel. Ohne das sieht man nicht, dass Laufen und Reden Zeit kosten.
+
+**Spielstand v7:** neues Feld `step`. Die Migration setzt es auf den Anfang des gespeicherten
+Abschnitts – nach dem Update ist es nie später als vorher.
+
+### Was damit noch offen ist
+
+Die Nacht ist bisher nur *weniger gefährlich* (−15 % Risiko), aber sie lohnt sich nicht **besonders**.
+Der Vorschlag des Product Owners dazu, noch nicht umgesetzt:
+
+- Vor dem Graffitistore steht tagsüber ein Polizist. Ausgerechnet dort zu malen ist am Tag absurd
+  gefährlich – nachts döst er, und es geht.
+- Ein Lichtschalter an der Laterne: Licht aus, und man malt ungestört.
+
+Beides braucht Risiko-Zuschläge am Spot, die an Bedingungen hängen (`{phase: nacht}`, ein Flag für
+das Licht). Das ist ein eigener Schritt und steht im Backlog.

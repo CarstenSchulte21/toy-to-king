@@ -326,6 +326,15 @@ export const riskSchema = z.strictObject({
   per_heat: share,
   per_wanted: share,
   per_phase: z.array(z.number().min(-1).max(1)).length(3, "per_phase braucht genau drei Werte."),
+  // Wie viel Zeit was kostet. Ein Tag hat steps_per_day Schritte, gedrittelt in Tag, Abend, Nacht.
+  time: z.strictObject({
+    steps_per_day: z.number().int().min(3).max(60),
+    room: z.number().int().min(0).max(10), // ein Raum weiter gehen
+    travel: z.number().int().min(0).max(10), // quer durch den Bezirk über die Karte
+    talk: z.number().int().min(0).max(10), // jemanden ansprechen
+    work: z.number().int().min(0).max(10), // ein Werk mit der Dose
+    marker: z.number().int().min(0).max(10), // ein Tag mit dem Marker
+  }),
   slow_max: share, // Aufschlag, wenn man lange an der Wand steht
   cap: share, // Obergrenze
   caught_share: share, // Anteil der Zwischenfälle, die im Erwischtwerden enden

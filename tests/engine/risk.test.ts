@@ -13,6 +13,7 @@ import {
   setWanted,
   turnOfDay,
   weekdayOf,
+  stepsLeft,
   type GameContent,
   type GameState,
 } from "@/engine";
@@ -23,6 +24,7 @@ const risk: NonNullable<GameContent["risk"]> = {
   heat_labels: ["ruhig", "beobachtet", "heiß", "verbrannt"],
   wanted_labels: ["unauffällig", "bekannt", "gesucht", "ganz oben"],
   risk_labels: ["kaum was", "geht schon", "wird eng", "Selbstmord"],
+  time: { steps_per_day: 12, room: 1, travel: 2, talk: 1, work: 3, marker: 1 },
   base: { legale_wand: 0, rolltor: 0.25, hauswand: 0.15, heaven_spot: 0.4, zug: 0.45 },
   per_heat: 0.12,
   per_wanted: 0.1,
@@ -97,12 +99,32 @@ describe("Zeit", () => {
   it("ein Tag hat drei Abschnitte, danach ist der nächste Tag dran", () => {
     let s = game();
     expect([s.day, s.phase]).toEqual([1, 0]);
-    s = advanceTime(s);
+    s = advanceTime(s, content, 4);
     expect([s.day, s.phase]).toEqual([1, 1]);
-    s = advanceTime(s);
+    s = advanceTime(s, content, 4);
     expect([s.day, s.phase]).toEqual([1, 2]);
-    s = advanceTime(s);
+    s = advanceTime(s, content, 4);
     expect([s.day, s.phase]).toEqual([2, 0]);
+  });
+
+  it("kleine Schritte bleiben im selben Abschnitt", () => {
+    let s = game();
+    s = advanceTime(s, content, 1);
+    expect([s.step, s.phase]).toEqual([1, 0]);
+    s = advanceTime(s, content, 2);
+    expect([s.step, s.phase]).toEqual([3, 0]);
+    s = advanceTime(s, content, 1);
+    expect([s.step, s.phase]).toEqual([4, 1]);
+  });
+
+  it("ein Werk kurz vor Mitternacht reicht in den nächsten Tag hinein", () => {
+    const s = advanceTime(game(), content, 14);
+    expect([s.day, s.step, s.phase]).toEqual([2, 2, 0]);
+  });
+
+  it("der Rest des Tages ist ablesbar", () => {
+    expect(stepsLeft(game(), content)).toBe(12);
+    expect(stepsLeft(advanceTime(game(), content, 5), content)).toBe(7);
   });
 
   it("Tag 1 ist ein Montag, Tag 8 wieder", () => {
