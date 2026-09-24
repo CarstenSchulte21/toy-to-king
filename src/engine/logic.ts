@@ -167,6 +167,15 @@ export function availableVerbs(hotspot: Hotspot, state?: GameState, content?: Ga
   return verbs;
 }
 
+// Am Marker-Spot sprüht man nicht, man taggt. Das Menü soll das auch sagen (M5a).
+export function verbLabel(verb: Verb, hotspot: Hotspot, content?: GameContent): string {
+  if (verb === "sprühen" && hotspot.sprühen && content) {
+    const spot = content.spots[hotspot.sprühen];
+    if (spot?.tool === "marker") return "Taggen";
+  }
+  return VERB_LABELS[verb];
+}
+
 export function currentRoom(state: GameState, content: GameContent): Room | undefined {
   return content.rooms[state.room];
 }

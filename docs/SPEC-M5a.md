@@ -1,6 +1,6 @@
 # SPEC – TOY TO KING, Meilenstein M5a „Material und Geld"
 
-**Stand 23.09.2026:** umgesetzt auf Branch `m5a` (175 Tests grün, Build grün). Offen ist der Test auf echten Handys. Bezug: `backlog.md` (F8.1–F8.3, F8.5, F8.6, F1.4), `SPEC-M4b.md`
+**Stand 23.09.2026:** umgesetzt auf Branch `m5a` (178 Tests grün, Build grün). Offen ist der Test auf echten Handys. Bezug: `backlog.md` (F8.1–F8.3, F8.5, F8.6, F1.4), `SPEC-M4b.md`
 (gilt weiter), Tester-Feedback („zu Beginn die Tags mit Markern").
 
 ## 1. Ziel
@@ -45,7 +45,7 @@ Raumbild** aus; die Marker-Spots sitzen auf Dingen, die längst gemalt sind.
 | Marker als Werkzeug | Ein Marker ist **Dose und Cap in einem**: Er hat eine Breite wie ein Cap und einen Fluss wie eine Dose. Im Sketch wählt man statt Dose und Cap einfach den Marker. | Ändert nichts an der Sprüh-Mechanik und an den gespeicherten Werken – nur an der Auswahl. |
 | Die drei Marker | **T-Tip** (Keilspitze, schmal, sauber, tropft nicht), **Dripper** (breit, nass, tropft stark), **Wachsmarker** (dick, trocken, tropft nie, hält den Buff aus) | Vom Tester genannt. Jeder hat einen echten Vor- und Nachteil, keiner ist nur „besser". |
 | Tag nur mit Marker | Der Tag-Style braucht einen Marker. Kalle gibt einem gleich im ersten Gespräch einen T-Tip. | Der Wunsch des Testers. Und der Einstieg wird leichter: kein Overspray, keine Reichweite, keine Tropfen. |
-| Marker-Spots | Vier neue kleine Spots auf glatten Flächen, auf denen **nur** der Marker geht: Laternenmast, Stromkasten, Waggontür, Zaun. Wenig XP, wenig Risiko, kostet keine Farbe. | Macht die vorhandenen Räume dichter, ohne ein neues Bild. Und gibt dem frühen Spiel etwas zu tun, das nichts kostet. |
+| Marker-Spots | Fünf neue kleine Spots auf glatten Flächen, auf denen **nur** der Marker geht: Mülltonnen, Laternenmast, Stromkasten, Waggontür, Zaunschild. Wenig XP, wenig Risiko, kostet keine Farbe. | Macht die vorhandenen Räume dichter, ohne ein neues Bild. Und gibt dem frühen Spiel etwas zu tun, das nichts kostet. |
 | Buff | Auf glatten Flächen hält ein Marker-Tag kürzer als ein Piece – außer beim Wachsmarker. | Gibt dem teuersten Marker einen Grund. |
 
 ## 4. Werte (Startwerte, in `content/economy.yaml` und `items.yaml`)
@@ -57,7 +57,7 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 
 **Marker:** T-Tip Breite 1, Fluss 5. Dripper Breite 3, Fluss 12. Wachsmarker Breite 4, Fluss 7.
 
-**Marker-Spots:** Style-Wert wie ein Tag (10 XP), Spot-Faktor 0,8, Risiko-Grundwert 10 %.
+**Marker-Spots:** Style-Wert wie ein Tag (10 XP), Risiko „kein" bis „niedrig". Jeder Spot sagt über `surface`, was man vor sich hat.
 
 ## 5. Technik
 
@@ -78,15 +78,17 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 - [x] Samstags gibt es Taschengeld, sichtbar als Meldung.
 - [x] Tags gehen nur mit Marker. Kalle gibt den ersten, alte Spielstände bekommen ihn bei der Migration.
 - [x] Die drei Marker verhalten sich unterschiedlich (Breite und Fluss wirken auf die Qualität).
-- [x] Vier Marker-Spots sind da und gehen nur mit Marker.
+- [x] Fünf Marker-Spots sind da und gehen nur mit Marker, jeder mit eigenem Untergrund.
 - [x] Der Durchlauf-Test belegt: Mit dem verdienten Geld bleibt King erreichbar, und man kann sich
       nicht festspielen (ohne Farbe geht immer noch der Marker).
+- [x] Untersuchen lohnt sich: Sieben Hotspots geben beim ersten Mal etwas her, jeder nur einmal.
 
 ## 7. Offene Fragen an den Tester
 
 - Stimmen die Preise, oder ist Farbe zu billig?
 - Reicht Taschengeld einmal die Woche, oder ist das zu zäh?
 - Fehlt ein Weg, sich Geld zu verdienen?
+- Sind sieben Funde zu wenig, um das Absuchen der Räume zur Gewohnheit zu machen?
 
 ## 8. Abweichungen bei der Umsetzung
 
@@ -95,8 +97,12 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 | Marker als Farbe | Ein Marker hat eine eigene Farbe (T-Tip und Dripper schwarz, Wachsmarker weiß). Im Sketch wählt man **nur** den Marker – keine Farbe, keine Dose, kein Cap. | Ein Marker ist in echt auch alles in einem. Und es macht den Einstieg auf drei Fingertipps kurz. |
 | Werkzeug wird nie einkassiert | Wer erwischt wird, verliert nur Farbe. Marker, Caps und Druckstufen bleiben. | Sonst stünde ein Toy ohne Marker da und könnte gar nicht mehr malen, bis Samstag Taschengeld kommt. Das wäre kein Risiko, das wäre eine Sackgasse. |
 | Kaufen | Eigenes Verb „Kaufen" am Hotspot, wie „Sprechen". Kein Dialog-Umweg. | Zwei Fingertipps statt vier. |
-| Marker-Spots | Vier Stück, alle an vorhandenen Hotspots: Laternenmast, Stromkasten, Waggontür, Zaunschild. Der Zaun-Hotspot kann jetzt beides – durchgehen und antaggen. | Kein einziges neues Raumbild, wie im Backlog festgehalten. |
+| Marker-Spots | Fünf Stück, alle an vorhandenen Hotspots: Mülltonnen, Laternenmast, Stromkasten, Waggontür, Zaunschild. Der Zaun-Hotspot kann jetzt beides – durchgehen und antaggen. | Kein einziges neues Raumbild, wie im Backlog festgehalten. |
+| Untergrund | Neues Feld `surface` am Spot. Der Sprüh-Bildschirm malt danach: Mast, Kasten, Blech, Tonne – statt immer Backstein. | Nach dem ersten Tester-Feedback: Am Laternenmast stand eine Steinwand im Bild. |
+| Verb | An einem Marker-Spot heißt das Menü **„Taggen"** statt „Sprühen", und der Knopf heißt „Drauf" statt „An die Wand". | Man sprüht keine Mülltonne an. |
 | Toy-Text | „Du hast eine Dose und einen Namen" heißt jetzt „Du hast einen Marker und einen Namen". | Stimmte sonst nicht mehr. |
+| Funde beim Untersuchen | Sieben Hotspots geben beim ersten Untersuchen etwas her: Chrom, Weiß, Skinny Cap, NY Fat, Fat Cap, 5 € und die Info „NOX". Jeder genau einmal, abgesichert über eine Flagge. | Nach Tester-Feedback: Bisher kam alles aus Gesprächen. Jetzt lohnt es sich, einen Raum abzusuchen – und das frühe Geld-Problem hat einen zweiten Ausweg neben Samstag. |
+| Info ohne NPC | `source` an einer Info ist jetzt optional. Fehlt sie, steht im Blackbook „selbst gesehen". | Die Crew NOX sieht man an der Wand, sie erzählt einem keiner. |
 
 ## 9. Was der Tester wissen muss
 

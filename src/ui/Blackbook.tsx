@@ -62,7 +62,7 @@ export function Blackbook(props: {
               {f.title}
             </span>
             <p>{f.text}</p>
-            <span className="bb-source">– {content.npcs[f.source]?.name ?? f.source}</span>
+            <span className="bb-source">– {f.source ? (content.npcs[f.source]?.name ?? f.source) : "selbst gesehen"}</span>
           </div>
         ))}
       </div>

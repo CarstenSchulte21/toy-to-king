@@ -20,7 +20,16 @@ hotspots:
     label: Laternenmast
     rect: [140, 20, 16, 130]
     sprühen: laternenmast
-    untersuchen: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
+    untersuchen:
+      - if: [{not_flag: fund_laterne}]
+        text:
+          - "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
+          - "Unten steht die Sockelklappe offen. Dahinter: Kabel, Dreck – und ein zusammengefalteter Fünfer."
+          - "Klamm, aber echt."
+        effects:
+          - set_flag: fund_laterne
+          - money: 5
+      - text: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
 
   - id: kamera
     label: Kamera

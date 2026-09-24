@@ -6,7 +6,7 @@ import { useEffect, useState, type PointerEvent } from "react";
 import {
   STAGE_HEIGHT,
   STAGE_WIDTH,
-  VERB_LABELS,
+  verbLabel,
   availableVerbs,
   visibleHotspots,
   type GameContent,
@@ -124,7 +124,7 @@ export function RoomView(props: {
                 onVerb(menu.hotspot, verb);
               }}
             >
-              {VERB_LABELS[verb]}
+              {verbLabel(verb, menu.hotspot, content)}
             </button>
           ))}
         </div>

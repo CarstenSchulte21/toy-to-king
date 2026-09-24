@@ -32,7 +32,15 @@ hotspots:
   - id: dosen
     label: Karton
     rect: [212, 118, 46, 46]
-    untersuchen: "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
+    untersuchen:
+      - if: [{not_flag: fund_karton}]
+        text:
+          - "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
+          - "Du schüttelst ein paar durch. Eine gluckert noch: Weiß, ein Drittel drin."
+        effects:
+          - set_flag: fund_karton
+          - give: farbe_weiss
+      - text: "Ein Karton voller leerer Dosen. Hier wird gemalt, nicht geredet."
 
   - id: zur_strasse
     label: Zur Straße

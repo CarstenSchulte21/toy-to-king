@@ -6,9 +6,22 @@ hotspots:
   - id: muelltonnen
     label: Mülltonnen
     rect: [20, 110, 70, 50]
+    sprühen: muelltonnen
     untersuchen:
-      - "Drei Tonnen, alle mit deinem Tag drauf."
-      - "Von links nach rechts wird der Handstyle besser. Die erste Tonne will keiner mehr sehen."
+      - if: [{not_flag: fund_tonne}]
+        text:
+          - "Du kippst die mittlere Tonne an. Unten drin klappert was."
+          - "Eine Dose Chrom, halb voll. Jemand hat sie weggeworfen, statt sie leer zu machen."
+          - "Dessen Problem."
+        effects:
+          - set_flag: fund_tonne
+          - give: farbe_chrom
+      - if: [{sprayed: muelltonnen}]
+        text: "Der neue Handstyle sitzt. Die erste Tonne von links will trotzdem keiner mehr sehen."
+      - text:
+          - "Drei Tonnen, alle mit deinem Tag drauf."
+          - "Von links nach rechts wird der Handstyle besser. Die erste Tonne will keiner mehr sehen."
+          - "Auf der mittleren ist noch Platz."
 
   - id: rolltor
     label: Garagentor
@@ -32,8 +45,17 @@ hotspots:
     rect: [255, 100, 30, 45]
     sprühen: stromkasten
     untersuchen:
-      - "Stromkasten voller Sticker. Ein paar Namen kennst du. Die meisten nicht."
-      - "Einer taucht überall auf: KRUX. Sauberer Handstyle, das muss man ihm lassen."
+      - if: [{not_flag: fund_kasten}]
+        text:
+          - "Stromkasten voller Sticker. Ein paar Namen kennst du. Die meisten nicht."
+          - "Einer taucht überall auf: KRUX. Sauberer Handstyle, das muss man ihm lassen."
+          - "Hinter dem Kasten, zwischen Wand und Blech, klemmt ein Skinny Cap. Staubig, aber heil."
+        effects:
+          - set_flag: fund_kasten
+          - give: skinny_cap
+      - text:
+          - "Stromkasten voller Sticker. Ein paar Namen kennst du. Die meisten nicht."
+          - "Einer taucht überall auf: KRUX. Sauberer Handstyle, das muss man ihm lassen."
 
   - id: kalle
     label: Mann auf der Kiste

@@ -7,8 +7,18 @@ hotspots:
     label: Wand voller Tags
     rect: [20, 30, 65, 110]
     untersuchen:
-      - "Tags über Tags über Tags. Einige kennst du von den Stickern."
-      - "Hier malt nur, wer was kann."
+      - if: [{not_flag: fund_nox}]
+        text:
+          - "Tags über Tags über Tags. Einige kennst du von den Stickern."
+          - "Hier malt nur, wer was kann."
+          - "Drei Namen stehen immer zusammen, und unter jedem dasselbe Kürzel: NOX."
+          - "Das ist keine Person. Das ist eine Crew."
+        effects:
+          - set_flag: fund_nox
+          - learn: nox
+      - text:
+          - "Tags über Tags über Tags. Einige kennst du von den Stickern."
+          - "Hier malt nur, wer was kann."
 
   - id: krux_piece
     label: Großes Piece
