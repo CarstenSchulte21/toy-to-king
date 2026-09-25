@@ -6,6 +6,16 @@
   fits: [tag, straight, bubble]
   fit_hint: "Die Rolltore sind für schnelle Sachen. Für mehr hast du hier keine Ruhe."
   risk: mittel
+  risk_mod:
+    - if: [{ not_phase: nacht }]
+      by: 0.35
+      hint: "Zehn Meter weiter steht die Streife und guckt in deine Richtung."
+    - if: [{ phase: nacht }]
+      by: 0.15
+      hint: "Die Streife sitzt im Wagen und guckt aufs Handy. Weg ist sie trotzdem nicht."
+    - if: [{ phase: nacht }, { flag: licht_aus }]
+      by: -0.2
+      hint: "Die Laterne ist aus. Vom Wagen aus bist du ein Schatten."
 
 - id: hall
   name: der Hall
@@ -45,7 +55,9 @@
   fits: [straight, bubble, bombing]
   fit_hint: "Auf dem Waggon muss es aus der Ferne wirken. Das geht hier unter."
   risk: hoch
-  if: [{ fact: zaun }, { phase: nacht }]
+  if: [{ fact: zaun }]
+  when: [{ phase: nacht }]
+  when_hint: "Am Tag wird hier rangiert. Zwischen den Waggons läuft ständig jemand herum. Nachts nicht."
 
 # Marker-Spots (M5a): glatte Flächen, auf denen nur der Marker geht. Kosten keine Farbe,
 # bringen wenig XP – aber sie kosten auch fast nichts an Risiko.

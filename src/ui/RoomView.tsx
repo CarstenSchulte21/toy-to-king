@@ -47,6 +47,8 @@ export function RoomView(props: {
   const [menu, setMenu] = useState<Menu>(null);
   const placeholder = !room.background;
   const hotspots = visibleHotspots(room, state, content);
+  // Räume, für die es eine Fassung "Licht aus" gibt – nur wenn der Schalter auch umgelegt ist.
+  const darkRooms = new Set(state.flags.licht_aus ? ["strasse"] : []);
 
   // Neu freigeschaltete Hotspots glitzern einmal kurz auf (F2.8), danach gelten sie als gesehen.
   const fresh = hotspots.map((h) => `${room.id}.${h.id}`).filter((k) => state.newlyVisible.includes(k));
@@ -71,10 +73,12 @@ export function RoomView(props: {
     });
   };
 
-  // Nachts zeigt jeder Raum seine dunkle Fassung (M4b). Die Datei entsteht mit "npm run art".
+  // Nachts zeigt jeder Raum seine dunkle Fassung (M4b), und wer das Licht ausgemacht hat,
+  // sieht noch weniger. Die Dateien entstehen mit "npm run art".
+  const night = (state.phase ?? 0) >= 2;
   const background =
-    (state.phase ?? 0) >= 2 && room.background
-      ? room.background.replace(/\.png$/, "-night.png")
+    night && room.background
+      ? room.background.replace(/\.png$/, darkRooms.has(room.id) ? "-dark.png" : "-night.png")
       : room.background;
 
   return (

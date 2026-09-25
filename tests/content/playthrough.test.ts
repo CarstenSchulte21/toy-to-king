@@ -8,6 +8,9 @@ import {
   createNewGame,
   buildLettering,
   frameOf,
+  isSpotKnown,
+  riskFor,
+  spotBlocker,
   TRANSPARENT,
   WORK_W,
   comfortableSpeed,
@@ -154,7 +157,9 @@ function explore(content: GameContent) {
 // Nur die Varianten mit "if"/"text" können Effekte haben – reine Texte nicht.
 function variants(value: unknown): { if?: Condition[]; effects?: Effect[] }[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((v): v is { if?: Condition[]; effects?: Effect[] } => typeof v === "object" && v !== null);
+  return value.filter(
+    (v): v is { if?: Condition[]; effects?: Effect[] } => typeof v === "object" && v !== null,
+  );
 }
 
 function reachableRooms(content: GameContent): Set<string> {
@@ -378,19 +383,19 @@ describe("Risiko (M4b)", () => {
     expect(moved.state.step).toBe(time.room);
 
     const hotspot = content.rooms.hinterhof!.hotspots.find((h) => h.sprechen)!;
-    const talked = reduce(
-      start,
-      { type: "INTERACT", hotspot: hotspot.id, verb: "sprechen" },
-      content,
-      NOW,
-    );
+    const talked = reduce(start, { type: "INTERACT", hotspot: hotspot.id, verb: "sprechen" }, content, NOW);
     expect(talked.state.step).toBe(time.talk);
   });
 
   it("Umsehen, Tasche und Kaufen kosten nichts", () => {
     const start = withFacts();
     const hotspot = content.rooms.hinterhof!.hotspots.find((h) => h.untersuchen)!;
-    const looked = reduce(start, { type: "INTERACT", hotspot: hotspot.id, verb: "untersuchen" }, content, NOW);
+    const looked = reduce(
+      start,
+      { type: "INTERACT", hotspot: hotspot.id, verb: "untersuchen" },
+      content,
+      NOW,
+    );
     expect(looked.state.step).toBe(start.step ?? 0);
   });
 
@@ -699,11 +704,59 @@ describe("Marker-Spots haben eine Fläche", () => {
         ink++;
         const x = i % WORK_W;
         const y = (i / WORK_W) | 0;
-        expect(x >= fx && x < fx + fw && y >= fy && y < fy + fh, `Spot ${spot.id}: Farbe daneben`).toBe(
-          true,
-        );
+        expect(x >= fx && x < fx + fw && y >= fy && y < fy + fh, `Spot ${spot.id}: Farbe daneben`).toBe(true);
       });
       expect(ink, `Spot ${spot.id} bleibt leer`).toBeGreaterThan(50);
+    }
+  });
+});
+
+// Ein bekannter Spot verschwindet nicht mehr kommentarlos, und die Nacht lohnt sich.
+describe("Die Nacht", () => {
+  const content = loadContent();
+  const withAll = () => {
+    const s = createNewGame(content, "TESTER", NOW);
+    return { ...s, facts: Object.fromEntries(Object.keys(content.facts).map((f) => [f, { new: false }])) };
+  };
+
+  it("das Abstellgleis sagt tagsüber, warum es nicht geht", () => {
+    const spot = content.spots.abstellgleis!;
+    expect(spot.when, "Abstellgleis hat keine Zeitbedingung mehr").toBeDefined();
+    expect(spot.when_hint, "ohne Hinweis verschwindet es wieder kommentarlos").toBeTruthy();
+    const tag = { ...withAll(), phase: 0 };
+    expect(spotBlocker(spot, tag, content)).toBe(spot.when_hint);
+    expect(spotBlocker(spot, { ...tag, phase: 2 }, content)).toBeNull();
+    // Der Spot bleibt bekannt – das Verb verschwindet nicht aus dem Menü.
+    expect(isSpotKnown(spot, tag, content)).toBe(true);
+  });
+
+  it("vor dem Laden ist es am Tag gefährlicher als nachts", () => {
+    const spot = content.spots.rolltore!;
+    const tag = riskFor(content, { ...withAll(), phase: 0 }, spot);
+    const nacht = riskFor(content, { ...withAll(), phase: 2 }, spot);
+    expect(tag.chance).toBeGreaterThan(nacht.chance);
+    expect(tag.reasons.length).toBeGreaterThan(0);
+  });
+
+  it("Licht aus senkt das Risiko auf der Straße", () => {
+    const spot = content.spots.rolltore!;
+    const hell = riskFor(content, { ...withAll(), phase: 2 }, spot);
+    const dunkel = riskFor(content, { ...withAll(), phase: 2, flags: { licht_aus: true } }, spot);
+    expect(dunkel.chance).toBeLessThan(hell.chance);
+  });
+
+  it("morgens brennt die Laterne wieder", () => {
+    const abends: GameState = { ...withAll(), phase: 2, step: 11, flags: { licht_aus: true } };
+    const r = reduce(abends, { type: "ENTER_ROOM", room: "unterfuehrung" }, content, NOW);
+    expect(r.state.day).toBe(2);
+    expect(r.state.flags.licht_aus).toBeUndefined();
+  });
+
+  it("jeder Spot mit Zuschlag begründet ihn auch", () => {
+    for (const spot of Object.values(content.spots)) {
+      for (const mod of spot.risk_mod ?? []) {
+        expect(mod.hint.length, `Spot ${spot.id}: Zuschlag ohne Grund`).toBeGreaterThan(10);
+      }
     }
   });
 });

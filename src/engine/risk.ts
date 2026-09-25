@@ -3,6 +3,7 @@
 // damit jeder Durchlauf reproduzierbar und testbar bleibt.
 import type { GameContent, Spot, Weekday } from "./content-schema";
 import { WEEKDAYS } from "./content-schema";
+import { evaluateAll } from "./logic";
 import type { GameState } from "./state";
 
 export const PHASE_COUNT = 3;
@@ -72,25 +73,31 @@ export function roll(seed: number, salt: string): number {
   return (h >>> 0) / 4294967296;
 }
 
-export type RiskView = { chance: number; level: number; label: string };
+/** Ein Grund, warum das Risiko hier höher oder niedriger ist, als man denkt. */
+export type RiskReason = { text: string; by: number };
+export type RiskView = { chance: number; level: number; label: string; reasons: RiskReason[] };
 
 /**
  * Wie wahrscheinlich ist ein Zwischenfall an diesem Spot – mit dem aktuellen Heat,
  * dem eigenen Wanted und zur aktuellen Tageszeit? `slowShare` (0…1) ist der Anteil der
  * Zeit, den man beim Nachfahren gebraucht hat: Wer trödelt, wird eher gesehen.
  */
-export function riskFor(
-  content: GameContent,
-  state: GameState,
-  spot: Spot,
-  slowShare = 0,
-): RiskView {
+export function riskFor(content: GameContent, state: GameState, spot: Spot, slowShare = 0): RiskView {
   const rules = content.risk;
-  if (!rules) return { chance: 0, level: 0, label: "" };
+  if (!rules) return { chance: 0, level: 0, label: "", reasons: [] };
   const base = rules.base[spot.type] ?? 0;
-  if (base <= 0) return { chance: 0, level: 0, label: rules.risk_labels[0]! };
+  if (base <= 0) return { chance: 0, level: 0, label: rules.risk_labels[0]!, reasons: [] };
 
   const phase = Math.min(PHASE_COUNT - 1, Math.max(0, state.phase ?? 0));
+  // Zuschläge, die am Ort und an der Lage hängen: die Streife vor dem Laden, das Licht aus.
+  // Sie werden mit ihrem Grund angezeigt, damit man versteht, warum das Risiko so hoch ist.
+  const reasons: RiskReason[] = [];
+  let extra = 0;
+  for (const mod of spot.risk_mod ?? []) {
+    if (!evaluateAll(mod.if, state, { content })) continue;
+    extra += mod.by;
+    reasons.push({ text: mod.hint, by: mod.by });
+  }
   const chance = Math.max(
     0,
     Math.min(
@@ -99,12 +106,13 @@ export function riskFor(
         rules.per_heat * heatOf(state, spot.id) +
         rules.per_wanted * (state.wanted ?? 0) +
         (rules.per_phase[phase] ?? 0) +
+        extra +
         rules.slow_max * Math.min(1, Math.max(0, slowShare)),
     ),
   );
   // Vier Stufen für die Anzeige: unter 15 %, unter 35 %, unter 60 %, darüber.
   const level = chance < 0.15 ? 0 : chance < 0.35 ? 1 : chance < 0.6 ? 2 : 3;
-  return { chance, level, label: rules.risk_labels[level]! };
+  return { chance, level, label: rules.risk_labels[level]!, reasons };
 }
 
 export type Outcome = "clean" | "escaped" | "caught";
@@ -150,6 +158,16 @@ export function turnOfDay(state: GameState, content: GameContent, day: number): 
   const rules = content.risk;
   if (!rules) return { state, buffed: [], crossed: [] };
 
+  // Was nur für eine Nacht galt, gilt morgen früh nicht mehr.
+  let flags = state.flags;
+  for (const flag of rules.nightly_flags ?? []) {
+    if (flags[flag]) {
+      const rest = { ...flags };
+      delete rest[flag];
+      flags = rest;
+    }
+  }
+
   // Heat kühlt ab
   const heat: Record<string, number> = {};
   for (const [spotId, value] of Object.entries(state.heat ?? {})) {
@@ -168,7 +186,8 @@ export function turnOfDay(state: GameState, content: GameContent, day: number): 
     const seed = day * 1000 + spotId.length;
 
     // Buff: an einem festen Wochentag sicher, sonst je nach Spot-Typ mit kleiner Chance.
-    const weeklyBuff = rules.buff_weekday && rules.buff_weekday.day === weekday && rules.buff_weekday.type === spot.type;
+    const weeklyBuff =
+      rules.buff_weekday && rules.buff_weekday.day === weekday && rules.buff_weekday.type === spot.type;
     const buffChance = weeklyBuff ? 1 : (rules.buff_per_day[spot.type] ?? 0);
     if (buffChance > 0 && roll(seed, `buff:${spotId}`) < buffChance) {
       delete works[spotId];
@@ -183,7 +202,7 @@ export function turnOfDay(state: GameState, content: GameContent, day: number): 
     }
   }
 
-  return { state: { ...state, heat, works }, buffed, crossed };
+  return { state: { ...state, heat, works, flags }, buffed, crossed };
 }
 
 /** Alle Tageswechsel zwischen zwei Ständen abarbeiten. */

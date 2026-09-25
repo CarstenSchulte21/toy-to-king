@@ -8,9 +8,9 @@ hotspots:
     rect: [40, 60, 90, 80]
     sprühen: rolltore
     untersuchen:
-      - if: [{sprayed: rolltore}]
+      - if: [{ sprayed: rolltore }]
         text: "Zwischen all den Tags: deiner. Mal sehen, wie lange er hält."
-      - if: [{fact: buff_montag}]
+      - if: [{ fact: buff_montag }]
         text: "Alle drei Rolltore frisch grau. Montag war Buff-Tag."
       - text:
           - "Drei Rolltore, alle voll mit Tags."
@@ -21,7 +21,7 @@ hotspots:
     rect: [140, 20, 16, 130]
     sprühen: laternenmast
     untersuchen:
-      - if: [{not_flag: fund_laterne}]
+      - if: [{ not_flag: fund_laterne }]
         text:
           - "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
           - "Unten steht die Sockelklappe offen. Dahinter: Kabel, Dreck – und ein zusammengefalteter Fünfer."
@@ -29,12 +29,28 @@ hotspots:
         effects:
           - set_flag: fund_laterne
           - money: 5
-      - text: "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
+      # Die offene Klappe ist ab dem Fund ein Schalter. Tagsüber bringt er nichts –
+      # das Licht ist ohnehin aus. Nachts ist er der Unterschied zwischen gesehen und nicht.
+      - if: [{ flag: licht_aus }]
+        text:
+          - "Du machst das Licht wieder an. Die Straße liegt da wie vorher."
+        effects:
+          - clear_flag: licht_aus
+      - if: [{ phase: nacht }]
+        text:
+          - "Die Klappe steht immer noch offen. Zwischen den Kabeln sitzt ein Kippschalter."
+          - "Du legst ihn um. Die Lampe geht aus, und ein Stück Straße verschwindet."
+        effects:
+          - set_flag: licht_aus
+      - text:
+          - "Die Klappe steht offen. Zwischen den Kabeln sitzt ein Kippschalter."
+          - "Du legst ihn um. Nichts passiert – bei Tageslicht brennt die Lampe sowieso nicht."
+          - "Nachts wäre das was anderes"
 
   - id: kamera
     label: Kamera
     rect: [200, 28, 20, 16]
-    if: [{fact: kamera}]
+    if: [{ fact: kamera }]
     untersuchen: "Die neue Kamera über dem Graffitistore. Sie zeigt genau auf die Rolltore."
 
   - id: brandt
@@ -46,7 +62,7 @@ hotspots:
   - id: nowak
     label: Mann in oranger Jacke
     rect: [92, 96, 34, 60]
-    if: [{weekday: mo}, {not_phase: nacht}]
+    if: [{ weekday: mo }, { not_phase: nacht }]
     untersuchen: "Ein Reinigungswagen steht auf dem Gehweg. Der Schlauch liegt quer über den Bordstein."
     sprechen: buff
 
@@ -58,14 +74,14 @@ hotspots:
   - id: zum_laden
     label: Graffitistore
     rect: [180, 50, 50, 90]
-    if: [{not_phase: nacht}]
+    if: [{ not_phase: nacht }]
     untersuchen: "Durch die Scheibe siehst du die Regale. Sibel sortiert irgendwas ein."
     gehen: farbenladen
 
   - id: laden_zu
     label: Graffitistore (zu)
     rect: [180, 50, 50, 90]
-    if: [{phase: nacht}]
+    if: [{ phase: nacht }]
     untersuchen:
       - "Rollladen runter, Licht aus. Steht ein Zettel dran: ab zehn Uhr."
       - "Was du heute Nacht nicht dabei hast, hast du heute Nacht nicht."

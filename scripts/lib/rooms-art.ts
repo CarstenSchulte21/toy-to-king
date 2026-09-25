@@ -37,7 +37,9 @@ import {
 } from "./art";
 import { BRANDT, KALLE, KRUX, SIBEL, character } from "./figures";
 
-type Scene = (R: () => number) => Art;
+// Manche Szenen kennen einen Zustand der Welt. Bisher nur einen: Brennt die Laterne?
+export type SceneOpts = { lightOff?: boolean };
+type Scene = (R: () => number, o: SceneOpts) => Art;
 
 // Boden mit Kante, Körnung und ein paar Rissen.
 function ground(a: Art, y: number, base: number, speck: number, R: () => number): void {
@@ -173,7 +175,7 @@ const hinterhof: Scene = (R) => {
   return a;
 };
 
-const strasse: Scene = (R) => {
+const strasse: Scene = (R, o) => {
   const a = newArt(C.grey);
   gradient(a, 0, 0, ART_W, 34, C.steel, C.sky);
   for (let k = 0; k < 3; k++) {
@@ -219,8 +221,13 @@ const strasse: Scene = (R) => {
   vline(a, 145, 26, 130, C.light_grey);
   vline(a, 150, 26, 130, C.dark_grey);
   box(a, 136, 20, 24, 7, C.light_grey, C.white, C.grey);
-  rect(a, 139, 27, 18, 4, C.yellow);
-  lightCone(a, 147, 31, 44, 32, C.yellow);
+  // Wer den Schalter in der Sockelklappe umgelegt hat, steht ab hier im Dunkeln.
+  if (o.lightOff) {
+    rect(a, 139, 27, 18, 4, C.dark_grey);
+  } else {
+    rect(a, 139, 27, 18, 4, C.yellow);
+    lightCone(a, 147, 31, 44, 32, C.yellow);
+  }
   rect(a, 140, 150, 15, 6, C.dark_grey);
 
   // Graffitistore [180,50,50,90] – der Laden heißt KINGSIZE, wie das Ziel des Spiels.
@@ -1029,7 +1036,10 @@ export const SCENES: Record<string, Scene> = {
   wache,
 };
 
-export function drawRoom(id: string, seed = 7): Art | null {
+export function drawRoom(id: string, seed = 7, opts: SceneOpts = {}): Art | null {
   const scene = SCENES[id];
-  return scene ? scene(rng(seed)) : null;
+  return scene ? scene(rng(seed), opts) : null;
 }
+
+/** Räume, die eine Fassung „Licht aus" kennen. */
+export const DARK_ROOMS = ["strasse"];

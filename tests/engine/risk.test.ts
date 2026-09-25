@@ -15,6 +15,7 @@ import {
   weekdayOf,
   stepsLeft,
   type GameContent,
+  type Spot,
   type GameState,
 } from "@/engine";
 
@@ -81,8 +82,8 @@ const content = {
   economy: null,
 } as unknown as GameContent;
 
-function game(): GameState {
-  return createNewGame(content, "TESTER", "2026-01-01T00:00:00.000Z");
+function game(extra: Partial<GameState> = {}): GameState {
+  return { ...createNewGame(content, "TESTER", "2026-01-01T00:00:00.000Z"), ...extra };
 }
 
 const work = (quality: number) => ({
@@ -246,5 +247,43 @@ describe("Buff und Crossen", () => {
     const s: GameState = { ...game(), heat: { waggon: 3 }, day: 4 };
     const turn = passDays(s, content, 1);
     expect(heatOf(turn.state, "waggon")).toBe(0);
+  });
+});
+
+// Die Nacht soll sich lohnen: Zuschläge am Spot, die an der Lage hängen.
+describe("Zuschläge aufs Risiko", () => {
+  const guarded = {
+    id: "laden",
+    name: "dem Rolltor",
+    type: "rolltor",
+    room: "strasse",
+    hotspot: "rolltore",
+    fits: ["tag"],
+    fit_hint: "…",
+    risk: "mittel",
+    risk_mod: [
+      { if: [{ not_phase: "nacht" }], by: 0.3, hint: "Die Streife steht daneben." },
+      { if: [{ flag: "licht_aus" }], by: -0.25, hint: "Die Laterne ist aus." },
+    ],
+  } as unknown as Spot;
+
+  it("tagsüber macht die Streife den Spot deutlich gefährlicher", () => {
+    const tags = riskFor(content, game({ phase: 0 }), guarded);
+    const nachts = riskFor(content, game({ phase: 2 }), guarded);
+    expect(tags.chance).toBeGreaterThan(nachts.chance);
+    expect(tags.reasons.map((r) => r.text)).toContain("Die Streife steht daneben.");
+  });
+
+  it("Licht aus hilft, und der Grund steht dabei", () => {
+    const hell = riskFor(content, game({ phase: 2 }), guarded);
+    const dunkel = riskFor(content, game({ phase: 2, flags: { licht_aus: true } }), guarded);
+    expect(dunkel.chance).toBeLessThan(hell.chance);
+    expect(dunkel.reasons.map((r) => r.text)).toContain("Die Laterne ist aus.");
+    expect(dunkel.reasons.every((r) => r.by < 0)).toBe(true);
+  });
+
+  it("ohne passende Lage gibt es keine Gründe zu zeigen", () => {
+    const plain = { ...guarded, risk_mod: undefined } as unknown as Spot;
+    expect(riskFor(content, game({ phase: 2 }), plain).reasons).toEqual([]);
   });
 });

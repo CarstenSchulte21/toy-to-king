@@ -274,7 +274,21 @@ export const spotSchema = z.strictObject({
   rot: z.literal(90).optional(), // Der Schriftzug steht quer, z. B. längs am Mast
   // Wo das fertige Werk im Raum sitzt (Raumkoordinaten). Ohne Angabe: das Rechteck des Hotspots.
   place: rect.optional(),
+  // `if` heißt: Kennt man den Spot überhaupt? `when` heißt: Geht er gerade?
+  // Ein Spot, den man kennt, verschwindet nicht mehr kommentarlos – er sagt, warum er nicht geht.
   if: z.array(conditionSchema).optional(),
+  when: z.array(conditionSchema).optional(),
+  when_hint: text.optional(),
+  // Zuschläge aufs Risiko, die an Bedingungen hängen: die Streife vor dem Laden, das Licht aus.
+  risk_mod: z
+    .array(
+      z.strictObject({
+        if: z.array(conditionSchema).min(1),
+        by: z.number().min(-1).max(1),
+        hint: text,
+      }),
+    )
+    .optional(),
 });
 export const spotsFileSchema = z.array(spotSchema);
 
@@ -347,6 +361,8 @@ export const riskSchema = z.strictObject({
   cross_per_day: share,
   cross_max_quality: z.number().int().min(0).max(3),
   station_room: id, // Raum, in dem man nach dem Erwischtwerden aufwacht
+  // Flags, die nur bis zum nächsten Morgen halten – die Stadt repariert die Laterne.
+  nightly_flags: z.array(id).optional(),
   texts: z.strictObject({
     escaped: lines,
     caught: lines,

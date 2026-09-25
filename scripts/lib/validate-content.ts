@@ -462,7 +462,19 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   const ok = errors.length === 0 && config !== null;
   return {
     content: ok
-      ? { config: config!, rooms, npcs, facts, items, spray: rules, spots, map: mapConfig, progress, risk, economy }
+      ? {
+          config: config!,
+          rooms,
+          npcs,
+          facts,
+          items,
+          spray: rules,
+          spots,
+          map: mapConfig,
+          progress,
+          risk,
+          economy,
+        }
       : null,
     errors,
     warnings,
