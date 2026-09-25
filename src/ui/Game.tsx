@@ -26,8 +26,6 @@ import { ShopView } from "./ShopView";
 import { Blackbook } from "./Blackbook";
 import { DebugPanel, type FontChoice } from "./DebugPanel";
 import { DialoguePanel } from "./DialoguePanel";
-import { buildVersion, type FeedbackContext } from "./feedback";
-import { FeedbackPanel } from "./FeedbackPanel";
 import { MapView } from "./MapView";
 import { RoomView } from "./RoomView";
 import { ConfirmNewGame, Incident, MainMenu, NameEntry, PauseMenu, RankUp, TextBox } from "./Screens";
@@ -63,7 +61,6 @@ export function Game() {
   // Zwischenfall beim Sprühen (M4b): knapp entkommen oder erwischt.
   const [incident, setIncident] = useState<{ kind: "escaped" | "caught"; lines: string[] } | null>(null);
   const [shopOpen, setShopOpen] = useState(false);
-  const [feedback, setFeedback] = useState<FeedbackContext | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [debug, setDebug] = useState(false);
   const [outlines, setOutlines] = useState(false);
@@ -87,6 +84,18 @@ export function Game() {
     setTimeout(() => setToasts((list) => list.filter((t) => t.id !== id)), TOAST_MS);
   }, []);
 
+  // Während eines Gesprächs wird nichts eingeblendet: Eine Meldung "Neu im Blackbook" nimmt
+  // vorweg, was der andere gerade erst erzählt. Gesammelt wird, und am Ende kommt alles zusammen.
+  const inDialogue = useRef(false);
+  const pending = useRef<string[]>([]);
+  const report = useCallback(
+    (text: string) => {
+      if (inDialogue.current) pending.current.push(text);
+      else toast(text);
+    },
+    [toast],
+  );
+
   const handleEvents = useCallback(
     (events: GameEvent[]) => {
       for (const e of events) {
@@ -95,16 +104,19 @@ export function Game() {
             setLines((queue) => [...queue, ...e.lines]);
             break;
           case "DIALOGUE":
+            inDialogue.current = true;
             setCursor({ npc: e.npc, node: e.node, seq: ++seqRef.current });
             break;
           case "DIALOGUE_END":
+            inDialogue.current = false;
             setCursor(null);
+            for (const text of pending.current.splice(0)) toast(text);
             break;
           case "FACT_LEARNED":
-            toast(`Neu im Blackbook: ${e.title}`);
+            report(`Neu im Blackbook: ${e.title}`);
             break;
           case "ITEM_GAINED":
-            toast(`Neu in der Tasche: ${e.name}`);
+            report(`Neu in der Tasche: ${e.name}`);
             break;
           case "SPRAY_OPEN": {
             const spot = content.spots[e.spot];
@@ -125,7 +137,7 @@ export function Game() {
             );
             break;
           case "ALLOWANCE":
-            toast(e.text);
+            report(e.text);
             break;
           case "RANK_UP":
             setRankUp(e);
@@ -149,13 +161,13 @@ export function Game() {
             });
             break;
           case "DAY_STARTED":
-            toast(e.text);
+            report(e.text);
             break;
           case "PHASE_CHANGED":
             break;
           case "TRUST_CHANGED": {
             const name = content.npcs[e.npc]?.name ?? e.npc;
-            toast(e.to > e.from ? `${name} vertraut dir mehr.` : `${name} vertraut dir weniger.`);
+            report(e.to > e.from ? `${name} vertraut dir mehr.` : `${name} vertraut dir weniger.`);
             break;
           }
           case "WARNING":
@@ -165,7 +177,7 @@ export function Game() {
         }
       }
     },
-    [toast],
+    [toast, report],
   );
 
   const dispatch = useCallback(
@@ -252,18 +264,6 @@ export function Game() {
     [dispatch],
   );
 
-  const openFeedback = (line?: string) => {
-    if (!state) return;
-    setFeedback({
-      room: content.rooms[state.room]?.name ?? state.room,
-      npc: cursor ? content.npcs[cursor.npc]?.name : undefined,
-      node: cursor?.node,
-      line,
-      version: buildVersion(),
-      date: new Date(),
-    });
-  };
-
   const room = state ? content.rooms[state.room] : undefined;
   const rank = state ? rankOf(state, content) : null;
   const upcoming = state ? nextRank(content, state.xp) : null;
@@ -288,8 +288,7 @@ export function Game() {
     spraySpot !== null ||
     shopOpen ||
     rankUp !== null ||
-    incident !== null ||
-    feedback !== null;
+    incident !== null;
 
   return (
     <div className={`game font-${font}`}>
@@ -396,7 +395,6 @@ export function Game() {
                 }
                 onContinue={() => dispatch({ type: "CONTINUE_DIALOGUE", npc: cursor.npc, node: cursor.node })}
                 onLeave={() => setCursor(null)}
-                onFeedback={openFeedback}
                 notices={toasts.map((t) => t.text)}
               />
             )}
@@ -456,16 +454,7 @@ export function Game() {
                 onClose={() => setRankUp(null)}
               />
             )}
-            {paused && (
-              <PauseMenu
-                onResume={() => setPaused(false)}
-                onFeedback={() => {
-                  setPaused(false);
-                  openFeedback(lines[0]);
-                }}
-                onMainMenu={toMainMenu}
-              />
-            )}
+            {paused && <PauseMenu onResume={() => setPaused(false)} onMainMenu={toMainMenu} />}
             {!dialogue && !blackbook && !mapOpen && !bagOpen && !spraySpot && (
               <div className="toasts" aria-live="polite">
                 {toasts.map((t) => (
@@ -478,8 +467,6 @@ export function Game() {
           </>
         )}
       </Stage>
-
-      {feedback && <FeedbackPanel context={feedback} onClose={() => setFeedback(null)} />}
 
       <div className="rotate-hint">
         <p>Dreh dein Handy</p>

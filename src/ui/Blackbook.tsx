@@ -35,8 +35,8 @@ export function Blackbook(props: {
     <div className="overlay blackbook">
       <div className="bb-head">
         <span className="bb-title">Blackbook</span>
-        <button className="small-btn" onPointerUp={props.onClose}>
-          Zu
+        <button className="small-btn close-btn" aria-label="Schließen" onPointerUp={props.onClose}>
+          ×
         </button>
       </div>
       <div className="bb-tabs">
@@ -62,7 +62,9 @@ export function Blackbook(props: {
               {f.title}
             </span>
             <p>{f.text}</p>
-            <span className="bb-source">– {f.source ? (content.npcs[f.source]?.name ?? f.source) : "selbst gesehen"}</span>
+            <span className="bb-source">
+              – {f.source ? (content.npcs[f.source]?.name ?? f.source) : "selbst gesehen"}
+            </span>
           </div>
         ))}
       </div>

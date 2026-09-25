@@ -34,7 +34,16 @@ const items = {
   rot: { id: "rot", name: "Rot", kind: "color", color: "red", text: "…", price: 4 },
   gold: { id: "gold", name: "Gold", kind: "color", color: "yellow", text: "…" }, // ohne Preis
   skinny: { id: "skinny", name: "Skinny", kind: "cap", width: 1, text: "…", price: 1 },
-  t_tip: { id: "t_tip", name: "T-Tip", kind: "marker", width: 1, flow: 5, color: "black", text: "…", price: 4 },
+  t_tip: {
+    id: "t_tip",
+    name: "T-Tip",
+    kind: "marker",
+    width: 1,
+    flow: 5,
+    color: "black",
+    text: "…",
+    price: 4,
+  },
 };
 
 const content = {

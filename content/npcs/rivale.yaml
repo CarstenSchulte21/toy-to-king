@@ -8,11 +8,11 @@ trust:
 
 dialogue:
   start:
-    - if: [{flag: krux_kennt_dich}, {wanted_min: 2}]
+    - if: [{ flag: krux_kennt_dich }, { wanted_min: 2 }]
       node: gesucht
-    - if: [{flag: krux_kennt_dich}, {phase: nacht}]
+    - if: [{ flag: krux_kennt_dich }, { phase: nacht }]
       node: nachts
-    - if: [{flag: krux_kennt_dich}]
+    - if: [{ flag: krux_kennt_dich }]
       node: wieder_da
     - node: erstes_mal
 
@@ -50,7 +50,9 @@ dialogue:
       text: "Was?"
       options:
         - text: "Ich wollte fragen, bevor ich hier male."
-          if: [{fact: krux}, {not_fact: krux_frage}]
+          id: frag_erlaubnis
+          once: true
+          if: [{ fact: krux }, { not_fact: krux_frage }]
           effects:
             - trust: 1
           next: fragen
@@ -61,14 +63,14 @@ dialogue:
             - trust: 1
           next: outline
         - text: "Du weißt, dass die Streife um zwei hier durchfährt?"
-          if: [{fact: streife_zwei}]
+          if: [{ fact: streife_zwei }]
           id: streife
           once: true
           effects:
             - trust: 1
           next: streife
         - text: "Warum kaufst du nicht mehr bei Sibel?"
-          if: [{fact: krux_kauft_nicht}]
+          if: [{ fact: krux_kauft_nicht }]
           id: sibel
           once: true
           next: sibel
@@ -85,13 +87,13 @@ dialogue:
         - text: "Kennst du gute Spots?"
           id: spots
           once: true
-          if: [{trust_min: 2}]
+          if: [{ trust_min: 2 }]
           show_locked: "KRUX erzählt dir sowas nicht. Noch nicht."
           next: bruecke
         - text: "Dein Wildstyle. Wie kriegt man die Buchstaben so ineinander?"
           id: wildstyle
           once: true
-          if: [{rank_min: piece_writer}, {sprayed: hall}]
+          if: [{ rank_min: piece_writer }, { sprayed: hall }]
           show_locked: "Danach fragst du ihn besser erst, wenn du selbst was an der Hall stehen hast."
           next: wildstyle
         - text: "Bin weg."

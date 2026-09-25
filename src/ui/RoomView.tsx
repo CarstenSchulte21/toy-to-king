@@ -16,7 +16,7 @@ import {
   type Spot,
   type Verb,
 } from "@/engine";
-import { Pips } from "./MapView";
+import { Pips, qualityWord } from "./MapView";
 import { WorkImage } from "./WorkImage";
 
 type Menu = { hotspot: Hotspot; x: number; y: number } | null;
@@ -120,7 +120,10 @@ export function RoomView(props: {
                   />
                 </span>
                 <span className="work-pips">
-                  <Pips value={state.works[h.sprühen]!.quality} />
+                  <Pips
+                    value={state.works[h.sprühen]!.quality}
+                    label={outlines ? qualityWord(content, state.works[h.sprühen]!.quality) : undefined}
+                  />
                 </span>
               </>
             )}

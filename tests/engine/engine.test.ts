@@ -323,7 +323,14 @@ describe("migrate", () => {
         result: "{style}",
         hints: { gaps: ".", gaps_low: ".", reach: ".", fat_line: ".", drips: "." },
         styles: [
-          { id: "bubble", name: "Bubble", tool: "can" as const, look: "bubble", caps: { fill: ["f"], outline: ["o"] }, xp: 30 },
+          {
+            id: "bubble",
+            name: "Bubble",
+            tool: "can" as const,
+            look: "bubble",
+            caps: { fill: ["f"], outline: ["o"] },
+            xp: 30,
+          },
         ],
       },
       spots: {

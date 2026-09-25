@@ -11,7 +11,7 @@ ranks:
     unlocks: "Tag"
   - id: tagger
     name: Tagger
-    xp: 50
+    xp: 40
     text: "Dein Handstyle steht. Jetzt wird es größer."
     unlocks: "Straight Letter und Bubble"
   - id: bomber
@@ -42,3 +42,4 @@ spot_factors:
 tempo_bonus_max: 0.3
 tempo_min_quality: 2
 repeat_share: 0.2
+xp_per_fact: 2 # Jede neue Info im Blackbook bringt etwas – Absuchen und Fragen lohnen sich

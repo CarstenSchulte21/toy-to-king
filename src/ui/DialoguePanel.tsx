@@ -11,7 +11,6 @@ export function DialoguePanel(props: {
   onChoose: (index: number) => void;
   onContinue: () => void;
   onLeave: () => void;
-  onFeedback: (line: string) => void;
   // Hinweise wie „Neu im Blackbook" erscheinen im Gespräch unter dem Text statt über ihm.
   notices: string[];
 }) {
@@ -59,9 +58,6 @@ export function DialoguePanel(props: {
             </span>
           )}
         </div>
-        <button className="small-btn" onPointerUp={() => props.onFeedback(line)}>
-          Feedback
-        </button>
         <button className="small-btn" onPointerUp={props.onLeave}>
           Gehen
         </button>

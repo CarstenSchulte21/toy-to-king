@@ -8,7 +8,7 @@ trust:
 
 dialogue:
   start:
-    - if: [{flag: nowak_kennt_dich}]
+    - if: [{ flag: nowak_kennt_dich }]
       node: wieder_da
     - node: erstes_mal
 
@@ -16,11 +16,13 @@ dialogue:
     erstes_mal:
       text:
         - "Ein Mann in oranger Jacke zieht den Schlauch vom Wagen."
-        - "„Morgen. Geh mal zwei Schritte weiter, das spritzt.\""
+        - '„Morgen. Geh mal zwei Schritte weiter, das spritzt."'
       effects:
         - set_flag: nowak_kennt_dich
       options:
         - text: "Machen Sie das jede Woche?"
+          id: frag_jede_woche
+          once: true
           next: jede_woche
         - text: "Das war richtig gute Arbeit, die Sie da wegmachen."
           next: gute_arbeit
@@ -28,10 +30,10 @@ dialogue:
           end: true
 
     wieder_da:
-      text: "„Du schon wieder. Und ich schon wieder.\""
+      text: '„Du schon wieder. Und ich schon wieder."'
       options:
         - text: "Was macht am meisten Arbeit?"
-          if: [{trust_min: 1}]
+          if: [{ trust_min: 1 }]
           show_locked: "Nowak redet nicht mit jedem über seine Arbeit."
           next: arbeit
         - text: "Lassen Sie was stehen?"
@@ -41,8 +43,8 @@ dialogue:
 
     jede_woche:
       text:
-        - "„Montags die Ladenzeile, mittwochs die Unterführung. Steht so im Plan.\""
-        - "„Die Unterführung lassen wir inzwischen. Da kommt eh am Freitag was Neues.\""
+        - '„Montags die Ladenzeile, mittwochs die Unterführung. Steht so im Plan."'
+        - '„Die Unterführung lassen wir inzwischen. Da kommt eh am Freitag was Neues."'
       effects:
         - learn: buff_montag
       next: hub
@@ -50,31 +52,31 @@ dialogue:
     gute_arbeit:
       text:
         - "Er stellt den Schlauch ab und guckt sich die Wand an."
-        - "„Kunst hin oder her. Ist halt nicht meine Wand und nicht deine.\""
-        - "„Aber ja. Manches ist schade drum.\""
+        - '„Kunst hin oder her. Ist halt nicht meine Wand und nicht deine."'
+        - '„Aber ja. Manches ist schade drum."'
       effects:
         - trust: 1
       next: hub
 
     arbeit:
       text:
-        - "„Rolltore sind einfach. Ein Durchgang, fertig.\""
-        - "„Backstein ist die Hölle. Da kriegst du das nie ganz raus, das sieht man noch nach Jahren.\""
+        - '„Rolltore sind einfach. Ein Durchgang, fertig."'
+        - '„Backstein ist die Hölle. Da kriegst du das nie ganz raus, das sieht man noch nach Jahren."'
       effects:
         - trust: 1
       next: hub
 
     stehen_lassen:
       text:
-        - "„Was an der Hall hängt, fasse ich nicht an. Das ist freigegeben, das ist nicht mein Problem.\""
-        - "„Alles andere kommt weg. Nicht persönlich.\""
+        - '„Was an der Hall hängt, fasse ich nicht an. Das ist freigegeben, das ist nicht mein Problem."'
+        - '„Alles andere kommt weg. Nicht persönlich."'
       next: hub
 
     hub:
       text: "Der Schlauch zischt."
       options:
         - text: "Was macht am meisten Arbeit?"
-          if: [{trust_min: 1}]
+          if: [{ trust_min: 1 }]
           next: arbeit
         - text: "Lassen Sie was stehen?"
           next: stehen_lassen

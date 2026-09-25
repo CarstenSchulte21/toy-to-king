@@ -26,6 +26,7 @@ hotspots:
           - "Sticker über Sticker. KRUX klebt ganz oben. Wie ist er da hochgekommen?"
           - "Unten steht die Sockelklappe offen. Dahinter: Kabel, Dreck – und ein zusammengefalteter Fünfer."
           - "Klamm, aber echt."
+          - "Zwischen den Kabeln sitzt außerdem ein Kippschalter. Nachts wäre der interessant."
         effects:
           - set_flag: fund_laterne
           - money: 5

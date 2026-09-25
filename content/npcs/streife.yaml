@@ -7,15 +7,15 @@ trust: false
 
 dialogue:
   start:
-    - if: [{wanted_min: 2}]
+    - if: [{ wanted_min: 2 }]
       node: gesucht
-    - if: [{wanted_min: 1}]
+    - if: [{ wanted_min: 1 }]
       node: abtasten
-    - if: [{flag: brandt_misstrauisch}]
+    - if: [{ flag: brandt_misstrauisch }]
       node: misstrauisch
-    - if: [{phase: nacht}]
+    - if: [{ phase: nacht }]
       node: nachts
-    - if: [{flag: brandt_kennt_dich}]
+    - if: [{ flag: brandt_kennt_dich }]
       node: wieder_da
     - node: erstes_mal
 
@@ -26,6 +26,8 @@ dialogue:
         - set_flag: brandt_kennt_dich
       options:
         - text: "Ja, alles gut. Lange Schicht?"
+          id: frag_schicht_erst
+          once: true
           next: schicht
         - text: "Ich hab nichts gemacht!"
           next: nervoes
@@ -69,7 +71,7 @@ dialogue:
     nachts:
       text:
         - "Sie stellt den Pappbecher aufs Dach vom Wagen."
-        - "„Spät für dein Alter.\""
+        - '„Spät für dein Alter."'
       effects:
         - set_flag: brandt_kennt_dich
       options:
@@ -82,21 +84,21 @@ dialogue:
 
     nicht_schlafen:
       text:
-        - "„Kenn ich. Ich auch nicht, nur werde ich dafür bezahlt.\""
+        - '„Kenn ich. Ich auch nicht, nur werde ich dafür bezahlt."'
         - "Sie guckt die Ladenzeile runter, bis zur Unterführung."
-        - "„Geh nach Hause, ja?\""
+        - '„Geh nach Hause, ja?"'
       end: true
 
     noch_frueh:
       text:
-        - "„Für mich fängt es jetzt erst an.\""
-        - "„Und wenn hier gleich einer mit einer Dose um die Ecke kommt, bin ich in zwei Minuten da.\""
+        - '„Für mich fängt es jetzt erst an."'
+        - '„Und wenn hier gleich einer mit einer Dose um die Ecke kommt, bin ich in zwei Minuten da."'
       end: true
 
     abtasten:
       text:
         - "Sie guckt dich zwei Sekunden zu lange an."
-        - "„Zeig mal deine Hände.\""
+        - '„Zeig mal deine Hände."'
       options:
         - text: "Warum?"
           next: haende
@@ -105,20 +107,20 @@ dialogue:
 
     haende:
       text:
-        - "„Schwarz unterm Daumennagel.\""
-        - "„Ich sag ja nichts. Ich guck nur.\""
+        - '„Schwarz unterm Daumennagel."'
+        - '„Ich sag ja nichts. Ich guck nur."'
       end: true
 
     noe:
       text:
-        - "„Muss ich auch nicht. Ich hab sie ja schon gesehen.\""
+        - '„Muss ich auch nicht. Ich hab sie ja schon gesehen."'
       end: true
 
     gesucht:
       text:
         - "Diesmal lächelt sie nicht."
-        - "„{name}.\""
-        - "„Ja, wir kennen den Namen. Steht auf genug Wänden.\""
+        - '„{name}."'
+        - '„Ja, wir kennen den Namen. Steht auf genug Wänden."'
       options:
         - text: "Ich weiß nicht, wovon Sie reden."
           next: leugnen
@@ -126,20 +128,22 @@ dialogue:
           next: und_jetzt
 
     leugnen:
-      text: "„Natürlich nicht.\""
+      text: '„Natürlich nicht."'
       end: true
 
     und_jetzt:
       text:
-        - "„Jetzt gar nichts. Ich hab dich nicht dabei erwischt.\""
-        - "„Mach nur nicht den Fehler zu denken, dass das so bleibt.\""
+        - '„Jetzt gar nichts. Ich hab dich nicht dabei erwischt."'
+        - '„Mach nur nicht den Fehler zu denken, dass das so bleibt."'
       end: true
 
     wieder_da:
       text: "Na. Alles ruhig?"
       options:
         - text: "Alles ruhig. Wieder Nachtschicht?"
-          if: [{not_fact: streife_zwei}]
+          id: frag_schicht
+          once: true
+          if: [{ not_fact: streife_zwei }]
           next: schicht
         - text: "Alles ruhig."
           end: true

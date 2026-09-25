@@ -8,14 +8,14 @@ hotspots:
     rect: [180, 70, 40, 80]
     untersuchen:
       - "Sie sortiert deine Dosen in eine Kiste und schreibt etwas auf."
-      - "„Name steht schon dran. Spar dir die Mühe.\""
-      - "„Nächstes Mal ruf einer deiner Freunde an, bevor ich es tue.\""
+      - '„Name steht schon dran. Spar dir die Mühe."'
+      - '„Nächstes Mal ruf einer deiner Freunde an, bevor ich es tue."'
 
   - id: tasche_wache
     label: Deine Tasche
     rect: [90, 110, 50, 40]
     untersuchen:
-      - if: [{not_flag: fund_wache}]
+      - if: [{ not_flag: fund_wache }]
         text:
           - "Caps noch da, Farben weg. Hätte schlimmer kommen können."
           - "In der Seitentasche, unter dem Futter: ein Fat Cap, den sie übersehen haben."

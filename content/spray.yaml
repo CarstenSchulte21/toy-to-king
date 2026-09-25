@@ -12,6 +12,7 @@ result: "{style} an {spot}: {quality}."
 hints:
   gaps: "Da sind Lücken. Näher an der Linie bleiben."
   gaps_low: "Low Pressure braucht Zeit. Langsamer fahren, dann deckt das."
+  gaps_marker: "Der Strich setzt aus. Den Marker aufdrücken und in einem Zug durchziehen."
   reach: "Mit dem Cap kommst du nicht bis an den Rand. Fürs Fill-in Fat Cap oder NY Fat."
   fat_line: "Die Linie ist zu fett. Dafür Skinny oder Standard-Cap."
   drips: "Das läuft. Mit High Pressure nicht stehen bleiben."
@@ -32,7 +33,7 @@ styles:
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
-    if: [{rank_min: tagger}]
+    if: [{ rank_min: tagger }]
     locked_hint: "Erst der Handstyle. Straight Letter gibt's ab Tagger."
 
   - id: bubble
@@ -42,7 +43,7 @@ styles:
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
-    if: [{rank_min: tagger}]
+    if: [{ rank_min: tagger }]
     locked_hint: "Bubbles gibt's ab Tagger. Tag erst mal weiter."
 
   - id: bombing
@@ -52,7 +53,7 @@ styles:
       fill: [ny_fat, fat_cap]
       outline: [standard_cap, skinny_cap]
     xp: 50
-    if: [{rank_min: bomber}]
+    if: [{ rank_min: bomber }]
     locked_hint: "Bombing kommt, wenn dein Name im Bezirk was zählt. Ab Bomber."
 
   - id: piece
@@ -62,7 +63,7 @@ styles:
       fill: [fat_cap]
       outline: [skinny_cap]
     xp: 120
-    if: [{rank_min: piece_writer}]
+    if: [{ rank_min: piece_writer }]
     locked_hint: "Für ein Piece bist du noch nicht so weit. Ab Piece-Writer."
     only_at: [hall]
     only_at_hint: "Ein Piece malst du nicht zwischen Tür und Angel. Dafür gibt's die Hall."
@@ -75,7 +76,7 @@ styles:
       fill: [fat_cap]
       outline: [skinny_cap]
     xp: 200
-    if: [{rank_min: piece_writer}, {flag: wildstyle_gelernt}]
+    if: [{ rank_min: piece_writer }, { flag: wildstyle_gelernt }]
     locked_hint: "Wildstyle zeigt dir keiner umsonst. Frag jemanden, der ihn kann."
     only_at: [hall]
     only_at_hint: "Wildstyle nur an der Hall. Da hast du die Zeit dafür."

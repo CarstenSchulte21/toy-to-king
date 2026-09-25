@@ -48,42 +48,42 @@
   kind: color
   color: black
   text: "Für Outlines und Tags. Hat jeder dabei."
-  price: 2
+  price: 4
 
 - id: farbe_chrom
   name: Chrom
   kind: color
   color: light_grey
   text: "Silber. Der Klassiker fürs Fill-in bei Throw-ups."
-  price: 2
+  price: 4
 
 - id: farbe_weiss
   name: Weiß
   kind: color
   color: white
   text: "Für Highlights, Second Outlines und alles, was knallen soll."
-  price: 3
+  price: 5
 
 - id: farbe_rot
   name: Rot
   kind: color
   color: red
   text: "Dunkles Rot. Deckt gut."
-  price: 4
+  price: 6
 
 - id: farbe_gelb
   name: Gelb
   kind: color
   color: yellow
   text: "Hell und laut. Mit schwarzer Outline sieht man das von weit weg."
-  price: 4
+  price: 6
 
 - id: farbe_hellblau
   name: Hellblau
   kind: color
   color: cyan
   text: "Kühl. Gut für Fades nach Weiß."
-  price: 4
+  price: 6
 
 # Marker (M5a): Damit macht man Tags, bevor man an Dosen kommt.
 - id: t_tip
@@ -92,7 +92,7 @@
   width: 1
   flow: 5
   color: black
-  price: 4
+  price: 2
   text: "Keilspitze. Schmal, sauber, tropft nicht. Womit jeder anfängt."
 
 - id: dripper
@@ -101,7 +101,7 @@
   width: 3
   flow: 12
   color: black
-  price: 6
+  price: 4
   text: "Selbst gebaut, voll Tinte. Breit und nass – und er läuft, wenn du stehen bleibst."
 
 - id: wachsmarker
@@ -111,5 +111,5 @@
   flow: 7
   color: white
   keeps: true
-  price: 9
+  price: 6
   text: "Dick und trocken. Tropft nie, und der Buff kriegt ihn kaum wieder runter."

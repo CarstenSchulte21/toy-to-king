@@ -1,13 +1,6 @@
 "use client";
 // Der Laden (M5a): kaufen bei Sibel. Kein Feilschen, keine Mengen – ein Tipp pro Dose.
-import {
-  isCareful,
-  paletteIndex,
-  shopOffers,
-  type GameContent,
-  type GameState,
-  type Action,
-} from "@/engine";
+import { isCareful, paletteIndex, shopOffers, type GameContent, type GameState, type Action } from "@/engine";
 import { rgbCss } from "./paint";
 
 const GROUPS = [
@@ -33,8 +26,8 @@ export function ShopView(props: {
       <div className="bb-head">
         <span className="bb-title">{eco.texts.shop_title}</span>
         <span className="shop-money">{state.money} €</span>
-        <button className="small-btn" onPointerUp={props.onClose}>
-          Zu
+        <button className="small-btn close-btn" aria-label="Schließen" onPointerUp={props.onClose}>
+          ×
         </button>
       </div>
       {careful && <p className="shop-careful">{eco.careful_text}</p>}
@@ -50,7 +43,7 @@ export function ShopView(props: {
                 <div key={o.item.id} className="bb-entry shop-entry">
                   <span className="bb-entry-title">
                     {o.item.color && (
-                      <i className="bag-swatch" style={{ background: rgbCss(paletteIndex(o.item.color))}} />
+                      <i className="bag-swatch" style={{ background: rgbCss(paletteIndex(o.item.color)) }} />
                     )}
                     {o.item.name}
                     {o.owned > 0 ? ` ×${o.owned}` : ""}

@@ -8,9 +8,9 @@ trust:
 
 dialogue:
   start:
-    - if: [{flag: sibel_kennt_dich}, {wanted_min: 2}]
+    - if: [{ flag: sibel_kennt_dich }, { wanted_min: 2 }]
       node: vorsichtig
-    - if: [{flag: sibel_kennt_dich}]
+    - if: [{ flag: sibel_kennt_dich }]
       node: wieder_da
     - node: erstes_mal
 
@@ -21,10 +21,14 @@ dialogue:
         - set_flag: sibel_kennt_dich
       options:
         - text: "Ich brauch was für saubere Outlines."
+          id: frag_caps_erst
+          once: true
           effects:
             - trust: 1
           next: caps
         - text: "Was ist das Billigste, was du hast?"
+          id: frag_billig
+          once: true
           next: billig
         - text: "Nur gucken."
           next: nur_gucken
@@ -56,12 +60,16 @@ dialogue:
       text: "Sonst noch was?"
       options:
         - text: "Welcher Cap wofür?"
-          if: [{not_fact: caps}]
+          id: frag_caps
+          once: true
+          if: [{ not_fact: caps }]
           effects:
             - trust: 1
           next: caps
         - text: "Low oder High Pressure – was ist der Unterschied?"
-          if: [{not_fact: druck}]
+          id: frag_druck
+          once: true
+          if: [{ not_fact: druck }]
           next: druck
         - text: "Viel Ärger hier in letzter Zeit?"
           id: aerger
@@ -72,7 +80,9 @@ dialogue:
           once: true
           next: klauen
         - text: "Wer kauft hier eigentlich so?"
-          if: [{trust_min: 2}]
+          id: frag_kunden
+          once: true
+          if: [{ trust_min: 2 }]
           show_locked: "Über Kunden redet Sibel nicht mit jedem."
           next: kunden
         - text: "Hast du Farben für mich?"
@@ -82,7 +92,7 @@ dialogue:
         - text: "Ich brauch noch mehr Farben."
           id: mehr_farben
           once: true
-          if: [{trust_min: 2}]
+          if: [{ trust_min: 2 }]
           show_locked: "Mehr Farben rückt Sibel nicht einfach so raus."
           next: mehr_farben
         - text: "Danke, bis dann."
