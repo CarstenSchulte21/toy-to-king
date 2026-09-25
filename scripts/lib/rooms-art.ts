@@ -481,8 +481,8 @@ const unterfuehrung: Scene = (R) => {
   line(a, 272, 104, 280, 96, C.light_grey);
   line(a, 292, 104, 286, 96, C.light_grey);
   // Schild am Zaun: emailliertes Blech, längst nicht mehr zu lesen. Genau dafür da.
-  box(a, 267, 61, 32, 15, C.light_grey, C.white, C.dark_grey);
-  hline(a, 269, 63, 28, C.light_red);
+  box(a, 266, 92, 26, 13, C.light_grey, C.white, C.dark_grey);
+  hline(a, 268, 94, 22, C.light_red);
   weeds(a, 270, 152, 4, C.green, R);
 
   rect(a, 304, 50, 16, 110, C.cyan);

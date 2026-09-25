@@ -108,6 +108,11 @@ export function RoomView(props: {
             onPointerUp={(e) => openMenu(e, h)}
             aria-label={h.label}
           >
+            {/* Ausgänge sind immer zu sehen. Ein 16 Pixel breiter Streifen am Bildrand findet
+                sonst niemand, ohne vorher "Blick" zu drücken (Tester, 25.09.2026). */}
+            {h.gehen !== undefined && (
+              <span className={`exit-arrow ${x > STAGE_WIDTH / 2 ? "right" : "left"}`} aria-hidden />
+            )}
             {(placeholder || outlines) && <span className="hotspot-label">{h.label}</span>}
             {h.sprühen && state.works[h.sprühen] && (
               <>

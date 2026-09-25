@@ -974,6 +974,43 @@ body {
   color: var(--c64-grey);
 }
 
+/* Ausgänge: ein Pfeil, der immer da ist. Blinkt langsam, damit er auffällt,
+   ohne dass man hinsehen muss. */
+.exit-arrow {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  margin-top: -5px;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  pointer-events: none;
+  animation: exit-pulse 2.4s ease-in-out infinite;
+}
+.exit-arrow.right {
+  right: 2px;
+  border-left: 7px solid var(--c64-white);
+}
+.exit-arrow.left {
+  left: 2px;
+  border-right: 7px solid var(--c64-white);
+}
+@keyframes exit-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exit-arrow {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
 /* Eigenes Werk am Spot: der Writer-Name an der Wand */
 .work {
   position: absolute;

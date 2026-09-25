@@ -792,3 +792,50 @@ describe("Aufstieg zum Tagger", () => {
     expect(sum).toBeLessThan(tagger.xp);
   });
 });
+
+// Nach dem Tester-Feedback vom 26.09.2026: "man kann den KRUX-Spot nicht mehr Richtung Straße
+// verlassen". Der Ausgang war da, aber zu schmal und von einem großen Nachbar-Hotspot bedrängt.
+describe("Ausgänge sind zu finden", () => {
+  const content = loadContent();
+
+  it("jeder Raum außer der Wache führt irgendwohin zurück", () => {
+    for (const room of Object.values(content.rooms)) {
+      const exits = room.hotspots.filter((h) => h.gehen !== undefined);
+      expect(exits.length, `${room.id} hat keinen Ausgang`).toBeGreaterThan(0);
+    }
+  });
+
+  it("kein Ausgang ist kleiner als ein Daumen", () => {
+    for (const room of Object.values(content.rooms)) {
+      for (const h of room.hotspots.filter((x) => x.gehen !== undefined)) {
+        const [, , w, hh] = h.rect;
+        expect(w * hh, `${room.id}.${h.id} ist ${w}×${hh}`).toBeGreaterThanOrEqual(20 * 60);
+      }
+    }
+  });
+
+  it("kein gleichzeitig sichtbarer Hotspot liegt auf einem Ausgang", () => {
+    const base = createNewGame(content, "TESTER", NOW);
+    const known = {
+      ...base,
+      facts: Object.fromEntries(Object.keys(content.facts).map((f) => [f, { new: false }])),
+    };
+    // Tag und Nacht getrennt: Der geschlossene Laden ersetzt nachts den offenen, beide
+    // sind nie zusammen da.
+    for (const phase of [0, 2]) {
+      const state = { ...known, phase };
+      for (const room of Object.values(content.rooms)) {
+        const visible = visibleHotspots(room, state, content);
+        for (const e of visible.filter((h) => h.gehen !== undefined)) {
+          const [ex, ey, ew, eh] = e.rect;
+          for (const other of visible) {
+            if (other.id === e.id) continue;
+            const [ox, oy, ow, oh] = other.rect;
+            const overlap = ex < ox + ow && ox < ex + ew && ey < oy + oh && oy < ey + eh;
+            expect(overlap, `${room.id} (Abschnitt ${phase}): "${other.id}" liegt auf "${e.id}"`).toBe(false);
+          }
+        }
+      }
+    }
+  });
+});
