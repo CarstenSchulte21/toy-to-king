@@ -1545,3 +1545,39 @@ Trost, damit der Besuch nicht nur Verlust ist.
 
 Die Info **NOX** ist die erste, die von keinem NPC kommt. Im Blackbook steht als Quelle deshalb
 „selbst gesehen".
+
+## 10. Die Nacht (Nachtrag zu M4b, 25.09.2026)
+
+Siehe `SPEC-M4b.md`, Abschnitte 10 und 11.
+
+### 10.1 Der Lichtschalter an der Laterne
+
+Die Sockelklappe (`strasse.laterne`, Verb „Untersuchen") ist ab dem Fund des Fünfers ein Schalter.
+Drei Varianten, in dieser Reihenfolge geprüft:
+
+| Bedingung | Text | Effekt |
+|-----------|------|--------|
+| `flag: licht_aus` | „Du machst das Licht wieder an. Die Straße liegt da wie vorher." | `clear_flag: licht_aus` |
+| `phase: nacht` | „Die Klappe steht immer noch offen. Zwischen den Kabeln sitzt ein Kippschalter." / „Du legst ihn um. Die Lampe geht aus, und ein Stück Straße verschwindet." | `set_flag: licht_aus` |
+| sonst | „…Nichts passiert – bei Tageslicht brennt die Lampe sowieso nicht." / „Nachts wäre das was anderes" | – |
+
+### 10.2 Die Streife an den Rolltoren
+
+`content/spots.yaml`, Spot `rolltore`:
+
+| Wann | Zuschlag | Hinweis im Sketch |
+|------|----------|-------------------|
+| nicht nachts | +0,35 | „Zehn Meter weiter steht die Streife und guckt in deine Richtung." |
+| nachts | +0,15 | „Die Streife sitzt im Wagen und guckt aufs Handy. Weg ist sie trotzdem nicht." |
+| nachts **und** Licht aus | −0,20 | „Die Laterne ist aus. Vom Wagen aus bist du ein Schatten." |
+
+Ergibt 75 % am Tag, 25 % nachts, 5 % nachts ohne Licht.
+
+### 10.3 Das Abstellgleis sagt, warum es nicht geht
+
+```yaml
+if: [{ fact: zaun }]          # kennt man den Spot
+when: [{ phase: nacht }]      # geht er gerade
+when_hint: "Am Tag wird hier rangiert. Zwischen den Waggons läuft ständig
+            jemand herum. Nachts nicht."
+```

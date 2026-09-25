@@ -155,14 +155,67 @@ Schritt, verbrauchte sind dunkel. Ohne das sieht man nicht, dass Laufen und Rede
 **Spielstand v7:** neues Feld `step`. Die Migration setzt es auf den Anfang des gespeicherten
 Abschnitts – nach dem Update ist es nie später als vorher.
 
-### Was damit noch offen ist
+## 11. Nachtrag (25.09.2026): Die Nacht lohnt sich
 
-Die Nacht ist bisher nur *weniger gefährlich* (−15 % Risiko), aber sie lohnt sich nicht **besonders**.
-Der Vorschlag des Product Owners dazu, noch nicht umgesetzt:
+**Das Problem.** Nach Abschnitt 10 kommt man ohne Umwege in die Nacht – aber es gab keinen Grund,
+sie abzuwarten. Die Nacht war nur pauschal 15 % sicherer, an jedem Spot gleich. Vorschlag des
+Product Owners: „vielleicht gehen spots besonders nachts gut. z.b. steht vor dem graffiti store
+immer ein polizist … vielleicht könnte man sogar das licht ausmachen durch einen schalter".
 
-- Vor dem Graffitistore steht tagsüber ein Polizist. Ausgerechnet dort zu malen ist am Tag absurd
-  gefährlich – nachts döst er, und es geht.
-- Ein Lichtschalter an der Laterne: Licht aus, und man malt ungestört.
+### Die Streife vor dem Laden
 
-Beides braucht Risiko-Zuschläge am Spot, die an Bedingungen hängen (`{phase: nacht}`, ein Flag für
-das Licht). Das ist ein eigener Schritt und steht im Backlog.
+Frau Brandt stand im Bild der Straße schon immer neben KINGSIZE – genutzt wurde das nie. Jetzt
+schlägt sie auf das Risiko der Rolltore durch, und man sieht im Sketch, warum:
+
+| Lage | Risiko | Was dabeisteht |
+|------|--------|----------------|
+| Tag | 75 % – Selbstmord | „Zehn Meter weiter steht die Streife und guckt in deine Richtung." |
+| Abend | 60 % – Selbstmord | dasselbe |
+| Nacht | 25 % – geht schon | „Die Streife sitzt im Wagen und guckt aufs Handy. Weg ist sie trotzdem nicht." |
+| Nacht, Licht aus | 5 % – kaum was | „Die Laterne ist aus. Vom Wagen aus bist du ein Schatten." |
+
+Damit ist der beste Spot der Anfangsphase tagsüber praktisch gesperrt und nachts eine echte Option.
+Kein neuer Spot, kein neues Bild – nur ein Ort, der endlich eine Tageszeit hat.
+
+### Der Lichtschalter
+
+Die Sockelklappe an der Laterne war seit `SPEC-M5a.md` der Fundort des Fünfers. Ab dem Fund ist sie
+ein Schalter:
+
+- **Tagsüber:** „Du legst ihn um. Nichts passiert – bei Tageslicht brennt die Lampe sowieso nicht."
+- **Nachts:** Licht aus, Flag `licht_aus`. Nochmal untersuchen macht es wieder an.
+- **Am nächsten Morgen** brennt die Laterne wieder (`nightly_flags` in `risk.yaml`).
+
+**Man sieht es.** Die Straße hat eine dritte Fassung: `strasse-dark.png`, gezeichnet ohne Lichtkegel
+und mit dunkler Lampe. Die Szene kennt dafür eine Option (`lightOff`), statt nachträglich Schwarz
+drüberzumalen – das sah aus wie ein Klotz vor dem Laden. Ohne diesen sichtbaren Unterschied wäre der
+Schalter nur eine Zahl in einer Tabelle.
+
+Umsehen kostet keine Zeit (Abschnitt 10), das Licht ausmachen also auch nicht. Das ist Absicht: Der
+Preis ist der Weg zur Laterne, nicht der Schalter.
+
+### Spots verschwinden nicht mehr kommentarlos
+
+Bisher trug ein Spot alle Bedingungen in `if`. War eine nicht erfüllt, fehlte das Verb im Menü –
+ohne Erklärung. Das Abstellgleis war tagsüber einfach weg.
+
+Jetzt sind es zwei Listen:
+
+- **`if`** – kennt man den Spot überhaupt? (`{fact: zaun}`) Nicht erfüllt: unsichtbar, wie bisher.
+- **`when`** + **`when_hint`** – geht er gerade? Nicht erfüllt: Das Verb steht da, und beim Antippen
+  kommt der Grund. Am Abstellgleis: „Am Tag wird hier rangiert. Zwischen den Waggons läuft ständig
+  jemand herum. Nachts nicht."
+
+### Technik
+
+- **Spot:** neue Felder `when`, `when_hint`, `risk_mod: [{ if, by, hint }]`.
+- **`riskFor`** gibt jetzt zusätzlich `reasons` zurück – jeder wirksame Zuschlag mit seinem Text.
+  Der Sketch zeigt sie unter der Risiko-Zeile, rot nach oben, grün nach unten.
+- **`spotBlocker(spot, state, content)`** → Grund oder `null`.
+- **`risk.yaml`:** `nightly_flags` – Flags, die der Tageswechsel löscht.
+- Kein neuer Spielstand: `licht_aus` ist ein gewöhnliches Flag.
+
+### Was bewusst nicht drin ist
+
+Der Mast hat keinen Licht-Bonus bekommen. Sein Risiko ist nachts ohnehin 0 – ein angezeigter Grund
+ohne Wirkung wäre gelogen.

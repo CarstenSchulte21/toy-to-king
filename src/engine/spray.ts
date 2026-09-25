@@ -56,6 +56,15 @@ export function isSpotKnown(spot: Spot, state: GameState, content: GameContent):
   return evaluateAll(spot.if, state, { content });
 }
 
+/**
+ * Warum der Spot gerade nicht geht – oder null, wenn er geht.
+ * Ein bekannter Spot verschwindet nicht mehr aus dem Menü, er sagt, was fehlt.
+ */
+export function spotBlocker(spot: Spot, state: GameState, content: GameContent): string | null {
+  if (spot.when === undefined || evaluateAll(spot.when, state, { content })) return null;
+  return spot.when_hint ?? "Das geht hier gerade nicht.";
+}
+
 export function knownSpots(state: GameState, content: GameContent): Spot[] {
   return Object.values(content.spots).filter((s) => isSpotKnown(s, state, content));
 }

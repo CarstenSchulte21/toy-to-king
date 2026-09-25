@@ -380,10 +380,7 @@ export function SprayScene(props: {
               ))}
             </div>
             {isMarker ? (
-              <Row
-                label="Marker"
-                value={choices.markers.find((m) => m.id === line)?.name ?? "keiner"}
-              >
+              <Row label="Marker" value={choices.markers.find((m) => m.id === line)?.name ?? "keiner"}>
                 {choices.markers.map((m) => (
                   <button
                     key={m.id}
@@ -478,6 +475,16 @@ export function SprayScene(props: {
               Anders
             </button>
           </div>
+          {/* Warum das Risiko hier anders ist als sonst – die Streife, das ausgeschaltete Licht. */}
+          {risk && risk.reasons.length > 0 && (
+            <ul className="risk-reasons">
+              {risk.reasons.map((r) => (
+                <li key={r.text} className={r.by > 0 ? "worse" : "better"}>
+                  {r.text}
+                </li>
+              ))}
+            </ul>
+          )}
           <button className="btn spray-go" disabled={!ready} onPointerUp={startSpraying}>
             {isMarker ? "Drauf" : "An die Wand"}
           </button>

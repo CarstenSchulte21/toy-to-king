@@ -3,7 +3,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { ART_H, ART_W, rng, toNight, toRgba } from "./lib/art";
 import { encodePng } from "./lib/png";
-import { NIGHT_OVERLAYS, SCENES, drawRoom } from "./lib/rooms-art";
+import { DARK_ROOMS, NIGHT_OVERLAYS, SCENES, drawRoom } from "./lib/rooms-art";
 
 const outDir = "public/art";
 mkdirSync(outDir, { recursive: true });
@@ -13,5 +13,11 @@ for (const id of Object.keys(SCENES)) {
   const night = toNight(art);
   NIGHT_OVERLAYS[id]?.(night, rng(id.length + 11));
   writeFileSync(`${outDir}/${id}-night.png`, encodePng(toRgba(night), ART_W, ART_H));
-  console.log(`✔ ${outDir}/${id}.png (+ Nacht)`);
+  const dark = DARK_ROOMS.includes(id);
+  if (dark) {
+    const off = toNight(drawRoom(id, 7, { lightOff: true })!);
+    NIGHT_OVERLAYS[id]?.(off, rng(id.length + 11));
+    writeFileSync(`${outDir}/${id}-dark.png`, encodePng(toRgba(off), ART_W, ART_H));
+  }
+  console.log(`✔ ${outDir}/${id}.png (+ Nacht${dark ? " + Licht aus" : ""})`);
 }

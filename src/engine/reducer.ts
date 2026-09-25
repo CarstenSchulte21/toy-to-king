@@ -31,6 +31,7 @@ import {
 } from "./risk";
 import {
   isSpotKnown,
+  spotBlocker,
   mapPlaces,
   rateWork,
   renderWork,
@@ -299,6 +300,9 @@ function interact(state: GameState, hotspotId: string, verb: Verb, content: Game
     const spot = content.spots[hotspot.sprühen!];
     if (!spot || !isSpotKnown(spot, state, content))
       return unchanged(state, `Hier kann man (noch) nicht sprühen.`);
+    // Der Spot ist bekannt, geht aber gerade nicht: sagen, was fehlt, statt ihn zu verstecken.
+    const blocked = spotBlocker(spot, state, content);
+    if (blocked) return { state, events: [{ type: "TEXT", lines: [blocked] }] };
     return { state, events: [{ type: "SPRAY_OPEN", spot: spot.id }] };
   }
 
@@ -373,6 +377,8 @@ function spray(
   const { spot } = choices;
   if (state.room !== spot.room) return unchanged(state, `Für "${spot.name}" musst du vor Ort sein.`);
   if (!isSpotKnown(spot, state, content)) return unchanged(state, `"${spot.name}" kennst du noch nicht.`);
+  const blocked = spotBlocker(spot, state, content);
+  if (blocked) return unchanged(state, blocked);
   const styleChoice = choices.styles.find((s) => s.id === action.style);
   if (!styleChoice?.available) return unchanged(state, `Style "${action.style}" geht gerade nicht.`);
   const style = styleOf(content, action.style)!;

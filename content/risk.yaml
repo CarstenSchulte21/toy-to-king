@@ -49,6 +49,7 @@ cross_per_day: 0.2
 cross_max_quality: 1
 
 station_room: wache
+nightly_flags: [licht_aus] # Morgens brennt die Laterne wieder
 
 texts:
   escaped:
