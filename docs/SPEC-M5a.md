@@ -111,6 +111,20 @@ NY Fat 2 €. Low Pressure 3 €, High Pressure 3 €. T-Tip 4 €, Dripper 6 �
 | Bemalbare Fläche | Neue Felder am Spot: `frame` (welcher Teil der Arbeitsfläche das Ding überhaupt ist), `rot: 90` (der Schriftzug steht quer) und `place` (wo das Werk im Raum sitzt). | Nach Tester-Feedback: Der Tag lief über alle drei Mülltonnen und ragte über den Laternenmast hinaus. Ein Werk war bisher immer so groß wie sein Hotspot. |
 | Hellere Flächen | Laternenmast und Waggontür sind jetzt verzinktes bzw. lackiertes Blech statt fast schwarz. Am Zaun hängt ein Schild – vorher gab es das nur im Text. | Ein schwarzer Marker auf dunkelgrauem Grund ist nicht zu sehen. Und der Spot hieß „Zaunschild", ohne dass eines im Bild war. |
 
+## 9a. Nach dem Playtest vom 25.09.2026
+
+Die Werte aus Abschnitt 4 stimmen nicht mehr. Der Tester: „Die Dosen müssen teurer sein als Marker."
+Er hat recht – und es war auch spielerisch falsch herum, weil der Marker der Einstieg ist.
+
+**Neue Preise:** Schwarz und Chrom 4 €, Weiß 5 €, Rot/Gelb/Hellblau je 6 €. T-Tip 2 €, Dripper 4 €,
+Wachsmarker 6 €. Caps und Druckstufen unverändert.
+
+**Damit das nicht alles ausbremst**, sind die Einnahmen mitgewachsen: Startgeld 8 → 12 €,
+Taschengeld 10 → 15 €. Ein Piece mit drei Farben kostet jetzt rund 15 € statt 10 – also weiterhin
+etwa ein Taschengeld.
+
+Alles Weitere zu diesem Playtest steht in `PLAYTEST-2026-09-25.md`.
+
 ## 9. Was der Tester wissen muss
 
 Farbe ist jetzt endlich. Ein Werk kostet je benutzter Farbe eine Dose – ein Piece mit vier Farben kostet

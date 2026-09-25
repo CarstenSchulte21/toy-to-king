@@ -102,6 +102,9 @@ export function SprayScene(props: {
   const isTag = styleChoice?.look === "tag";
   // Marker (M5a): ein Werkzeug statt Farbe + Dose + Cap.
   const isMarker = styleChoice?.tool === "marker";
+  // An einem Marker-Spot geht ohnehin nur der Marker. Die Dosen-Zeile hat dort nichts zu suchen,
+  // auch bevor man einen Style gewählt hat (Tester: "Dose und Low Pressure … kann man nicht wählen").
+  const markerSpot = isMarker || choices.spot.tool === "marker";
   const pickMarker = (id: string) => {
     setLine(id);
     setDose(id);
@@ -173,16 +176,28 @@ export function SprayScene(props: {
       const buf = wall.slice();
       if (pixels) paintWork(buf, pixels);
       if (guide && lettering) {
-        // Führungslinie: nur da, wo noch zu wenig Farbe ist
+        // Führungslinie: nur da, wo noch zu wenig Farbe ist.
+        // Erst ein dunkler Saum, dann ein heller Kern – so hebt sich die Linie von jedem
+        // Untergrund ab. Eine einzelne helle Farbe ging auf der grün-gelben Tonne unter.
+        const dot = (x: number, y: number, r: number, g: number, b: number) => {
+          if (x < 0 || y < 0 || x >= WORK_W || y >= WORK_H) return;
+          const i = (y * WORK_W + x) * 4;
+          buf[i] = r;
+          buf[i + 1] = g;
+          buf[i + 2] = b;
+        };
+        const open: number[] = [];
         for (let k = 0; k < lettering.nodeCount; k += 2) {
           if ((guide.exposure[k] ?? 0) >= 1) continue;
+          open.push(k);
+        }
+        for (const k of open) {
           const x = Math.round(lettering.nodes[k * 2]!);
           const y = Math.round(lettering.nodes[k * 2 + 1]!);
-          if (x < 0 || y < 0 || x >= WORK_W || y >= WORK_H) continue;
-          const i = (y * WORK_W + x) * 4;
-          buf[i] = 238;
-          buf[i + 1] = 238;
-          buf[i + 2] = 119;
+          for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) dot(x + dx, y + dy, 16, 16, 24);
+        }
+        for (const k of open) {
+          dot(Math.round(lettering.nodes[k * 2]!), Math.round(lettering.nodes[k * 2 + 1]!), 255, 255, 255);
         }
       }
       toCanvas(canvas, buf);
@@ -360,8 +375,8 @@ export function SprayScene(props: {
           <div className="sketch-panel">
             <div className="sketch-head">
               <span className="bb-title">Sketch</span>
-              <button className="small-btn" onPointerUp={props.onClose}>
-                Zu
+              <button className="small-btn close-btn" aria-label="Schließen" onPointerUp={props.onClose}>
+                ×
               </button>
             </div>
             <div className="chips">
@@ -444,7 +459,7 @@ export function SprayScene(props: {
               </Row>
             )}
           </div>
-          <div className="sketch-dose" hidden={isMarker}>
+          <div className="sketch-dose" hidden={markerSpot}>
             <Row label="Dose">
               {choices.doses.map((d) => (
                 <button

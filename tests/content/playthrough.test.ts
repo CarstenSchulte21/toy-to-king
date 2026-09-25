@@ -8,6 +8,7 @@ import {
   createNewGame,
   buildLettering,
   frameOf,
+  applyEffects,
   isSpotKnown,
   riskFor,
   spotBlocker,
@@ -758,5 +759,36 @@ describe("Die Nacht", () => {
         expect(mod.hint.length, `Spot ${spot.id}: Zuschlag ohne Grund`).toBeGreaterThan(10);
       }
     }
+  });
+});
+
+// Nach dem Playtest vom 25.09.2026: Der erste Rang muss erreichbar sein, ohne perfekt zu malen.
+describe("Aufstieg zum Tagger", () => {
+  const content = loadContent();
+
+  it("Wissen bringt XP", () => {
+    const start = createNewGame(content, "TESTER", NOW);
+    const after = applyEffects(start, [{ learn: "hall" }], { content });
+    expect(after.xp).toBe((start.xp ?? 0) + content.progress!.xp_per_fact!);
+    // Zweimal dieselbe Info bringt nichts.
+    expect(applyEffects(after, [{ learn: "hall" }], { content }).xp).toBe(after.xp);
+  });
+
+  it("die Marker-Spots allein reichen für Tagger, wenn man sauber malt", () => {
+    const tagger = content.progress!.ranks.find((r) => r.id === "tagger")!;
+    const tag = content.spray!.styles.find((s) => s.id === "tag")!;
+    const sum = Object.values(content.spots)
+      .filter((s) => s.fits.includes("tag"))
+      .reduce((total, spot) => total + xpForWork(content, spot, tag, 2), 0);
+    expect(sum, "mit Qualität 'sauber' an allen Tag-Spots").toBeGreaterThanOrEqual(tagger.xp);
+  });
+
+  it("aber nicht geschenkt: mit lauter wackeligen Werken reicht es nicht", () => {
+    const tagger = content.progress!.ranks.find((r) => r.id === "tagger")!;
+    const tag = content.spray!.styles.find((s) => s.id === "tag")!;
+    const sum = Object.values(content.spots)
+      .filter((s) => s.fits.includes("tag"))
+      .reduce((total, spot) => total + xpForWork(content, spot, tag, 0), 0);
+    expect(sum).toBeLessThan(tagger.xp);
   });
 });

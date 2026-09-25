@@ -8,11 +8,11 @@ trust:
 
 dialogue:
   start:
-    - if: [{flag: kalle_kennt_dich}, {wanted_min: 2}]
+    - if: [{ flag: kalle_kennt_dich }, { wanted_min: 2 }]
       node: sorge
-    - if: [{flag: kalle_kennt_dich}, {phase: nacht}]
+    - if: [{ flag: kalle_kennt_dich }, { phase: nacht }]
       node: nachts
-    - if: [{flag: kalle_kennt_dich}]
+    - if: [{ flag: kalle_kennt_dich }]
       node: wieder_da
     - node: erstes_mal
 
@@ -28,9 +28,11 @@ dialogue:
         - give: t_tip
       options:
         - text: "Und wer bist du?"
+          id: frag_wer
+          once: true
           next: wer_bist_du
         - text: "Ich weiß, dass die noch nicht gut sind."
-          if: [{not_flag: kalle_ehrlich}]
+          if: [{ not_flag: kalle_ehrlich }]
           effects:
             - trust: 1
           next: ehrlich
@@ -90,12 +92,16 @@ dialogue:
       text: "Was willst du wissen?"
       options:
         - text: "Wo kann ich hier malen?"
+          id: frag_spots
+          once: true
           next: spots
         - text: "Was ist mit der Unterführung?"
-          if: [{not_fact: krux}]
+          id: frag_unterfuehrung
+          once: true
+          if: [{ not_fact: krux }]
           next: unterfuehrung
         - text: "Was muss ich an meinen Tags besser machen?"
-          if: [{not_flag: kalle_ehrlich}]
+          if: [{ not_flag: kalle_ehrlich }]
           effects:
             - trust: 1
           next: besser_machen
@@ -106,26 +112,28 @@ dialogue:
             - trust: 1
           next: blackbook
         - text: "Wie komm ich an bessere Spots?"
-          if: [{trust_min: 2}]
+          id: frag_zaun
+          once: true
+          if: [{ trust_min: 2 }]
           show_locked: "Dafür kennt Kalle dich noch nicht gut genug."
           next: zaun
         - text: "Ich muss ein paar Tage weg vom Fenster."
-          if: [{wanted_min: 1}]
+          if: [{ wanted_min: 1 }]
           next: untertauchen
         - text: "Guck mal, wie weit ich bin."
           id: rang_tagger
           once: true
-          if: [{rank_min: tagger}]
+          if: [{ rank_min: tagger }]
           next: rang_tagger
         - text: "Hast du gesehen, was im Bezirk hängt?"
           id: rang_bomber
           once: true
-          if: [{rank_min: bomber}]
+          if: [{ rank_min: bomber }]
           next: rang_bomber
         - text: "Ich war an der Hall."
           id: rang_piece
           once: true
-          if: [{rank_min: piece_writer}]
+          if: [{ rank_min: piece_writer }]
           next: rang_piece
         - text: "Ich bin raus."
           end: true
@@ -159,7 +167,7 @@ dialogue:
     untertauchen:
       text:
         - "Kalle guckt dich kurz an, dann macht er die Tür auf."
-        - "„Rein. Handy aus. Und morgen gehst du nicht an dieselbe Wand.\""
+        - '„Rein. Handy aus. Und morgen gehst du nicht an dieselbe Wand."'
         - "Du sitzt einen Tag im Hinterhof und machst nichts. Fühlt sich falsch an. Hilft aber."
       effects:
         - wanted: -1

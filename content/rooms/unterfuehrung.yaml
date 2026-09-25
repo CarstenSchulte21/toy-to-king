@@ -7,7 +7,7 @@ hotspots:
     label: Wand voller Tags
     rect: [20, 30, 65, 110]
     untersuchen:
-      - if: [{not_flag: fund_nox}]
+      - if: [{ not_flag: fund_nox }]
         text:
           - "Tags über Tags über Tags. Einige kennst du von den Stickern."
           - "Hier malt nur, wer was kann."
@@ -16,6 +16,15 @@ hotspots:
         effects:
           - set_flag: fund_nox
           - learn: nox
+      - if: [{ fact: nox }, { not_flag: fund_wandnamen }]
+        text:
+          - "Du gehst die Wand noch mal ab, langsam."
+          - "Drei Handstyles kommen immer wieder: YARE, sauber und eng. TEAR, schnell und schief."
+          - "CRES, fett und mit Chrom drüber – der hat Material."
+          - "Alle drei stehen mal mit NOX drunter und mal ohne. Die gehören nicht richtig dazu."
+        effects:
+          - set_flag: fund_wandnamen
+          - learn: wandnamen
       - text:
           - "Tags über Tags über Tags. Einige kennst du von den Stickern."
           - "Hier malt nur, wer was kann."
@@ -32,9 +41,9 @@ hotspots:
     rect: [0, 40, 16, 100]
     sprühen: linke_wand
     untersuchen:
-      - if: [{sprayed: linke_wand}]
+      - if: [{ sprayed: linke_wand }]
         text: "Dein Werk, direkt neben KRUX. Jetzt muss es sich halten."
-      - if: [{fact: krux_frage}]
+      - if: [{ fact: krux_frage }]
         text: "Die linke Wand. Mit KRUX' Okay. Jetzt fehlt nur noch Farbe."
       - text: "Die linke Wand ist fast leer. Seltsam, bei so viel Platz."
 
@@ -47,7 +56,7 @@ hotspots:
   - id: zaunloch
     label: Aufgebogener Zaun
     rect: [266, 58, 35, 92]
-    if: [{fact: zaun}]
+    if: [{ fact: zaun }]
     sprühen: zaunblech
     untersuchen:
       - "Der Zaun ist unten aufgebogen, gerade breit genug."

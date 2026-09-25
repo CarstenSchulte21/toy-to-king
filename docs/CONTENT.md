@@ -1581,3 +1581,33 @@ when: [{ phase: nacht }]      # geht er gerade
 when_hint: "Am Tag wird hier rangiert. Zwischen den Waggons läuft ständig
             jemand herum. Nachts nicht."
 ```
+
+## 11. Nach dem Playtest vom 25.09.2026
+
+Vollständig in `PLAYTEST-2026-09-25.md`. Was sich an den Inhalten geändert hat:
+
+### 11.1 Neue Funde
+
+| Raum | Hotspot | Fund | Flagge |
+|------|---------|------|--------|
+| Graffitistore | Regal Low Pressure | Dose Schwarz mit Beule („Die verkauf ich nicht mehr. Nimm mit.") | `fund_regal_low` |
+| Graffitistore | Regal High Pressure | Standard-Cap | `fund_regal_high` |
+| Unterführung | Wand voller Tags | Info „YARE, TEAR und CRES" – erst, wenn man NOX schon kennt | `fund_wandnamen` |
+
+Die dritte ist der Anfang von M5b: Man kennt die Namen von der Wand, bevor man die Leute trifft.
+
+### 11.2 Fragen verschwinden, wenn sie beantwortet sind
+
+Dreizehn Dialogoptionen, die eine Info geben, haben `once: true` und eine eigene `id` bekommen –
+über alle fünf NPCs. Vorher konnte man Kalle endlos fragen, wie man an bessere Spots kommt.
+
+### 11.3 Der Weg zum Jugendzentrum
+
+Der Flyer an der Pinnwand im Laden nennt jetzt die Adresse und lernt `hall` – damit steht das
+Jugendzentrum auf der Karte. Vorher hing das allein an einer Antwort von Kalle, und wer die nicht
+gefunden hatte, fand den Ort nie.
+
+### 11.4 Wissen bringt XP
+
+`xp_per_fact: 2` in `progress.yaml`. Jede neue Info im Blackbook bringt zwei XP. Die Schwelle
+Toy → Tagger ist von 50 auf 40 gesunken.

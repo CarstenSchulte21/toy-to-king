@@ -94,17 +94,25 @@ const content: GameContent = {
       drips: "Läuft.",
     },
     styles: [
-      { id: "tag", name: "Tag", tool: "can" as const, look: "tag", caps: { line: ["skinny_cap", "standard_cap"] } },
+      {
+        id: "tag",
+        name: "Tag",
+        tool: "can" as const,
+        look: "tag",
+        caps: { line: ["skinny_cap", "standard_cap"] },
+      },
       {
         id: "bubble",
         name: "Bubble",
-        tool: "can" as const, look: "bubble",
+        tool: "can" as const,
+        look: "bubble",
         caps: { fill: ["fat_cap", "ny_fat"], outline: ["skinny_cap", "standard_cap"] },
       },
       {
         id: "piece",
         name: "Piece",
-        tool: "can" as const, look: "piece",
+        tool: "can" as const,
+        look: "piece",
         caps: { fill: ["fat_cap"], outline: ["skinny_cap"] },
         if: [{ flag: "rang_piece" }],
         locked_hint: "Noch nicht.",

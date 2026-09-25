@@ -15,8 +15,8 @@ export function MapView(props: {
       <div className="map-streets" aria-hidden />
       <div className="bb-head map-head">
         <span className="bb-title">{content.map?.title ?? "Karte"}</span>
-        <button className="small-btn" onPointerUp={props.onClose}>
-          Zu
+        <button className="small-btn close-btn" aria-label="Schließen" onPointerUp={props.onClose}>
+          ×
         </button>
       </div>
       {places.map((p) => (
@@ -32,7 +32,7 @@ export function MapView(props: {
             const work = state.works[s.id];
             return (
               <span key={s.id} className={`map-spot ${work ? "done" : ""}`}>
-                {work ? <Pips value={work.quality} /> : "Spot"}
+                {work ? <Pips value={work.quality} label={qualityWord(content, work.quality)} /> : "Spot"}
               </span>
             );
           })}
@@ -43,12 +43,22 @@ export function MapView(props: {
   );
 }
 
-export function Pips({ value }: { value: number }) {
+/**
+ * Die Qualität eines Werks. Als Wort, wo Platz ist – als drei Punkte, wo keiner ist.
+ * Der Tester konnte mit den Punkten allein nichts anfangen ("drei leere Vierecke").
+ */
+export function Pips({ value, label }: { value: number; label?: string }) {
+  const title = label ? `Qualität: ${label}` : `Qualität ${value} von 3`;
+  if (label) return <span className="quality-word">{label}</span>;
   return (
-    <span className="quality" aria-label={`Qualität ${value} von 3`}>
+    <span className="quality" aria-label={title} title={title}>
       {[1, 2, 3].map((n) => (
         <i key={n} className={n <= value ? "pip on" : "pip"} />
       ))}
     </span>
   );
+}
+
+export function qualityWord(content: GameContent, value: number): string {
+  return content.spray?.quality_labels[Math.max(0, Math.min(3, value))] ?? `${value}/3`;
 }

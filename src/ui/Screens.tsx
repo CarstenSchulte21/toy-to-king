@@ -90,7 +90,7 @@ export function TextBox(props: { line: string; more: boolean; onNext: () => void
   );
 }
 
-export function PauseMenu(props: { onResume: () => void; onFeedback: () => void; onMainMenu: () => void }) {
+export function PauseMenu(props: { onResume: () => void; onMainMenu: () => void }) {
   return (
     <div className="overlay">
       <div className="screen menu">
@@ -98,9 +98,6 @@ export function PauseMenu(props: { onResume: () => void; onFeedback: () => void;
         <div className="menu-buttons">
           <button className="btn" onClick={props.onResume}>
             Weiter
-          </button>
-          <button className="btn" onClick={props.onFeedback}>
-            Feedback geben
           </button>
           <button className="btn" onClick={props.onMainMenu}>
             Hauptmenü

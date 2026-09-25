@@ -1,17 +1,17 @@
 # Geld und Verbrauch (M5a). Beträge in Euro, ganze Zahlen.
-start_money: 8
+start_money: 12
 
 # Taschengeld: einmal die Woche, an einem festen Tag.
 allowance:
   day: sa
-  amount: 10
+  amount: 15
   text: "Taschengeld. {amount} € in der Hosentasche."
 
 # Ab dieser Wanted-Stufe verkauft Sibel nur noch, was unauffällig ist.
 careful_from_wanted: 2
 careful_kinds: [cap, marker]
 careful_colors: [farbe_schwarz, farbe_chrom]
-careful_text: "Sibel schiebt die bunten Dosen weg. „Nicht diese Woche.\""
+careful_text: 'Sibel schiebt die bunten Dosen weg. „Nicht diese Woche."'
 
 # Verbrauch: je benutzter Farbe eine Dose.
 paint_per_color: 1

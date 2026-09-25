@@ -17,8 +17,8 @@ export function BagView(props: { content: GameContent; state: GameState; onClose
     <div className="overlay blackbook">
       <div className="bb-head">
         <span className="bb-title">Tasche</span>
-        <button className="small-btn" onPointerUp={props.onClose}>
-          Zu
+        <button className="small-btn close-btn" aria-label="Schließen" onPointerUp={props.onClose}>
+          ×
         </button>
       </div>
       <div className="bb-list">

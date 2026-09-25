@@ -274,7 +274,17 @@ export function rateWork(
     if (capOk && (s?.coverage ?? 0) < 0.9) gaps = true;
   }
   if (drips > 0) hints.push(rules.hints.drips);
-  if (gaps) hints.push((content.items[work.dose]?.flow ?? 10) < 6 ? rules.hints.gaps_low : rules.hints.gaps);
+  if (gaps) {
+    // Der Hinweis muss zum Werkzeug passen: Ein Marker hat keine Druckstufe (Tester-Feedback).
+    const tool = content.items[work.dose];
+    hints.push(
+      tool?.kind === "marker"
+        ? (rules.hints.gaps_marker ?? rules.hints.gaps)
+        : (tool?.flow ?? 10) < 6
+          ? rules.hints.gaps_low
+          : rules.hints.gaps,
+    );
+  }
   penalty += Math.min(MAX_DRIP_PENALTY, drips * DRIP_PENALTY);
   const coverage = stats.length ? stats.reduce((sum, s) => sum + s.coverage, 0) / stats.length : 0;
   const score = coverage - penalty;

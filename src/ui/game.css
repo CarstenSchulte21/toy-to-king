@@ -450,6 +450,11 @@ body {
   margin-left: 3px;
   color: var(--c64-cyan);
 }
+.close-btn {
+  min-width: 18px;
+  font-size: 13px;
+  line-height: 1;
+}
 .small-btn {
   min-height: 16px;
   padding: 0 4px;
@@ -583,63 +588,6 @@ body {
   color: var(--c64-grey);
 }
 
-/* Feedback – außerhalb der Bühne, normale Schriftgröße fürs Tippen */
-.feedback-panel {
-  position: fixed;
-  inset: 0;
-  z-index: 150;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 16px
-    max(16px, env(safe-area-inset-left));
-  box-sizing: border-box;
-  background: var(--c64-black);
-  font-family: "VT323", monospace;
-  font-size: 20px;
-  -webkit-user-select: text;
-  user-select: text;
-}
-.feedback-panel h2 {
-  margin: 0;
-  color: var(--c64-yellow);
-  font-weight: normal;
-}
-.feedback-where {
-  margin: 0;
-  color: var(--c64-grey);
-}
-.feedback-panel textarea {
-  flex: 1;
-  min-height: 80px;
-  padding: 8px;
-  font: inherit;
-  font-size: 18px;
-  color: var(--c64-white);
-  background: #111;
-  border: 1px solid var(--c64-white);
-  resize: none;
-}
-.feedback-status {
-  margin: 0;
-  color: var(--c64-cyan);
-}
-.feedback-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-.feedback-buttons button {
-  font: inherit;
-  padding: 6px 16px;
-  color: var(--c64-light-grey);
-  background: var(--c64-black);
-  border: 1px solid var(--c64-grey);
-}
-.feedback-buttons button.primary {
-  color: var(--c64-yellow);
-  border-color: var(--c64-yellow);
-}
 .dialogue-notice {
   color: var(--c64-cyan);
 }
@@ -1002,6 +950,12 @@ body {
   bottom: 2px;
   margin: 0;
   color: var(--c64-grey);
+}
+/* Qualität als Wort – im "Blick" und auf der Karte, wo genug Platz ist. */
+.quality-word {
+  color: var(--c64-yellow);
+  font-size: 10px;
+  white-space: nowrap;
 }
 .quality {
   display: inline-flex;

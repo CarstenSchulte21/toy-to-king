@@ -245,7 +245,8 @@ export const spraySchema = z.strictObject({
   result: text, // Ergebnissatz mit {style}, {spot} und {quality}
   hints: z.strictObject({
     gaps: text, // Lücken trotz passendem Cap
-    gaps_low: text, // Lücken mit Low Pressure
+    gaps_low: text,
+    gaps_marker: text.optional(), // M5a: Ein Marker hat keine Druckstufe // Lücken mit Low Pressure
     reach: text, // Cap fürs Fill-in zu dünn
     fat_line: text, // Cap für Outline oder Tag zu breit
     drips: text,
@@ -324,6 +325,7 @@ export const progressSchema = z.strictObject({
   tempo_bonus_max: z.number().min(0).max(1),
   tempo_min_quality: z.number().int().min(0).max(3),
   repeat_share: z.number().min(0).max(1),
+  xp_per_fact: z.number().int().min(0).max(20).optional(), // XP für jede neue Info
   rank_up_title: text, // Überschrift auf dem Aufstiegs-Bildschirm
 });
 

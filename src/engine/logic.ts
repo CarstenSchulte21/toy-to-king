@@ -68,7 +68,14 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
   if ("learn" in effect) {
     // Einmal gelernt bleibt gelernt – und gilt nur beim ersten Mal als neu.
     if (state.facts[effect.learn]) return state;
-    return { ...state, facts: { ...state.facts, [effect.learn]: { new: true } } };
+    // Wissen zählt. Wenig, aber es zählt: Am Anfang ist jede Info ein Schritt nach vorn,
+    // später geht sie im Rauschen unter (Tester: "Ich brauche mehr Möglichkeiten, XP zu bekommen").
+    const bonus = ctx.content.progress?.xp_per_fact ?? 0;
+    return {
+      ...state,
+      xp: (state.xp ?? 0) + bonus,
+      facts: { ...state.facts, [effect.learn]: { new: true } },
+    };
   }
   if ("give" in effect) {
     return { ...state, items: { ...state.items, [effect.give]: (state.items[effect.give] ?? 0) + 1 } };
