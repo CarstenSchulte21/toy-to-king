@@ -365,10 +365,43 @@ describe("Risiko (M4b)", () => {
     for (let seed = 1; seed < 400; seed++) {
       const r = sprayAt(before, "rolltore", seed);
       if (r.events.some((e) => e.type === "ESCAPED" || e.type === "CAUGHT")) continue;
-      expect(r.state.phase).toBe(before.phase + 1);
+      expect(r.state.step).toBe((before.step ?? 0) + content.risk!.time.work);
       return;
     }
     throw new Error("keine Saat ohne Zwischenfall gefunden");
+  });
+
+  it("auch Laufen und Reden kosten Zeit – sonst käme man nie in die Nacht", () => {
+    const start = withFacts();
+    const time = content.risk!.time;
+    const moved = reduce(start, { type: "ENTER_ROOM", room: "strasse" }, content, NOW);
+    expect(moved.state.step).toBe(time.room);
+
+    const hotspot = content.rooms.hinterhof!.hotspots.find((h) => h.sprechen)!;
+    const talked = reduce(
+      start,
+      { type: "INTERACT", hotspot: hotspot.id, verb: "sprechen" },
+      content,
+      NOW,
+    );
+    expect(talked.state.step).toBe(time.talk);
+  });
+
+  it("Umsehen, Tasche und Kaufen kosten nichts", () => {
+    const start = withFacts();
+    const hotspot = content.rooms.hinterhof!.hotspots.find((h) => h.untersuchen)!;
+    const looked = reduce(start, { type: "INTERACT", hotspot: hotspot.id, verb: "untersuchen" }, content, NOW);
+    expect(looked.state.step).toBe(start.step ?? 0);
+  });
+
+  it("der Tag geht irgendwann zu Ende, ganz ohne Werk", () => {
+    let s = withFacts();
+    // Immer hin und her laufen, bis der Tag um ist.
+    for (let i = 0; i < 40 && (s.day ?? 1) === 1; i++) {
+      const to = s.room === "hinterhof" ? "strasse" : "hinterhof";
+      s = reduce(s, { type: "ENTER_ROOM", room: to }, content, NOW).state;
+    }
+    expect(s.day).toBe(2);
   });
 
   // Mit einem Dosen-Style, damit auch der Materialverlust geprüft wird.

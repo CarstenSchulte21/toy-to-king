@@ -84,7 +84,7 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
     return { ...state, money: next };
   }
   if ("advance_day" in effect) {
-    return { ...state, day: (state.day ?? 1) + 1, phase: 0 };
+    return { ...state, day: (state.day ?? 1) + 1, phase: 0, step: 0 };
   }
   if ("trust" in effect) {
     const npcId = ctx.npc;

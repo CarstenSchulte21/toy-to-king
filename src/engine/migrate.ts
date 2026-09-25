@@ -80,6 +80,13 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
       }
       return { ...s, schemaVersion: 6, money: content?.economy?.start_money ?? 0, items };
     },
+    // v6 → v7: Zeit vergeht jetzt in Schritten, nicht nur durch Werke. Wer mitten am Abend
+    // gespeichert hat, steht danach am Anfang desselben Abschnitts – nie später als vorher.
+    6: (s, content) => {
+      const perDay = content?.risk?.time.steps_per_day ?? 12;
+      const phase = typeof s.phase === "number" ? s.phase : 0;
+      return { ...s, schemaVersion: 7, step: Math.floor((phase * perDay) / 3) };
+    },
   };
 
 export function migrate(saved: unknown, content?: GameContent): GameState {

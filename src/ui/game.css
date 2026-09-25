@@ -896,6 +896,22 @@ body {
   margin-left: 8px;
   color: var(--c64-light-grey);
 }
+/* Der Rest des Tages: ein Strich je Schritt, verbrauchte sind dunkel.
+   Ohne das sieht man nicht, dass Laufen und Reden Zeit kosten. */
+.hud-day {
+  display: inline-flex;
+  gap: 1px;
+  align-items: center;
+  margin-left: 2px;
+}
+.hud-day .tick {
+  width: 2px;
+  height: 7px;
+  background: var(--c64-light-grey);
+}
+.hud-day .tick.used {
+  background: var(--c64-dark-grey);
+}
 .hud-wanted {
   font-style: normal;
   color: var(--c64-light-red);

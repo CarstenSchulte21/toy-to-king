@@ -8,7 +8,7 @@ Rollen: **Product Owner** (Priorisierung, Abnahme, Issues), **Claude** (Code und
 
 ## Maßgebliche Dokumente
 
-- `docs/SPEC.md` – technische Spezifikation M1/M2, `docs/SPEC-M3.md` – Ergänzungen für M3, `docs/SPEC-M3.5.md` – Sprühen 2.0, `docs/SPEC-M4a.md` – Aufstieg, `docs/SPEC-GRAFIK.md` – Raumbilder, `docs/SPEC-M4b.md` – Risiko, `docs/SPEC-M5a.md` – Material und Geld. Bei Widersprüchen gilt die jeweils neuere SPEC.
+- `docs/SPEC.md` – technische Spezifikation M1/M2, `docs/SPEC-M3.md` – Ergänzungen für M3, `docs/SPEC-M3.5.md` – Sprühen 2.0, `docs/SPEC-M4a.md` – Aufstieg, `docs/SPEC-GRAFIK.md` – Raumbilder, `docs/SPEC-M4b.md` – Risiko (inkl. Nachtrag „Zeit vergeht durch alles"), `docs/SPEC-M5a.md` – Material und Geld. Bei Widersprüchen gilt die jeweils neuere SPEC.
 - `docs/MEILENSTEINE.md` – aktueller Meilenstein und Aufgaben.
 - `docs/GLOSSAR.md` – verbindliche Begriffe und Tonalität.
 - `docs/CONTENT.md` – die Spielinhalte, Quelle für `content/`.

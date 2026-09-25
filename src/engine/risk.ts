@@ -7,6 +7,33 @@ import type { GameState } from "./state";
 
 export const PHASE_COUNT = 3;
 
+// Zeit vergeht durch alles, was man tut – nicht nur durchs Malen. Ein Tag ist eine feste Zahl
+// von Schritten; welches Drittel man gerade ist, ergibt Tag, Abend oder Nacht.
+const DEFAULT_TIME = { steps_per_day: 12, room: 1, travel: 2, talk: 1, work: 3, marker: 1 };
+
+export function timeRules(content: GameContent): typeof DEFAULT_TIME {
+  return content.risk?.time ?? DEFAULT_TIME;
+}
+
+export type TimeCost = "room" | "travel" | "talk" | "work" | "marker";
+
+export function costOf(content: GameContent, what: TimeCost): number {
+  return timeRules(content)[what];
+}
+
+export function stepsPerDay(content: GameContent): number {
+  return timeRules(content).steps_per_day;
+}
+
+export function phaseOfStep(step: number, perDay: number): number {
+  return Math.min(PHASE_COUNT - 1, Math.max(0, Math.floor((step * PHASE_COUNT) / perDay)));
+}
+
+/** Wie viele Schritte der Tag noch hergibt. */
+export function stepsLeft(state: GameState, content: GameContent): number {
+  return Math.max(0, stepsPerDay(content) - (state.step ?? 0));
+}
+
 /** Tag 1 ist ein Montag. */
 export function weekdayOf(day: number): Weekday {
   return WEEKDAYS[(day - 1) % 7]!;
@@ -91,10 +118,22 @@ export function rollOutcome(content: GameContent, chance: number, seed: number):
 }
 
 /** Nächster Abschnitt. Nach der Nacht beginnt der nächste Tag. */
-export function advanceTime(state: GameState): GameState {
-  const phase = (state.phase ?? 0) + 1;
-  if (phase < PHASE_COUNT) return { ...state, phase };
-  return { ...state, day: (state.day ?? 1) + 1, phase: 0 };
+/** Zeit vergehen lassen. Läuft der Tag dabei über, beginnt der nächste. */
+export function advanceTime(state: GameState, content: GameContent, cost: number): GameState {
+  if (cost <= 0) return state;
+  const perDay = stepsPerDay(content);
+  let step = (state.step ?? 0) + cost;
+  let day = state.day ?? 1;
+  while (step >= perDay) {
+    step -= perDay;
+    day += 1;
+  }
+  return { ...state, day, step, phase: phaseOfStep(step, perDay) };
+}
+
+/** Der nächste Morgen – nach dem Erwischtwerden oder beim Untertauchen. */
+export function nextMorning(state: GameState): GameState {
+  return { ...state, day: (state.day ?? 1) + 1, step: 0, phase: 0 };
 }
 
 export function isLastPhase(state: GameState): boolean {

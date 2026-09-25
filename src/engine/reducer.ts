@@ -18,6 +18,9 @@ import { passesFor, type PassKind, type Stroke } from "./lettering";
 import { rankOf, timeLeftShare, xpForWork, xpGain } from "./progress";
 import {
   advanceTime,
+  costOf,
+  nextMorning,
+  type TimeCost,
   bumpHeat,
   passDays,
   riskFor,
@@ -184,7 +187,7 @@ function reduceAction(state: GameState, action: Action, content: GameContent, no
       const check = validatePlayerName(action.playerName);
       if (!check.ok) return unchanged(state, `Ungültiger Name: ${check.error}`);
       const fresh = createNewGame(content, check.name, now);
-      return enterRoom(fresh, content.config.start_room, content);
+      return enterRoom(fresh, content.config.start_room, content, null);
     }
     case "ENTER_ROOM":
       return enterRoom(state, action.room, content);
@@ -202,7 +205,7 @@ function reduceAction(state: GameState, action: Action, content: GameContent, no
       if (!mapPlaces(state, content).some((p) => p.room === action.room)) {
         return unchanged(state, `"${action.room}" ist auf der Karte noch nicht bekannt.`);
       }
-      return enterRoom(state, action.room, content);
+      return enterRoom(state, action.room, content, "travel");
     }
     case "SPRAY":
       return spray(state, action, content, now);
@@ -249,13 +252,20 @@ function reduceAction(state: GameState, action: Action, content: GameContent, no
   }
 }
 
-function enterRoom(state: GameState, roomId: string, content: GameContent): ReduceResult {
+function enterRoom(
+  state: GameState,
+  roomId: string,
+  content: GameContent,
+  cost: TimeCost | null = "room",
+): ReduceResult {
   const room = content.rooms[roomId];
   if (!room) return unchanged(state, `Unbekannter Room "${roomId}".`);
 
   const firstVisit = !state.visited.includes(roomId);
+  // Der Weg kostet Zeit – außer man steht schon da (Spielstart, Wache nach dem Erwischtwerden).
+  const moved = state.room !== roomId;
   let next: GameState = {
-    ...state,
+    ...(cost && moved ? advanceTime(state, content, costOf(content, cost)) : state),
     room: roomId,
     visited: firstVisit ? [...state.visited, roomId] : state.visited,
   };
@@ -302,7 +312,8 @@ function interact(state: GameState, hotspotId: string, verb: Verb, content: Game
     if (!npc) return unchanged(state, `Unbekannter NPC "${hotspot.sprechen}".`);
     const node = startNode(state, content, npc);
     if (!node) return unchanged(state, `${npc.name}: Kein Start-Knoten passt gerade.`);
-    return goToNode(state, content, npc.id, node);
+    // Ein Gespräch kostet einmal Zeit, egal wie lang es wird. Wer nachfragt, soll nicht zahlen.
+    return goToNode(advanceTime(state, content, costOf(content, "talk")), content, npc.id, node);
   }
 
   const text = resolveText(hotspot.untersuchen, state, { content });
@@ -498,7 +509,7 @@ function spray(
         next = { ...next, items };
       }
       // Der Rest des Tages ist weg, und man wacht auf der Wache auf.
-      next = { ...next, day: (next.day ?? 1) + 1, phase: 0, room: rules.station_room };
+      next = { ...nextMorning(next), room: rules.station_room };
       events.push({
         type: "CAUGHT",
         lines: toLines(rules.texts.caught),
@@ -507,7 +518,7 @@ function spray(
         room: rules.station_room,
       });
     } else {
-      next = advanceTime(next);
+      next = advanceTime(next, content, costOf(content, spot.tool === "marker" ? "marker" : "work"));
     }
     // An der legalen Wand malen heißt: Man war einen Abschnitt lang jemand, den keiner sucht.
     if (spot.type === "legale_wand" && rules.wanted_relief_legal > 0) {
