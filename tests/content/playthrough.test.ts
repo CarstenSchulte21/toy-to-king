@@ -10,6 +10,7 @@ import {
   frameOf,
   applyEffects,
   isSpotKnown,
+  paintCost,
   riskFor,
   spotBlocker,
   TRANSPARENT,
@@ -432,19 +433,29 @@ describe("Risiko (M4b)", () => {
       seed,
     };
     const bag: Record<string, number> = { ...state.items, [dose.id]: 1 };
-    for (const c of colors) bag[c.id] = 3;
+    // Farben zählen seit M5b in Einheiten: drei volle Dosen.
+    for (const c of colors) bag[c.id] = 3 * content.economy!.can_units!;
     for (const p of passes) bag[p.cap] = 1;
     return reduce({ ...state, room: spot.room, items: bag }, action, content, NOW);
   }
 
-  it("ein Werk zieht die benutzten Farben ab", () => {
+  it("ein Werk zieht die benutzten Farben ab – so viel, wie der Style braucht", () => {
     // Dosen-Styles gibt es erst ab Tagger, deshalb mit XP. An der Hall ist das Risiko 0,
     // sonst könnte die Farbe stattdessen einkassiert werden.
     const before: GameState = { ...withFacts(), xp: 1000 };
     const r = sprayWithCan(before, "hall", 5);
     const colors = Object.values(content.items).filter((i) => i.kind === "color");
-    expect(r.state.items[colors[0]!.id]).toBe(2);
-    expect(r.state.items[colors[1]!.id]).toBe(2);
+    const voll = 3 * content.economy!.can_units!;
+    const kosten = paintCost(content, r.state.works.hall!.style);
+    expect(kosten, "ein Style ohne Farbverbrauch wäre sinnlos").toBeGreaterThan(0);
+    expect(r.state.items[colors[0]!.id]).toBe(voll - kosten);
+    expect(r.state.items[colors[1]!.id]).toBe(voll - kosten);
+  });
+
+  it("eine Dose reicht für mehrere Throw-ups, aber nicht für zwei Pieces", () => {
+    const per = content.economy!.can_units!;
+    expect(Math.floor(per / paintCost(content, "bubble"))).toBeGreaterThanOrEqual(3);
+    expect(Math.floor(per / paintCost(content, "piece"))).toBe(1);
   });
 
   it("der Marker wird beim Erwischtwerden nicht einkassiert", () => {

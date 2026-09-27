@@ -6,6 +6,7 @@ import {
   createNewGame,
   isCareful,
   paintFor,
+  hasPaintFor,
   shopOffers,
   spendPaint,
   type GameContent,
@@ -19,7 +20,8 @@ const economy: NonNullable<GameContent["economy"]> = {
   careful_kinds: ["cap", "marker"],
   careful_colors: ["schwarz"],
   careful_text: "Nicht diese Woche.",
-  paint_per_color: 1,
+  paint_per_color: 20,
+  can_units: 100,
   texts: {
     bought: "{item} für {price} €.",
     too_expensive: "Dafür reicht es nicht.",
@@ -91,7 +93,7 @@ describe("Kaufen", () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.state.money).toBe(4);
-    expect(r.state.items.rot).toBe(1);
+    expect(r.state.items.rot).toBe(100); // eine volle Dose (M5b)
   });
 
   it("was zu teuer ist, kauft man nicht", () => {
@@ -121,9 +123,23 @@ describe("Verbrauch", () => {
   });
 
   it("verbrauchte Farbe verschwindet aus der Tasche, wenn sie alle ist", () => {
-    const s = game({ items: { rot: 2, schwarz: 1 } });
-    const after = spendPaint(s, content, ["rot", "schwarz"]);
-    expect(after.items.rot).toBe(1);
+    // Einheiten statt Stück (M5b): 50 sind eine halbe Dose, ein Throw-up zieht 20 ab.
+    const s = game({ items: { rot: 50, schwarz: 20 } });
+    const after = spendPaint(s, content, ["rot", "schwarz"], "bubble");
+    expect(after.items.rot).toBe(30);
     expect(after.items.schwarz).toBeUndefined();
+  });
+
+  it("eine gekaufte Dose ist voll, ein gekauftes Cap ist eins", () => {
+    const farbe = buy(game(), content, "rot");
+    expect(farbe.ok && farbe.state.items.rot).toBe(100);
+    const cap = buy(game(), content, "skinny");
+    expect(cap.ok && cap.state.items.skinny).toBe(1);
+  });
+
+  it("was fast leer ist, reicht nicht mehr für ein großes Werk", () => {
+    const rest = game({ items: { rot: 15 } });
+    expect(hasPaintFor(rest, content, "rot", "bubble")).toBe(false);
+    expect(hasPaintFor(game({ items: { rot: 100 } }), content, "rot", "bubble")).toBe(true);
   });
 });

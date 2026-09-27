@@ -237,6 +237,7 @@ export const styleSchema = z.strictObject({
   only_at_hint: text.optional(),
   top_label: text.optional(), // eigener Name für die beste Stufe, z. B. "Burner"
   xp: z.number().int().min(0).optional(), // Grundwert für die XP (M4a)
+  paint: z.number().int().min(0).max(200).optional(), // Farbe je benutzter Dose (M5b)
 });
 
 export const spraySchema = z.strictObject({
@@ -388,7 +389,8 @@ export const economySchema = z.strictObject({
   careful_kinds: z.array(z.enum(ITEM_KINDS)),
   careful_colors: z.array(id),
   careful_text: text,
-  paint_per_color: z.number().int().min(0).max(3),
+  paint_per_color: z.number().int().min(0).max(200), // Rückfallwert, wenn ein Style nichts sagt
+  can_units: z.number().int().min(1).max(500).optional(), // Füllung einer gekauften Dose (M5b)
   texts: z.strictObject({
     bought: text, // {item}, {price}
     too_expensive: text,

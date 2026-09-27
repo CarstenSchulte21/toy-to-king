@@ -974,6 +974,35 @@ body {
   color: var(--c64-grey);
 }
 
+.swatch.empty {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Füllstand einer Farbe: ein Balken, daneben die Zahl der Dosen. */
+.bag-fill {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 6px;
+  margin-left: 5px;
+  background: var(--c64-dark-grey);
+  vertical-align: middle;
+}
+.bag-fill > i {
+  display: block;
+  height: 100%;
+  background: var(--c64-light-green);
+}
+.bag-fill > b {
+  position: absolute;
+  left: 38px;
+  top: -4px;
+  font-weight: normal;
+  font-size: 10px;
+  color: var(--c64-light-grey);
+}
+
 /* Ausgänge: ein Pfeil, der immer da ist. Blinkt langsam, damit er auffällt,
    ohne dass man hinsehen muss. */
 .exit-arrow {

@@ -17,8 +17,9 @@ categories:
 
 empty_category_text: "Noch nichts. Rede mit Leuten."
 
+# Farben zählen in Einheiten (M5b): 100 = eine volle Dose.
 start_items:
   standard_cap: 1
   low_pressure: 1
-  farbe_schwarz: 1
-  farbe_chrom: 1
+  farbe_schwarz: 100
+  farbe_chrom: 100

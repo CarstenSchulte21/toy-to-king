@@ -80,6 +80,16 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
       }
       return { ...s, schemaVersion: 6, money: content?.economy?.start_money ?? 0, items };
     },
+    // v7 → v8 (M5b): Farbe zählt in Einheiten statt in Dosen. Wer drei Dosen Schwarz hatte,
+    // hat danach drei volle Dosen – niemand verliert Material durch das Update.
+    7: (s, content) => {
+      const per = content?.economy?.can_units ?? 1;
+      const items = { ...((s.items ?? {}) as Record<string, number>) };
+      for (const [id, count] of Object.entries(items)) {
+        if (content?.items[id]?.kind === "color") items[id] = count * per;
+      }
+      return { ...s, schemaVersion: 8, items };
+    },
     // v6 → v7: Zeit vergeht jetzt in Schritten, nicht nur durch Werke. Wer mitten am Abend
     // gespeichert hat, steht danach am Anfang desselben Abschnitts – nie später als vorher.
     6: (s, content) => {

@@ -449,10 +449,11 @@ function spray(
   const totalXp = (state.xp ?? 0) + gain;
   const rankBefore = rankOf(state, content);
 
-  // Material (M5a): Je benutzter Farbe geht eine Dose weg. Marker verbrauchen nichts.
+  // Material (M5a, angepasst in M5b): Je benutzter Farbe geht so viel weg, wie der Style
+  // braucht – ein Throw-up wenig, ein Wildstyle viel. Marker verbrauchen nichts.
   const paint = style.tool === "marker" ? [] : paintFor(draft.colors);
   let next: GameState = {
-    ...spendPaint(state, content, paint),
+    ...spendPaint(state, content, paint, style.id),
     works: { ...state.works, [spot.id]: { ...draft, quality: rating.quality, at: now } },
     best: { ...state.best, [spot.id]: Math.max(bestBefore, xp) },
     xp: totalXp,

@@ -3,7 +3,7 @@
 import { z } from "zod";
 import type { GameContent } from "./content-schema";
 
-export const SCHEMA_VERSION = 7;
+export const SCHEMA_VERSION = 8;
 
 const passKind = z.enum(["line", "fill", "outline"]);
 

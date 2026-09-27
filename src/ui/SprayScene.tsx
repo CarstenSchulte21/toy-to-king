@@ -12,6 +12,7 @@ import {
   WORK_H,
   WORK_W,
   frameOf,
+  hasPaintFor,
   letteringFor,
   passTimeLimit,
   renderSketch,
@@ -339,12 +340,15 @@ export function SprayScene(props: {
   // ---------- Darstellung ----------
   const Swatch = (p: { id: string; on: boolean; onPick: () => void; mark?: string }) => {
     const c = choices.colors.find((x) => x.id === p.id)!;
+    // Was fast leer ist, reicht für dieses Werk nicht mehr (M5b).
+    const enough = !style || hasPaintFor(state, content, p.id, style);
     return (
       <button
-        className={`swatch ${p.on ? "on" : ""}`}
+        className={`swatch ${p.on ? "on" : ""} ${enough ? "" : "empty"}`}
         style={{ background: rgbCss(c.color ?? 0) }}
-        aria-label={c.name}
-        title={c.name}
+        aria-label={enough ? c.name : `${c.name} – fast leer`}
+        title={enough ? c.name : `${c.name} – fast leer`}
+        disabled={!enough}
         onPointerUp={p.onPick}
       >
         {p.mark}
