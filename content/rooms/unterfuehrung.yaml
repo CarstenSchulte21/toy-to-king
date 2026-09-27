@@ -55,7 +55,7 @@ hotspots:
 
   - id: zaunloch
     label: Aufgebogener Zaun
-    rect: [266, 58, 35, 92]
+    rect: [264, 88, 32, 64]
     if: [{ fact: zaun }]
     sprühen: zaunblech
     untersuchen:
@@ -66,5 +66,5 @@ hotspots:
 
   - id: raus
     label: Zur Straße
-    rect: [304, 50, 16, 110]
+    rect: [300, 40, 20, 120]
     gehen: strasse

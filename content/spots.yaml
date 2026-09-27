@@ -111,7 +111,7 @@
   tool: marker
   surface: kasten
   frame: [50, 40, 220, 100]
-  place: [269, 63, 28, 11]
+  place: [268, 94, 22, 9]
   fits: [tag]
   fit_hint: "Das Schild am Zaun ist handtellergroß."
   risk: kein
