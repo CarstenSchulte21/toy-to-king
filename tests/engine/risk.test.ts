@@ -80,6 +80,7 @@ const content = {
   progress: null,
   risk,
   economy: null,
+  orders: null,
 } as unknown as GameContent;
 
 function game(extra: Partial<GameState> = {}): GameState {

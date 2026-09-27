@@ -95,6 +95,7 @@ const content: GameContent = {
   progress: null,
   risk: null,
   economy: null,
+  orders: null,
 };
 
 function run(state: GameState, ...actions: Action[]): { state: GameState; events: GameEvent[] } {

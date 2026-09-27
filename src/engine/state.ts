@@ -3,7 +3,7 @@
 import { z } from "zod";
 import type { GameContent } from "./content-schema";
 
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 const passKind = z.enum(["line", "fill", "outline"]);
 
@@ -53,6 +53,9 @@ export const gameStateSchema = z.object({
   day: z.number().int().min(1), // Spieltag, zählt ab 1 (ab v5)
   phase: z.number().int().min(0), // Abschnitt im Tag: 0 Tag, 1 Abend, 2 Nacht (ab v5)
   step: z.number().int().min(0), // Schritt im Tag; daraus ergibt sich der Abschnitt (ab v7)
+  // Auftragsarbeiten (ab v9): höchstens einer offen, dazu die Liste der erledigten.
+  order: z.strictObject({ id: z.string(), due: z.number().int().min(1) }).optional(),
+  doneOrders: z.array(z.string()).optional(),
   heat: z.record(z.string(), z.number().int().min(0)), // Heat je Spot (ab v5)
   wanted: z.number().int().min(0), // eigenes Wanted-Level (ab v5)
   caught: z.number().int().min(0), // wie oft man schon erwischt wurde (ab v5)

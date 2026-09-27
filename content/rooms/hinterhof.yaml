@@ -3,6 +3,13 @@ name: Hinterhof
 background: hinterhof.png
 description: "Hinterhof. Hier hat alles angefangen: drei Mülltonnen und ein Edding."
 hotspots:
+  - id: zum_doener
+    label: Hintertür
+    rect: [0, 52, 20, 108]
+    if: [{ fact: doener }]
+    untersuchen: "Eine Stahltür, darüber ein Dunstabzug. Von drinnen riecht es nach Fleisch und Zwiebeln."
+    gehen: doener
+
   - id: muelltonnen
     label: Mülltonnen
     rect: [20, 110, 70, 50]
@@ -26,7 +33,12 @@ hotspots:
   - id: rolltor
     label: Garagentor
     rect: [110, 60, 90, 90]
+    sprühen: doener_rolltor
     untersuchen:
+      - if: [{ fact: auftrag }]
+        text:
+          - "Hakans Lager. Das Tor ist grau gebufft, die Fläche ist frei."
+          - "Er will was Großes drauf. Mit Farbe, nicht mit dem Marker."
       - if: [{fact: buff_montag}]
         text: "Grau. Wie alles hier nach einem Montag."
       - text:

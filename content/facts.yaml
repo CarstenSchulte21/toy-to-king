@@ -73,3 +73,27 @@
   category: crews
   title: YARE, TEAR und CRES
   text: "Drei Handstyles, die überall in der Unterführung stehen. Mal mit NOX drunter, mal ohne."
+
+- id: doener
+  category: spot
+  title: Hakans Laden
+  text: "Dönerladen am Ende der Straße. Hintertür geht in den Hinterhof. Drinnen guckt keiner."
+  source: mentor
+
+- id: auftrag
+  category: spot
+  title: Hakans Tor
+  text: "Hakan zahlt, wenn du sein Garagentor machst. Groß, mit Farbe – und es muss was hermachen."
+  source: hakan
+
+- id: streife_tage
+  category: risiko
+  title: Wann die Streife fährt
+  text: "Montag und Donnerstag ist die Streife im Bezirk. Die anderen Nächte sind ruhiger."
+  source: hakan
+
+- id: cres
+  category: crews
+  title: CRES
+  text: "Sitzt manchmal hinten im Dönerladen. Redet wenig, kommt an Material, das es im Laden nicht gibt."
+  source: hakan

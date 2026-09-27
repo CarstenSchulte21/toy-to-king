@@ -20,10 +20,12 @@ import {
   progressSchema,
   riskSchema,
   economySchema,
+  ordersSchema,
   SPOT_TYPES,
   type Progress,
   type Risk,
   type Economy,
+  type Orders,
   type Condition,
   type Effect,
   type Fact,
@@ -51,6 +53,7 @@ const MAP_PATH = "content/map.yaml";
 const PROGRESS_PATH = "content/progress.yaml";
 const RISK_PATH = "content/risk.yaml";
 const ECONOMY_PATH = "content/economy.yaml";
+const ORDERS_PATH = "content/orders.yaml";
 
 export function validateContent(files: ContentFile[]): ValidationResult {
   const errors: string[] = [];
@@ -67,6 +70,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
   let progress: Progress | null = null;
   let risk: Risk | null = null;
   let economy: Economy | null = null;
+  let orders: Orders | null = null;
   const fileOf: Record<string, string> = {};
   // Dateien mit Fehlern – Verweise darauf nicht zusätzlich als „fehlt" melden.
   const broken: Broken = {
@@ -128,6 +132,10 @@ export function validateContent(files: ContentFile[]): ValidationResult {
     } else if (kind === "risk") {
       const parsed = riskSchema.safeParse(data);
       if (parsed.success) risk = parsed.data;
+      else pushIssues(file.path, data, parsed.error.issues, errors);
+    } else if (kind === "orders") {
+      const parsed = ordersSchema.safeParse(data);
+      if (parsed.success) orders = parsed.data;
       else pushIssues(file.path, data, parsed.error.issues, errors);
     } else if (kind === "economy") {
       const parsed = economySchema.safeParse(data);
@@ -474,6 +482,7 @@ export function validateContent(files: ContentFile[]): ValidationResult {
           progress,
           risk,
           economy,
+          orders,
         }
       : null,
     errors,
@@ -493,6 +502,7 @@ type Kind =
   | "progress"
   | "risk"
   | "economy"
+  | "orders"
   | "room"
   | "npc"
   | "other";
@@ -507,6 +517,7 @@ function kindOf(path: string): Kind {
   if (path === PROGRESS_PATH) return "progress";
   if (path === RISK_PATH) return "risk";
   if (path === ECONOMY_PATH) return "economy";
+  if (path === ORDERS_PATH) return "orders";
   if (path.startsWith("content/rooms/")) return "room";
   if (path.startsWith("content/npcs/")) return "npc";
   return "other";

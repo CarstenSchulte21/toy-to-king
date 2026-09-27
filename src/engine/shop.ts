@@ -90,7 +90,11 @@ export function paintLeft(state: GameState, colorId: string): number {
 export function fillOf(state: GameState, content: GameContent, colorId: string) {
   const per = canUnits(content);
   const units = paintLeft(state, colorId);
-  return { units, cans: units / per, share: per > 0 ? Math.min(1, (units % per || (units ? per : 0)) / per) : 0 };
+  return {
+    units,
+    cans: units / per,
+    share: per > 0 ? Math.min(1, (units % per || (units ? per : 0)) / per) : 0,
+  };
 }
 
 /** Was ein Werk dieses Styles je benutzter Farbe kostet. */

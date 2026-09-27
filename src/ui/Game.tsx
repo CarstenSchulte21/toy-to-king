@@ -165,6 +165,16 @@ export function Game() {
             break;
           case "PHASE_CHANGED":
             break;
+          case "ORDER_TAKEN":
+            report((content.orders?.texts.taken ?? "Angenommen: {title}").replace("{title}", e.title));
+            break;
+          case "ORDER_DONE":
+            setLines((queue) => [...queue, ...e.lines.filter(Boolean)]);
+            if (e.paid > 0) report(`${e.title}: ${e.paid} €`);
+            break;
+          case "ORDER_EXPIRED":
+            report(e.text);
+            break;
           case "TRUST_CHANGED": {
             const name = content.npcs[e.npc]?.name ?? e.npc;
             report(e.to > e.from ? `${name} vertraut dir mehr.` : `${name} vertraut dir weniger.`);

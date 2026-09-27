@@ -80,6 +80,8 @@ const STEPS: Record<number, (s: Record<string, unknown>, content?: GameContent) 
       }
       return { ...s, schemaVersion: 6, money: content?.economy?.start_money ?? 0, items };
     },
+    // v8 → v9 (M5b): Aufträge. Alte Stände haben keinen offenen und keinen erledigten.
+    8: (s) => ({ ...s, schemaVersion: 9, doneOrders: [] }),
     // v7 → v8 (M5b): Farbe zählt in Einheiten statt in Dosen. Wer drei Dosen Schwarz hatte,
     // hat danach drei volle Dosen – niemand verliert Material durch das Update.
     7: (s, content) => {

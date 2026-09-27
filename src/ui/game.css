@@ -979,6 +979,18 @@ body {
   cursor: default;
 }
 
+/* Offener Auftrag im Blackbook (M5b) */
+.bb-order {
+  margin: 0 0 3px;
+  padding: 2px 4px;
+  background: var(--c64-dark-grey);
+  color: var(--c64-yellow);
+  font-size: 11px;
+}
+.bb-order.late {
+  color: var(--c64-light-red);
+}
+
 /* Füllstand einer Farbe: ein Balken, daneben die Zahl der Dosen. */
 .bag-fill {
   position: relative;

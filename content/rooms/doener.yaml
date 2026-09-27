@@ -1,0 +1,54 @@
+id: doener
+name: Dönerladen
+background: doener.png
+description: "Warm, hell, der Spieß dreht sich. Hier guckt keiner, was du an den Händen hast."
+hotspots:
+  - id: hakan
+    label: Mann hinter dem Tresen
+    rect: [190, 55, 45, 60]
+    untersuchen: "Schürze, Dreitagebart, Unterarme wie einer, der seit zwanzig Jahren Fleisch schneidet."
+    sprechen: hakan
+
+  - id: speisekarte
+    label: Speisekarte
+    rect: [38, 16, 94, 40]
+    untersuchen:
+      - if: [{ not_flag: fund_karte }]
+        text:
+          - "Dönerteller, Dürüm, Lahmacun. Die Preise sind zweimal überklebt."
+          - "Ganz unten, mit Filzstift dazugeschrieben: Ayran 1 €."
+          - "In der Ecke der Karte klebt ein Sticker, den du kennst. CRES."
+        effects:
+          - set_flag: fund_karte
+      - text: "Dönerteller, Dürüm, Lahmacun. Die Preise sind zweimal überklebt."
+
+  - id: zettel
+    label: Zettel an der Wand
+    rect: [244, 58, 48, 44]
+    untersuchen:
+      - if: [{ fact: auftrag }]
+        text:
+          - "Hakans Zettel. Ganz unten hat er mit Kuli deinen Namen danebengeschrieben."
+      - text:
+          - "Ein Zettel in Klarsichthülle: Wer hier was ankritzelt, bekommt Hausverbot."
+          - "Darunter, kleiner: außer es sieht gut aus."
+
+  - id: klotuer
+    label: Klotür
+    rect: [8, 30, 34, 80]
+    sprühen: doener_klotuer
+    untersuchen:
+      - "Die Klotür ist innen voll. Namen, Zahlen, Sprüche, drei Schichten übereinander."
+      - "Hakan macht das seit Jahren nicht mehr sauber. Hier drin ist ihm alles egal."
+
+  - id: doener_kaufen
+    label: Tresen
+    rect: [56, 104, 130, 48]
+    untersuchen:
+      - "Salat, Kraut, Zwiebeln, scharfe Soße. Der Spieß dreht sich seit heute Morgen."
+
+  - id: raus_doener
+    label: Hintertür zum Hof
+    rect: [296, 30, 24, 110]
+    untersuchen: "Die Tür, durch die du reingekommen bist. Dahinter der Hof und die Tonnen."
+    gehen: hinterhof

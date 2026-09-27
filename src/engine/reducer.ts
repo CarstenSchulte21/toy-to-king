@@ -42,6 +42,7 @@ import {
   type WorkDraft,
 } from "./spray";
 import { allowanceFor, buy, paintFor, spendPaint } from "./shop";
+import { expireOrders, orderDef, settleOrder } from "./orders";
 import { createNewGame, validatePlayerName, type GameState, type WorkColors } from "./state";
 
 export type Action =
@@ -90,6 +91,16 @@ export type GameEvent =
   | { type: "CAUGHT"; lines: string[]; wanted: number; lost: string[]; room: string }
   | { type: "DAY_STARTED"; day: number; weekday: string; text: string; buffed: string[]; crossed: string[] }
   | { type: "PHASE_CHANGED"; day: number; phase: number }
+  | { type: "ORDER_TAKEN"; order: string; title: string; days: number }
+  | {
+      type: "ORDER_DONE";
+      order: string;
+      title: string;
+      paid: number;
+      money: number;
+      lines: string[];
+    }
+  | { type: "ORDER_EXPIRED"; order: string; title: string; text: string }
   | { type: "BOUGHT"; item: string; name: string; price: number; money: number }
   | { type: "ALLOWANCE"; amount: number; money: number; text: string }
   | { type: "WARNING"; message: string };
@@ -126,6 +137,13 @@ export function reduce(
     for (const [item, count] of Object.entries(next.items)) {
       if (count > (state.items[item] ?? 0)) {
         events.push({ type: "ITEM_GAINED", item, name: content.items[item]?.name ?? item });
+      }
+    }
+    const tookOrder = next.order && next.order.id !== state.order?.id ? next.order : null;
+    if (tookOrder) {
+      const def = orderDef(content, tookOrder.id);
+      if (def) {
+        events.push({ type: "ORDER_TAKEN", order: def.id, title: def.title, days: def.days });
       }
     }
     for (const npcId of Object.keys(next.trust)) {
@@ -168,6 +186,20 @@ export function reduce(
         amount,
         money: next.money,
         text: (content.economy?.allowance.text ?? "{amount} €").replace("{amount}", String(amount)),
+      });
+    }
+    // Abgelaufene Aufträge fallen mit dem Tag weg (M5b).
+    const expired = expireOrders(next, content);
+    if (expired.lost) {
+      next = expired.state;
+      events.push({
+        type: "ORDER_EXPIRED",
+        order: expired.lost.id,
+        title: expired.lost.title,
+        text: (content.orders?.texts.expired ?? "{title}: Frist vorbei.").replace(
+          "{title}",
+          expired.lost.title,
+        ),
       });
     }
     for (const spotId of turn.crossed) {
@@ -532,6 +564,24 @@ function spray(
       next = setWanted(next, (next.wanted ?? 0) - rules.wanted_relief_legal);
     }
   }
+  // Auftrag (M5b): Hat das Werk einen erfüllt? Dann zahlt der Auftraggeber – oder eben nicht.
+  const settled = settleOrder(next, content, spot.id, {
+    style: draft.style,
+    quality: rating.quality,
+  });
+  if (settled.state !== next) {
+    const def = orderDef(content, state.order!.id)!;
+    next = settled.state;
+    events.push({
+      type: "ORDER_DONE",
+      order: def.id,
+      title: def.title,
+      paid: settled.paid,
+      money: next.money ?? 0,
+      lines: settled.paid > 0 ? toLines(def.done) : [settled.reason ?? ""],
+    });
+  }
+
   return { state: next, events };
 }
 
