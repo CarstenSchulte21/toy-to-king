@@ -6,8 +6,14 @@ hotspots:
   - id: zum_doener
     label: Hintertür
     rect: [0, 52, 20, 108]
-    if: [{ fact: doener }]
-    untersuchen: "Eine Stahltür, darüber ein Dunstabzug. Von drinnen riecht es nach Fleisch und Zwiebeln."
+    untersuchen:
+      - if: [{ not_fact: doener }]
+        text:
+          - "Eine Stahltür, darüber ein Dunstabzug. Von drinnen riecht es nach Fleisch und Zwiebeln."
+          - "Also steht hier hinten irgendwo ein Laden. Die Tür ist nicht abgeschlossen."
+        effects:
+          - learn: doener
+      - text: "Hakans Hintertür. Dahinter der Tresen und der Spieß."
     gehen: doener
 
   - id: muelltonnen

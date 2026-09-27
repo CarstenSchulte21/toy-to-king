@@ -39,7 +39,8 @@ die Menü-Auflösung aus dem Playtest (eigener Schritt).
 | **Dönerladen** | Sicherer Raum: kein Risiko, kein Heat, keine Streife. Ein Döner kostet Geld und einen Schritt. | Ein Ort zum Durchatmen, den man sich leisten muss. Und der einzige Raum, in dem Zeit vergeht, ohne dass etwas passiert. |
 | **Hakan** | Graffiti ist ihm egal, aber er sieht alles und redet gern. Seine Infos kosten keinen Gefallen, sondern einen Döner. | Die günstigste Informationsquelle im Spiel – und die ehrlichste. Er will kein Vertrauen aufbauen, er will verkaufen. |
 | **Aufträge** | Jemand will ein bestimmtes Werk an einem bestimmten Spot, bis zu einem bestimmten Tag, und zahlt nach Qualität. Hakans Rolltor ist der erste. | Die Geldquelle, die zum Spiel passt. Man malt ohnehin – jetzt zahlt jemand dafür. Und es gibt dem Malen zum ersten Mal eine **Vorgabe** statt freier Wahl. |
-| **Der Jam** | Kein Raum, sondern ein Abend: An einem festen Wochentag ist die Hall voll. Wie man behandelt wird, hängt am Rang – als Toy redet keiner mit dir. | Ein Grund, einen bestimmten Tag abzuwarten, und der natürliche Ort, um drei Writer kennenzulernen. |
+| **Der Jam** | Kein Raum, sondern ein Abend: An einem festen Wochentag ist die Hall voll. Wie man behandelt wird, hängt am Rang – als Toy redet keiner mit dir. **Er wiederholt sich jede Woche** (PO, 27.09.2026). | Ein Grund, einen bestimmten Tag abzuwarten, und der natürliche Ort, um drei Writer kennenzulernen. Wer ihn verpasst, geht nächste Woche – das nimmt dem Ereignis die Härte. |
+| **Das Plakat** | An der Pinnwand im Graffitistore hängt ein Plakat für den nächsten Jam und zählt die Tage herunter. Wer es liest, bekommt die Info **`jam` ins Blackbook** (PO, 27.09.2026). | Idee des PO. Dort hing bisher ein Flyer mit einem Datum, das *schon vorbei* war – aus der Zeit, als es den Jam noch nicht gab. Aus dem toten Hinweis wird ein lebender, ohne neues Objekt. Und im Blackbook steht der Termin dauerhaft, statt nur einmal im Vorbeigehen. |
 | **Die drei Kandidaten** | Jeder bringt eine **Fähigkeit**, nicht nur eine Persönlichkeit: **YARE** skizziert vor (Bonus auf die Qualität), **TEAR** steht Schmiere (senkt das Risiko), **CRES** kommt an Material (billiger einkaufen). | Wer jemanden aufnimmt, merkt es beim Spielen, nicht nur im Menü. |
 | **Die Namen kennt man schon** | YARE, TEAR und CRES stehen seit dem Grafik-Schritt an den Wänden, und seit dem Playtest gibt die Tagwand sie ausdrücklich her. | So läuft es in echt: Man kennt den Namen, lange bevor man das Gesicht sieht. |
 | **Crew gründen** | Ab Rang Bomber und einem aufgenommenen Mitglied. Der Name ist frei wählbar und steht danach unter den eigenen Werken. | `{crew}` gibt es in den Texten seit M1. Jetzt wird er endlich gefüllt. |
@@ -62,6 +63,9 @@ Damit reicht eine Dose für rund vier Throw-ups oder knapp zwei Pieces – statt
 
 **Döner:** 4 €, ein Schritt. Hakans Infos: der erste umsonst, danach je ein Döner.
 
+**Jam:** jeden **Samstag**, abends und nachts (PO, 27.09.2026). Bewusst derselbe Tag, an dem das
+Taschengeld kommt – so steht man nicht mit leeren Taschen daneben, während alle anderen malen.
+
 **Aufträge:** Hakans Rolltor bringt 25 € bei „sauber", 35 € bei „sitzt", 12 € bei „geht so".
 Unter „geht so" zahlt er nicht. Frist: drei Tage.
 
@@ -73,7 +77,10 @@ Unter „geht so" zahlt er nicht. Frist: drei Tage.
 - [ ] Hakan gibt gegen einen Döner Infos, die man sonst nirgends bekommt.
 - [ ] Man kann einen Auftrag annehmen, sieht ihn irgendwo stehen, und wird nach Qualität bezahlt.
 - [ ] Ein verpasster Auftrag läuft ab und wird nicht bezahlt.
-- [ ] Am Jam-Abend ist die Hall voll, und als Toy redet keiner mit dir.
+- [ ] Das Plakat im Laden nennt den nächsten Jam mit den Tagen, die noch fehlen.
+- [ ] Wer es liest, hat den Termin danach im Blackbook stehen.
+- [ ] Am Jam-Abend (Samstag) ist die Hall voll, und als Toy redet keiner mit dir.
+- [ ] Wer den Jam verpasst, kann nächste Woche wieder hin.
 - [ ] Man kann YARE, TEAR oder CRES aufnehmen, und die Fähigkeit wirkt messbar.
 - [ ] Man kann eine Crew gründen und benennen; der Name steht danach in den Texten.
 - [ ] Die Fluchtszene bietet genau eine Entscheidung.

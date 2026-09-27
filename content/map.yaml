@@ -10,7 +10,6 @@ places:
     if: [{not_phase: nacht}]
   - room: doener
     pos: [110, 92]
-    if: [{fact: doener}]
   - room: unterfuehrung
     pos: [220, 125]
   - room: jugendzentrum
