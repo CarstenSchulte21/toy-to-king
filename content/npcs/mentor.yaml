@@ -117,6 +117,10 @@ dialogue:
           if: [{ trust_min: 2 }]
           show_locked: "Dafür kennt Kalle dich noch nicht gut genug."
           next: zaun
+        - text: "Gibt's hier irgendwo was zu essen?"
+          id: frag_doener
+          once: true
+          next: doener
         - text: "Ich muss ein paar Tage weg vom Fenster."
           if: [{ wanted_min: 1 }]
           next: untertauchen
@@ -172,6 +176,15 @@ dialogue:
       effects:
         - wanted: -1
         - advance_day: true
+      next: hub
+
+    doener:
+      text:
+        - "„Hakan. Ende der Straße, kannst du nicht verfehlen, das riecht man.\""
+        - "„Da gehen alle hin. Die Hintertür geht direkt in den Hof – wenn du mal schnell weg musst, weißt du das jetzt.\""
+        - "„Und er redet gern. Wenn du wissen willst, wer wann wo war, kostet dich das einen Döner.\""
+      effects:
+        - learn: doener
       next: hub
 
     zaun:

@@ -35,7 +35,7 @@ import {
   word,
   type Art,
 } from "./art";
-import { BRANDT, KALLE, KRUX, SIBEL, character } from "./figures";
+import { BRANDT, HAKAN, KALLE, KRUX, SIBEL, character } from "./figures";
 
 // Manche Szenen kennen einen Zustand der Welt. Bisher nur einen: Brennt die Laterne?
 export type SceneOpts = { lightOff?: boolean };
@@ -123,6 +123,16 @@ const hinterhof: Scene = (R) => {
       frame(a, x + 3, 104, 13, 8, C.dark_grey);
     }
   }
+  // Hintertür zum Dönerladen [0,52,18,108]: Stahltür, Dunstabzug, warmes Licht im Schlitz.
+  rect(a, 0, 48, 20, 112, C.grey_darker);
+  box(a, 2, 52, 16, 104, C.steel, C.light_blue, C.navy);
+  rect(a, 4, 56, 12, 40, C.navy);
+  dither(a, 4, 56, 12, 40, C.navy, C.black, 0.4);
+  rect(a, 3, 150, 14, 3, C.yellow);
+  disc(a, 15, 108, 2, C.light_grey);
+  rect(a, 0, 34, 24, 14, C.grey_mid);
+  frame(a, 0, 34, 24, 14, C.grey_darker);
+  for (let k = 0; k < 3; k++) hline(a, 2, 37 + k * 4, 20, C.grey_darker);
   weeds(a, 92, 160, 5, C.green, R);
   puddle(a, 214, 168, 14, 4, C.black, C.grey);
 
@@ -1005,6 +1015,92 @@ const wache: Scene = (R) => {
 
 // Ein paar Räume sehen nachts nicht nur dunkler aus, sondern anders: Der Laden hat zu.
 // Das wird nach dem Umfärben auf das Nachtbild gemalt.
+// Der Dönerladen (M5b): warm, hell, laut. Der einzige Raum, in dem niemand auf dich achtet.
+// Hakan steht hinter dem Tresen, der Spieß dreht sich, an der Wand hängt ein Rolltor-Auftrag.
+const doener: Scene = (R) => {
+  const a = newArt(C.tan);
+  // Decke und Neonlicht
+  rect(a, 0, 0, ART_W, 14, C.brown);
+  dither(a, 0, 0, ART_W, 14, C.brown, C.dark_brown, 0.4);
+  for (const lx of [50, 160, 262]) {
+    box(a, lx, 4, 42, 5, C.white, C.white, C.grey_soft);
+    lightCone(a, lx + 21, 9, 96, 52, C.yellow);
+  }
+  // Wand: Fliesen bis auf Kopfhöhe, darüber Putz
+  rect(a, 0, 14, ART_W, 96, C.tan);
+  dither(a, 0, 14, ART_W, 96, C.tan, C.orange, 0.22);
+  rect(a, 0, 60, ART_W, 50, C.grey_pale);
+  hline(a, 0, 60, ART_W, C.white);
+  for (let x = 0; x < ART_W; x += 14) vline(a, x, 61, 49, C.grey_soft);
+  for (let y = 72; y < 110; y += 13) hline(a, 0, y, ART_W, C.grey_soft);
+  grain(a, 0, 14, ART_W, 96, C.dark_brown, 0.025, R);
+  // Boden
+  rect(a, 0, 110, ART_W, 70, C.grey_mid);
+  hline(a, 0, 110, ART_W, C.grey_soft);
+  dither(a, 0, 112, ART_W, 68, C.grey_mid, C.grey_darker, 0.3);
+  for (let k = -2; k < 9; k++) line(a, 120 + k * 26, 110, 120 + k * 90, ART_H, C.grey_darker);
+
+  // Speisekarte über dem Tresen [40,18,90,36]
+  box(a, 38, 16, 94, 40, C.black, C.grey_darker, C.black);
+  hline(a, 42, 20, 86, C.light_red);
+  for (let i = 0; i < 5; i++) {
+    hline(a, 44, 26 + i * 6, 54 - (i % 3) * 9, C.grey_soft);
+    hline(a, 112, 26 + i * 6, 12, C.yellow);
+  }
+
+  // Der Spieß [140,30,30,70]
+  rect(a, 152, 28, 3, 76, C.light_grey);
+  for (let j = 0; j < 8; j++) {
+    const w = 22 - Math.abs(j - 3) * 2;
+    rect(a, 153 - w / 2 + 1, 34 + j * 8, w, 8, j % 2 ? C.brown : C.dark_brown);
+    hline(a, 153 - w / 2 + 1, 34 + j * 8, w, C.orange);
+  }
+  rect(a, 146, 100, 16, 5, C.grey_mid);
+  // Hitzeblech dahinter
+  rect(a, 166, 30, 10, 72, C.grey_soft);
+  dither(a, 166, 30, 10, 72, C.grey_soft, C.orange, 0.3);
+
+  // Tresen [60,105,180,40]
+  box(a, 52, 104, 196, 14, C.light_grey, C.white, C.grey_mid);
+  rect(a, 56, 118, 188, 34, C.grey_soft);
+  dither(a, 56, 118, 188, 34, C.grey_soft, C.grey_mid, 0.35);
+  for (let x = 60; x < 240; x += 30) vline(a, x, 118, 34, C.grey_mid);
+  // Auslage mit Salat
+  for (let i = 0; i < 4; i++) {
+    const bx = 60 + i * 26;
+    box(a, bx, 96, 22, 9, C.grey_pale, C.white, C.grey_mid);
+    rect(a, bx + 2, 97, 18, 6, [C.green, C.light_red, C.white, C.purple][i]!);
+  }
+
+  // Hakan hinter dem Tresen [190,55,40,60]
+  character(a, 196, 52, 66, HAKAN);
+
+  // Klotür [8,30,34,80]: angelehnt, innen voll mit Handstyles.
+  box(a, 6, 28, 38, 84, C.grey_soft, C.grey_pale, C.grey_darker);
+  rect(a, 10, 32, 30, 76, C.grey_pale);
+  dither(a, 10, 32, 30, 76, C.grey_pale, C.grey_soft, 0.3);
+  tags(a, 12, 36, 26, 68, [C.black, C.navy], 4, R);
+  disc(a, 38, 72, 2, C.grey_mid);
+  rect(a, 14, 22, 22, 6, C.grey_mid);
+  word(a, 16, 23, 3, "WC", C.black, C.grey_mid);
+  // Tisch mit Stuhl [50,124,40,40]
+  box(a, 50, 122, 40, 6, C.dark_brown, C.brown, C.black);
+  rect(a, 56, 128, 4, 26, C.grey_darker);
+  rect(a, 80, 128, 4, 26, C.grey_darker);
+  box(a, 58, 142, 12, 5, C.grey_darker, C.grey_mid, C.black);
+  // Zettel an der Wand: der Auftrag [244,58,48,44]
+  box(a, 244, 58, 48, 44, C.white, C.white, C.grey_mid);
+  hline(a, 248, 64, 40, C.black);
+  for (let i = 0; i < 5; i++) hline(a, 248, 70 + i * 6, 40 - (i % 2) * 13, C.grey_mid);
+  rect(a, 272, 90, 16, 8, C.light_red);
+
+  // Tür nach draußen rechts
+  rect(a, 296, 30, 24, 80, C.cyan);
+  dither(a, 296, 30, 24, 80, C.cyan, C.white, 0.35);
+  frame(a, 296, 30, 24, 80, C.grey_mid);
+  return a;
+};
+
 export const NIGHT_OVERLAYS: Record<string, (a: Art, R: () => number) => void> = {
   strasse: (a, R) => {
     // Rollladen über der ganzen Ladenfront
@@ -1034,6 +1130,7 @@ export const SCENES: Record<string, Scene> = {
   bruecke,
   abstellgleis,
   wache,
+  doener,
 };
 
 export function drawRoom(id: string, seed = 7, opts: SceneOpts = {}): Art | null {

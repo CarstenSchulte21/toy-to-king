@@ -1,0 +1,27 @@
+# Auftragsarbeiten (M5b): Jemand will ein bestimmtes Werk an einem bestimmten Spot und zahlt dafür.
+# pay steht je Qualitätsstufe: wackelig, geht so, sauber, sitzt. 0 heißt, dafür zahlt keiner.
+texts:
+  too_late: '„Zu spät. Ich hab''s jetzt streichen lassen."'
+  rejected: '„Nee. So nicht. Dafür zahl ich nichts."'
+  expired: "{title}: Frist vorbei."
+  taken: "Angenommen: {title}"
+  open: "{title} – noch {days} Tage"
+
+list:
+  - id: hakan_rolltor
+    from: hakan
+    spot: doener_rolltor
+    style: bubble
+    days: 3
+    pay: [0, 12, 25, 35]
+    title: Hakans Lagertor
+    brief:
+      - "„Du malst doch. Ich hab da was."
+      - "Mein Lagertor, hinten im Hof. Jede Woche kritzelt einer was drauf, jede Woche mach ich es sauber."
+      - '„Mach du was Ordentliches drauf. Ein richtiges, mit Farbe. Dann trauen sich die anderen nicht mehr drüber."'
+      - '„Drei Tage. Und es muss was hermachen, sonst zahl ich nicht."'
+    reject: '„Das sieht aus wie das, was ich jede Woche wegmache. Nee."'
+    done:
+      - "Hakan tritt raus auf den Gehweg und guckt sich das an. Lange."
+      - '„Okay. Okay! Das bleibt."'
+      - "Er drückt dir Scheine in die Hand und wischt sich die Finger an der Schürze ab."

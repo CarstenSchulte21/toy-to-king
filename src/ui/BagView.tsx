@@ -1,10 +1,11 @@
 "use client";
 // Tasche (F1.4): Caps, Dosen und Farben, die man hat.
-import { paletteIndex, type GameContent, type GameState } from "@/engine";
+import { canUnits, paletteIndex, type GameContent, type GameState } from "@/engine";
 import { rgbCss } from "./paint";
 
 export function BagView(props: { content: GameContent; state: GameState; onClose: () => void }) {
   const { content, state } = props;
+  const per = canUnits(content);
   const items = Object.entries(state.items)
     .filter(([id, count]) => count > 0 && content.items[id])
     .map(([id, count]) => ({ ...content.items[id]!, count }));
@@ -34,7 +35,18 @@ export function BagView(props: { content: GameContent; state: GameState; onClose
                       <i className="bag-swatch" style={{ background: rgbCss(paletteIndex(i.color)) }} />
                     )}
                     {i.name}
-                    {i.count > 1 ? ` ×${i.count}` : ""}
+                    {/* Farben zählen in Einheiten (M5b): als Dosenzahl plus Balken zeigen,
+                        damit man sieht, wie viel noch drin ist. Alles andere bleibt Stückzahl. */}
+                    {i.kind === "color" ? (
+                      <i className="bag-fill" title={`${(i.count / per).toFixed(1)} Dosen`}>
+                        <i style={{ width: `${Math.min(100, (i.count / per) * 100)}%` }} />
+                        <b>{(i.count / per).toFixed(1)}</b>
+                      </i>
+                    ) : i.count > 1 ? (
+                      ` ×${i.count}`
+                    ) : (
+                      ""
+                    )}
                   </span>
                   <p>{i.text}</p>
                 </div>

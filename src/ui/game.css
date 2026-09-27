@@ -974,6 +974,57 @@ body {
   color: var(--c64-grey);
 }
 
+.swatch.empty {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Versionsanzeige auf dem Startbildschirm */
+.build {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  margin: 0;
+  font-size: 9px;
+  color: var(--c64-dark-grey);
+}
+
+/* Offener Auftrag im Blackbook (M5b) */
+.bb-order {
+  margin: 0 0 3px;
+  padding: 2px 4px;
+  background: var(--c64-dark-grey);
+  color: var(--c64-yellow);
+  font-size: 11px;
+}
+.bb-order.late {
+  color: var(--c64-light-red);
+}
+
+/* Füllstand einer Farbe: ein Balken, daneben die Zahl der Dosen. */
+.bag-fill {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 6px;
+  margin-left: 5px;
+  background: var(--c64-dark-grey);
+  vertical-align: middle;
+}
+.bag-fill > i {
+  display: block;
+  height: 100%;
+  background: var(--c64-light-green);
+}
+.bag-fill > b {
+  position: absolute;
+  left: 38px;
+  top: -4px;
+  font-weight: normal;
+  font-size: 10px;
+  color: var(--c64-light-grey);
+}
+
 /* Ausgänge: ein Pfeil, der immer da ist. Blinkt langsam, damit er auffällt,
    ohne dass man hinsehen muss. */
 .exit-arrow {

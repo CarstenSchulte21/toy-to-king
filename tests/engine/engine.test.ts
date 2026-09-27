@@ -61,6 +61,7 @@ const content: GameContent = {
   progress: null,
   risk: null,
   economy: null,
+  orders: null,
 };
 
 // Kurzformen mit festem Kontext für die Tests ohne Gespräch.
@@ -100,7 +101,7 @@ describe("createNewGame", () => {
     expect(s.room).toBe("hof");
     expect(s.player).toEqual({ name: "KRAZE", crew: null });
     expect(s.visited).toEqual([]);
-    expect(s.schemaVersion).toBe(7);
+    expect(s.schemaVersion).toBe(9);
     expect(s.works).toEqual({});
   });
 });
@@ -276,7 +277,7 @@ describe("migrate", () => {
     delete v1.works;
     const withStart = { ...content, config: { ...content.config, start_items: { standard_cap: 1 } } };
     const migrated = migrate(v1, withStart);
-    expect(migrated.schemaVersion).toBe(7);
+    expect(migrated.schemaVersion).toBe(9);
     expect(migrated.items).toEqual({ standard_cap: 1 });
     expect(migrated.works).toEqual({});
     expect(migrated.player.name).toBe("KRAZE");
@@ -301,7 +302,7 @@ describe("migrate", () => {
       },
     };
     const m = migrate(JSON.parse(JSON.stringify(v2)), withColors);
-    expect(m.schemaVersion).toBe(7);
+    expect(m.schemaVersion).toBe(9);
     expect(m.items).toEqual({ standard_cap: 1, low_pressure: 1, schwarz: 1, chrom: 1 });
     expect(m.works.rolltore).toEqual({
       style: "bubble",
@@ -377,7 +378,7 @@ describe("migrate", () => {
     delete v3.xp;
     delete v3.best;
     const m = migrate(v3, withProgress);
-    expect(m.schemaVersion).toBe(7);
+    expect(m.schemaVersion).toBe(9);
     expect(m.xp).toBe(54); // 30 × 1,5 × 1,2
     expect(m.best.wand).toBe(54);
     expect(rankOf(m, withProgress)?.id).toBe("tagger");

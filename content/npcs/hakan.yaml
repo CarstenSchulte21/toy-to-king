@@ -1,0 +1,105 @@
+id: hakan
+name: Hakan
+role: Dönerladen
+room: doener
+hotspot: hakan
+trust: false
+
+# Hakan baut kein Vertrauen auf. Er verkauft. Seine Infos kosten keinen Gefallen,
+# sondern einen Döner – das macht ihn zur günstigsten und ehrlichsten Quelle im Spiel.
+dialogue:
+  start:
+    - node: erstes_mal
+      if: [{ not_flag: hakan_kennt }]
+    - node: hub
+
+  nodes:
+    erstes_mal:
+      text:
+        - '„Na. Dich hab ich hier noch nicht gesehen."'
+        - "Er wischt den Tresen ab, ohne hinzugucken. Der Lappen macht dieselbe Runde wie seit zwanzig Jahren."
+        - '„Ich bin Hakan. Das hier ist mein Laden. Du willst was essen oder du willst was wissen – beides kriegst du bei mir."'
+      effects:
+        - set_flag: hakan_kennt
+      next: hub
+
+    hub:
+      text: '„Und?"'
+      options:
+        - text: "Einmal Dürüm."
+          id: kaufen
+          next: essen
+        - text: "Was geht hier so?"
+          id: was_geht
+          if: [{ flag: satt }]
+          show_locked: "Er tippt auf die Karte. Erst bestellen."
+          next: was_geht
+        - text: "Kennst du einen, der CRES heißt?"
+          id: frag_cres
+          once: true
+          if: [{ fact: wandnamen }, { flag: satt }]
+          show_locked: "Erst bestellen. Dann reden."
+          next: cres
+        - text: "Du hattest was von deinem Tor gesagt."
+          id: frag_auftrag
+          once: true
+          if: [{ flag: hakan_tor }]
+          next: auftrag
+        - text: "Stört dich das nicht, das ganze Gekritzel?"
+          id: frag_graffiti
+          once: true
+          next: egal
+        - text: "Ich muss los."
+          next: tschuess
+
+    essen:
+      text:
+        - "Er schneidet, ohne zu fragen, was drauf soll. Es ist immer alles drauf."
+        - '„Vier Euro. Setz dich, wenn du willst."'
+      effects:
+        - money: -4
+        - set_flag: satt
+      next: hub
+
+    was_geht:
+      text:
+        - '„Was hier so geht? Leute kommen, Leute gehen, alle wollen scharf."'
+        - '„Und gestern stand die Streife eine Stunde vor meinem Fenster. Die haben nichts gemacht, nur geguckt."'
+        - '„Wenn du nachts unterwegs bist: Die fahren Montag und Donnerstag. Die anderen Tage sind sie woanders."'
+      effects:
+        - learn: streife_tage
+      next: hub
+
+    cres:
+      text:
+        - '„CRES. Ja. Der sitzt manchmal da hinten."'
+        - "Er zeigt mit dem Messer auf den Tisch in der Ecke."
+        - '„Alter Hase. Redet wenig, isst viel. Wenn du was brauchst, was es nicht im Laden gibt – der kriegt das."'
+      effects:
+        - learn: cres
+      next: hub
+
+    egal:
+      text:
+        - "Er zuckt mit den Schultern."
+        - '„Auf der Klotür? Sollen sie. Da geht keiner hin, um die Wand anzugucken."'
+        - '„Hinten an meinem Lagertor ist was anderes. Da mach ich jede Woche sauber."'
+        - "Er hält mitten in der Bewegung inne und guckt dich zum ersten Mal richtig an."
+      effects:
+        - set_flag: hakan_tor
+      next: hub
+
+    auftrag:
+      text:
+        - '„Du malst doch. Ich hab da was."'
+        - '„Mein Lagertor, hinten im Hof. Jede Woche kritzelt einer was drauf, jede Woche mach ich es sauber."'
+        - '„Mach du was Ordentliches drauf. Groß, mit Farbe. Dann trauen sich die anderen nicht mehr drüber."'
+        - '„Drei Tage. Und es muss was hermachen, sonst zahl ich nicht."'
+      effects:
+        - learn: auftrag
+        - order: hakan_rolltor
+      next: hub
+
+    tschuess:
+      text: '„Bis dann. Und nimm dir Servietten mit."'
+      end: true

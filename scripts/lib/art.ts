@@ -217,7 +217,10 @@ function smooth(pts: Pt[], iterations: number): Pt[] {
     for (let i = 0; i < out.length - 1; i++) {
       const [ax, ay] = out[i]!;
       const [bx, by] = out[i + 1]!;
-      next.push([ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25], [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75]);
+      next.push(
+        [ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25],
+        [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75],
+      );
     }
     next.push(out[out.length - 1]!);
     out = next;
@@ -266,7 +269,8 @@ export function graffiti(
       const pts = stroke.map(tf);
       push(pts);
       if (!P.arrows) continue;
-      const closed = Math.hypot(pts[0]![0] - pts[pts.length - 1]![0], pts[0]![1] - pts[pts.length - 1]![1]) < 1;
+      const closed =
+        Math.hypot(pts[0]![0] - pts[pts.length - 1]![0], pts[0]![1] - pts[pts.length - 1]![1]) < 1;
       if (closed) continue;
       // Arrows: Spitze verlängern, dazu zwei Widerhaken
       for (const [inner, tip] of [
@@ -301,7 +305,13 @@ export function graffiti(
     for (const [p0, p1] of segs) {
       const steps = Math.max(1, Math.ceil(Math.hypot(p1[0] - p0[0], p1[1] - p0[1])));
       for (let t = 0; t <= steps; t++)
-        disc(a, p0[0] + ((p1[0] - p0[0]) * t) / steps + dx, p0[1] + ((p1[1] - p0[1]) * t) / steps + dy, r, color);
+        disc(
+          a,
+          p0[0] + ((p1[0] - p0[0]) * t) / steps + dx,
+          p0[1] + ((p1[1] - p0[1]) * t) / steps + dy,
+          r,
+          color,
+        );
     }
   };
 
@@ -315,7 +325,8 @@ export function graffiti(
       vline(a, sx, sy - 1, 3, C.white);
     }
   }
-  if (colors.shade !== undefined) stroke(radius + 1.4, colors.shade, Math.max(2, u * 0.5), Math.max(2, u * 0.5));
+  if (colors.shade !== undefined)
+    stroke(radius + 1.4, colors.shade, Math.max(2, u * 0.5), Math.max(2, u * 0.5));
   if (colors.second !== undefined) stroke(radius + 2.8, colors.second);
   if (style !== "tag") stroke(radius + 1.4, colors.outline);
   else if (colors.outline !== colors.fill) stroke(radius + 0.8, colors.outline);
@@ -336,7 +347,8 @@ export function graffiti(
   if (style !== "tag") {
     for (let j = Math.floor(y); j < y + h * 0.5; j++)
       for (let i = Math.floor(x); i < x + width; i++)
-        if (get(a, i, j) === colors.fill && get(a, i - 1, j - 1) === colors.outline && R() < 0.5) px(a, i, j, C.white);
+        if (get(a, i, j) === colors.fill && get(a, i - 1, j - 1) === colors.outline && R() < 0.5)
+          px(a, i, j, C.white);
   }
   // Schwung unter dem Tag
   if (P.swoosh) {

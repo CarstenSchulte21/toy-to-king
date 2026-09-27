@@ -30,6 +30,7 @@ styles:
     name: Straight Letter
     look: straight
     xp: 20
+    paint: 20 # Farbe je benutzter Dose (M5b)
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
@@ -40,6 +41,7 @@ styles:
     name: Bubble
     look: bubble
     xp: 30
+    paint: 25 # Farbe je benutzter Dose (M5b)
     caps:
       fill: [fat_cap, ny_fat]
       outline: [skinny_cap, standard_cap]
@@ -53,6 +55,7 @@ styles:
       fill: [ny_fat, fat_cap]
       outline: [standard_cap, skinny_cap]
     xp: 50
+    paint: 40 # Farbe je benutzter Dose (M5b)
     if: [{ rank_min: bomber }]
     locked_hint: "Bombing kommt, wenn dein Name im Bezirk was zählt. Ab Bomber."
 
@@ -63,6 +66,7 @@ styles:
       fill: [fat_cap]
       outline: [skinny_cap]
     xp: 120
+    paint: 55 # Farbe je benutzter Dose (M5b)
     if: [{ rank_min: piece_writer }]
     locked_hint: "Für ein Piece bist du noch nicht so weit. Ab Piece-Writer."
     only_at: [hall]
@@ -76,6 +80,7 @@ styles:
       fill: [fat_cap]
       outline: [skinny_cap]
     xp: 200
+    paint: 65 # Farbe je benutzter Dose (M5b)
     if: [{ rank_min: piece_writer }, { flag: wildstyle_gelernt }]
     locked_hint: "Wildstyle zeigt dir keiner umsonst. Frag jemanden, der ihn kann."
     only_at: [hall]

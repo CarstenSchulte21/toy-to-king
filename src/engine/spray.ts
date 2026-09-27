@@ -20,6 +20,7 @@ import {
   type Stroke,
 } from "./lettering";
 import { evaluateAll, renderText } from "./logic";
+import { hasPaintFor } from "./shop";
 import type { GameState, Work, WorkColors } from "./state";
 
 export type Quality = 0 | 1 | 2 | 3;
@@ -102,10 +103,11 @@ export function styleBlocker(
   const kind = style.tool === "marker" ? "marker" : "dose";
   const hasTool = Object.values(content.items).some((i) => i.kind === kind && (state.items[i.id] ?? 0) > 0);
   if (!hasTool) return style.tool === "marker" ? "Dafür brauchst du einen Marker." : "Dir fehlt eine Dose.";
-  // Ohne Farbe kein Werk – Marker brauchen keine.
+  // Ohne Farbe kein Werk – Marker brauchen keine. Seit M5b zählt nicht, ob noch eine Dose
+  // da ist, sondern ob in einer genug für diesen Style drin ist.
   if (style.tool !== "marker") {
     const hasColor = Object.values(content.items).some(
-      (i) => i.kind === "color" && (state.items[i.id] ?? 0) > 0,
+      (i) => i.kind === "color" && hasPaintFor(state, content, i.id, style.id),
     );
     if (!hasColor) return content.economy?.texts.no_paint ?? "Die Farbe ist alle.";
   }

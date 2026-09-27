@@ -8,8 +8,14 @@ import {
   createNewGame,
   buildLettering,
   frameOf,
+  activeOrder,
   applyEffects,
+  canTake,
   isSpotKnown,
+  payFor,
+  settleOrder,
+  takeOrder,
+  paintCost,
   riskFor,
   spotBlocker,
   TRANSPARENT,
@@ -131,6 +137,16 @@ function explore(content: GameContent) {
     stuck: [] as string[],
     states: 0,
   };
+  // Wer sich umsieht, lernt auch ohne Gespräch etwas (M5a: Funde beim Untersuchen).
+  // Der Spieler macht das zuerst, also der Durchlauf auch – sonst wären Fragen unerreichbar,
+  // die auf so einer Info aufbauen (z. B. Hakan über CRES).
+  for (const room of Object.values(content.rooms)) {
+    for (const h of room.hotspots) {
+      for (const v of variants(h.untersuchen)) {
+        for (const e of v.effects ?? []) if ("learn" in e) known.add(e.learn);
+      }
+    }
+  }
   let changed = true;
   while (changed) {
     changed = false;
@@ -432,19 +448,29 @@ describe("Risiko (M4b)", () => {
       seed,
     };
     const bag: Record<string, number> = { ...state.items, [dose.id]: 1 };
-    for (const c of colors) bag[c.id] = 3;
+    // Farben zählen seit M5b in Einheiten: drei volle Dosen.
+    for (const c of colors) bag[c.id] = 3 * content.economy!.can_units!;
     for (const p of passes) bag[p.cap] = 1;
     return reduce({ ...state, room: spot.room, items: bag }, action, content, NOW);
   }
 
-  it("ein Werk zieht die benutzten Farben ab", () => {
+  it("ein Werk zieht die benutzten Farben ab – so viel, wie der Style braucht", () => {
     // Dosen-Styles gibt es erst ab Tagger, deshalb mit XP. An der Hall ist das Risiko 0,
     // sonst könnte die Farbe stattdessen einkassiert werden.
     const before: GameState = { ...withFacts(), xp: 1000 };
     const r = sprayWithCan(before, "hall", 5);
     const colors = Object.values(content.items).filter((i) => i.kind === "color");
-    expect(r.state.items[colors[0]!.id]).toBe(2);
-    expect(r.state.items[colors[1]!.id]).toBe(2);
+    const voll = 3 * content.economy!.can_units!;
+    const kosten = paintCost(content, r.state.works.hall!.style);
+    expect(kosten, "ein Style ohne Farbverbrauch wäre sinnlos").toBeGreaterThan(0);
+    expect(r.state.items[colors[0]!.id]).toBe(voll - kosten);
+    expect(r.state.items[colors[1]!.id]).toBe(voll - kosten);
+  });
+
+  it("eine Dose reicht für mehrere Throw-ups, aber nicht für zwei Pieces", () => {
+    const per = content.economy!.can_units!;
+    expect(Math.floor(per / paintCost(content, "bubble"))).toBeGreaterThanOrEqual(3);
+    expect(Math.floor(per / paintCost(content, "piece"))).toBe(1);
   });
 
   it("der Marker wird beim Erwischtwerden nicht einkassiert", () => {
@@ -836,6 +862,73 @@ describe("Ausgänge sind zu finden", () => {
           }
         }
       }
+    }
+  });
+});
+
+// Auftragsarbeiten (M5b): die Geldquelle, die zum Spiel passt.
+describe("Aufträge", () => {
+  const content = loadContent();
+  const def = content.orders!.list[0]!;
+  const start = () => ({
+    ...createNewGame(content, "TESTER", NOW),
+    facts: Object.fromEntries(Object.keys(content.facts).map((f) => [f, { new: false }])),
+  });
+
+  it("man hat höchstens einen Auftrag gleichzeitig", () => {
+    const one = takeOrder(start(), content, def.id);
+    expect(one.order?.id).toBe(def.id);
+    expect(canTake(one, content, def.id)).toBe(false);
+  });
+
+  it("die Frist steht fest, sobald man annimmt", () => {
+    const s = takeOrder({ ...start(), day: 5 }, content, def.id);
+    expect(s.order?.due).toBe(5 + def.days);
+    expect(activeOrder(s, content)?.daysLeft).toBe(def.days);
+  });
+
+  it("bezahlt wird nach Qualität, und schlechte Arbeit zahlt niemand", () => {
+    expect(payFor(def, { style: def.style, quality: 0 })).toBe(0);
+    expect(payFor(def, { style: def.style, quality: 3 })).toBeGreaterThan(
+      payFor(def, { style: def.style, quality: 2 }),
+    );
+    // Der falsche Style bringt nichts, auch wenn er gut ist.
+    expect(payFor(def, { style: "tag", quality: 3 })).toBe(0);
+  });
+
+  it("ein gutes Werk am richtigen Spot bringt Geld", () => {
+    const s = takeOrder(start(), content, def.id);
+    const r = settleOrder(s, content, def.spot, { style: def.style, quality: 3 });
+    expect(r.paid).toBe(def.pay[3]);
+    expect(r.state.money).toBe((s.money ?? 0) + def.pay[3]!);
+    expect(r.state.order).toBeUndefined();
+  });
+
+  it("woanders zu malen lässt den Auftrag offen", () => {
+    const s = takeOrder(start(), content, def.id);
+    const r = settleOrder(s, content, "rolltore", { style: def.style, quality: 3 });
+    expect(r.paid).toBe(0);
+    expect(r.state.order?.id).toBe(def.id);
+  });
+
+  it("nach der Frist zahlt er nicht mehr", () => {
+    const s = takeOrder(start(), content, def.id);
+    const late = { ...s, day: s.order!.due + 1 };
+    const r = settleOrder(late, content, def.spot, { style: def.style, quality: 3 });
+    expect(r.paid).toBe(0);
+    expect(r.reason).toBeTruthy();
+    expect(r.state.order).toBeUndefined();
+  });
+
+  it("jeder Auftrag zeigt auf einen Spot und einen Style, die es gibt", () => {
+    for (const o of content.orders!.list) {
+      expect(content.spots[o.spot], `Auftrag ${o.id}: Spot fehlt`).toBeDefined();
+      expect(
+        content.spray!.styles.some((st) => st.id === o.style),
+        `Auftrag ${o.id}`,
+      ).toBe(true);
+      expect(content.npcs[o.from], `Auftrag ${o.id}: NPC fehlt`).toBeDefined();
+      expect(content.spots[o.spot]!.fits, `Auftrag ${o.id}: Style passt nicht zum Spot`).toContain(o.style);
     }
   });
 });

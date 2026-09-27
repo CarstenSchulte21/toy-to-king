@@ -14,7 +14,8 @@ careful_colors: [farbe_schwarz, farbe_chrom]
 careful_text: 'Sibel schiebt die bunten Dosen weg. „Nicht diese Woche."'
 
 # Verbrauch: je benutzter Farbe eine Dose.
-paint_per_color: 1
+paint_per_color: 20 # Rückfallwert, wenn ein Style nichts sagt
+can_units: 100 # So voll ist eine gekaufte Dose (M5b)
 
 texts:
   bought: "{item} für {price} €."

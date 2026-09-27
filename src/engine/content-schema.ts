@@ -61,6 +61,7 @@ export const conditionSchema = z.union(
 export const effectSchema = z.union(
   [
     z.strictObject({ set_flag: id }),
+    z.strictObject({ order: id }), // M5b: Auftrag annehmen
     z.strictObject({ clear_flag: id }),
     z.strictObject({ learn: id }),
     z.strictObject({ trust: z.number().int().min(-5).max(5) }),
@@ -71,7 +72,7 @@ export const effectSchema = z.union(
   ],
   {
     error:
-      "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give, wanted, advance_day, money.",
+      "Unbekannter Effekt. Erlaubt: set_flag, clear_flag, learn, trust, give, wanted, advance_day, money, order.",
   },
 );
 
@@ -237,6 +238,7 @@ export const styleSchema = z.strictObject({
   only_at_hint: text.optional(),
   top_label: text.optional(), // eigener Name für die beste Stufe, z. B. "Burner"
   xp: z.number().int().min(0).optional(), // Grundwert für die XP (M4a)
+  paint: z.number().int().min(0).max(200).optional(), // Farbe je benutzter Dose (M5b)
 });
 
 export const spraySchema = z.strictObject({
@@ -329,6 +331,32 @@ export const progressSchema = z.strictObject({
   rank_up_title: text, // Überschrift auf dem Aufstiegs-Bildschirm
 });
 
+// Aufträge (M5b): Jemand zahlt für ein bestimmtes Werk an einem bestimmten Spot.
+export const orderSchema = z.strictObject({
+  id,
+  from: id, // NPC, der den Auftrag gibt
+  spot: id,
+  style: id,
+  days: z.number().int().min(1).max(14),
+  // Was es je Qualitätsstufe gibt (wackelig, geht so, sauber, sitzt). 0 heißt: dafür zahlt keiner.
+  pay: z.array(z.number().int().min(0).max(200)).length(4, "pay braucht genau vier Beträge (0–3)."),
+  title: text,
+  brief: lines, // Was er will, in seinen Worten
+  reject: text.optional(), // Wenn die Qualität nicht reicht
+  done: lines, // Wenn er zahlt
+});
+
+export const ordersSchema = z.strictObject({
+  list: z.array(orderSchema),
+  texts: z.strictObject({
+    too_late: text,
+    rejected: text,
+    expired: text, // {title}
+    taken: text, // {title}
+    open: text, // {title}, {days}
+  }),
+});
+
 // Risiko-Regeln (M4b): Wie wahrscheinlich ist es, dass an einem Spot etwas passiert?
 const share = z.number().min(0).max(1);
 
@@ -388,7 +416,8 @@ export const economySchema = z.strictObject({
   careful_kinds: z.array(z.enum(ITEM_KINDS)),
   careful_colors: z.array(id),
   careful_text: text,
-  paint_per_color: z.number().int().min(0).max(3),
+  paint_per_color: z.number().int().min(0).max(200), // Rückfallwert, wenn ein Style nichts sagt
+  can_units: z.number().int().min(1).max(500).optional(), // Füllung einer gekauften Dose (M5b)
   texts: z.strictObject({
     bought: text, // {item}, {price}
     too_expensive: text,
@@ -478,6 +507,8 @@ export type Rank = z.infer<typeof rankSchema>;
 export type Progress = z.infer<typeof progressSchema>;
 export type Risk = z.infer<typeof riskSchema>;
 export type Economy = z.infer<typeof economySchema>;
+export type OrderDef = z.infer<typeof orderSchema>;
+export type Orders = z.infer<typeof ordersSchema>;
 
 export type GameContent = {
   config: GameConfig;
@@ -491,4 +522,5 @@ export type GameContent = {
   progress: Progress | null;
   risk: Risk | null;
   economy: Economy | null;
+  orders: Orders | null;
 };

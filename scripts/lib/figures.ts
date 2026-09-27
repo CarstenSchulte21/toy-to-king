@@ -386,3 +386,24 @@ export const BRANDT: Figure = {
   badge: C.yellow,
   stripes: C.grey_soft,
 };
+
+// Hakan steht seit zwanzig Jahren hinter demselben Tresen. Schürze, Dreitagebart,
+// Unterarme wie einer, der jeden Tag Fleisch schneidet. Graffiti ist ihm egal.
+export const HAKAN: Figure = {
+  skin: C.skin_dark,
+  skinLight: C.skin,
+  skinShade: C.skin_deep,
+  skinDeep: C.dark_brown,
+  hair: C.black,
+  hairLight: C.grey_darker,
+  top: C.white,
+  topLight: C.grey_pale,
+  topDark: C.grey_soft,
+  pants: C.grey_darker,
+  pantsDark: C.black,
+  shoes: C.black,
+  apron: C.light_red,
+  stubble: C.grey_darker,
+  age: true,
+  pose: "theke",
+};

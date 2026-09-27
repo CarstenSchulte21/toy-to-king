@@ -3,6 +3,7 @@
 import type { Condition, Effect, GameContent, Hotspot, Room, TextVariants } from "./content-schema";
 import { hasRank } from "./progress";
 import { heatOf, weekdayOf, PHASE_COUNT } from "./risk";
+import { takeOrder } from "./orders";
 import type { GameState } from "./state";
 
 // Kontext: Welcher NPC ist im Gespräch? Nötig für "trust_min: 2" und "trust: 1" ohne Namen.
@@ -89,6 +90,10 @@ export function applyEffect(state: GameState, effect: Effect, ctx: Ctx): GameSta
     const next = Math.max(0, (state.money ?? 0) + effect.money);
     if (next === (state.money ?? 0)) return state;
     return { ...state, money: next };
+  }
+  if ("order" in effect) {
+    // Auftrag annehmen. Wer schon einen hat, bekommt keinen zweiten.
+    return takeOrder(state, ctx.content, effect.order);
   }
   if ("advance_day" in effect) {
     return { ...state, day: (state.day ?? 1) + 1, phase: 0, step: 0 };

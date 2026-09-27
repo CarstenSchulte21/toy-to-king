@@ -1,7 +1,7 @@
 "use client";
 // Blackbook (M2-4): alle Insider-Infos, nach Kategorien. Neue Einträge sind markiert, bis man sie gesehen hat.
 import { useEffect, useState } from "react";
-import { FACT_CATEGORIES, type FactCategory, type GameContent, type GameState } from "@/engine";
+import { activeOrder, FACT_CATEGORIES, type FactCategory, type GameContent, type GameState } from "@/engine";
 
 export function Blackbook(props: {
   content: GameContent;
@@ -10,6 +10,7 @@ export function Blackbook(props: {
   onClose: () => void;
 }) {
   const { content, state } = props;
+  const order = activeOrder(state, content);
   const learned = Object.keys(state.facts)
     .map((id) => content.facts[id])
     .filter((f) => f !== undefined);
@@ -39,6 +40,14 @@ export function Blackbook(props: {
           ×
         </button>
       </div>
+      {/* Der offene Auftrag steht ganz oben: Hier sucht man, was man noch vorhat (M5b). */}
+      {order && (
+        <p className={`bb-order ${order.daysLeft <= 0 ? "late" : ""}`}>
+          {(content.orders?.texts.open ?? "{title} – noch {days} Tage")
+            .replace("{title}", order.def.title)
+            .replace("{days}", String(Math.max(0, order.daysLeft)))}
+        </p>
+      )}
       <div className="bb-tabs">
         {FACT_CATEGORIES.map((c) => {
           const count = learned.filter((f) => f.category === c).length;

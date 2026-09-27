@@ -130,3 +130,33 @@
   fits: [tag]
   fit_hint: "Auf eine Tonne passt ein Handstyle, mehr nicht."
   risk: kein
+
+# Auftragsarbeit (M5b): Hakans Lager im Hinterhof. Legal in dem Sinn, dass der Besitzer
+# es selbst will – und deshalb ohne Risiko, aber auch ohne den Reiz des Verbotenen.
+- id: doener_rolltor
+  name: Hakans Tor
+  type: rolltor
+  room: hinterhof
+  hotspot: rolltor
+  fits: [bubble, bombing, piece]
+  fit_hint: "Für ein Tor in dieser Größe ist das zu klein. Er zahlt für was, das man sieht."
+  risk: kein
+  if: [{ fact: auftrag }]
+  risk_mod:
+    - if: [{ fact: auftrag }]
+      by: -1
+      hint: "Der Besitzer will das hier. Zum ersten Mal musst du nicht gucken, wer kommt."
+
+# Marker-Spot im Dönerladen: die Klotür. Hakan macht die seit Jahren nicht mehr sauber.
+- id: doener_klotuer
+  name: der Klotür
+  type: hauswand
+  room: doener
+  hotspot: klotuer
+  tool: marker
+  surface: kasten
+  frame: [60, 20, 200, 140]
+  place: [12, 44, 26, 52]
+  fits: [tag]
+  fit_hint: "Auf eine Klotür passt ein Handstyle. Mehr will da auch keiner sehen."
+  risk: kein

@@ -167,6 +167,7 @@ const content: GameContent = {
   },
   risk: null,
   economy: null,
+  orders: null,
 };
 
 function run(state: GameState, ...actions: E.Action[]) {

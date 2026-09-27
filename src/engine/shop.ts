@@ -51,7 +51,10 @@ export function buy(state: GameState, content: GameContent, itemId: string): Buy
     state: {
       ...state,
       money: (state.money ?? 0) - item.price,
-      items: { ...state.items, [itemId]: (state.items[itemId] ?? 0) + 1 },
+      items: {
+        ...state.items,
+        [itemId]: (state.items[itemId] ?? 0) + (item.kind === "color" ? canUnits(content) : 1),
+      },
     },
   };
 }
@@ -67,6 +70,44 @@ export function allowanceFor(content: GameContent, fromDay: number, toDay: numbe
   return sum;
 }
 
+// ---------- Farbe mit Füllstand (M5b) ----------
+//
+// Farben stehen in `items` nicht als Zahl der Dosen, sondern als **Einheiten**. Eine gekaufte
+// Dose bringt `can_units` Einheiten; ein Werk zieht so viel ab, wie sein Style braucht. Damit
+// reicht eine Dose für mehrere Throw-ups, aber nicht für zwei Pieces – und man sieht in der
+// Tasche, wie viel noch drin ist. Caps, Dosen und Marker bleiben Stückzahlen.
+
+export function canUnits(content: GameContent): number {
+  return content.economy?.can_units ?? 1;
+}
+
+/** Wie viel von dieser Farbe noch da ist, in Einheiten. */
+export function paintLeft(state: GameState, colorId: string): number {
+  return state.items[colorId] ?? 0;
+}
+
+/** Füllstand zum Anzeigen: ganze Dosen und der Rest als Anteil (0…1). */
+export function fillOf(state: GameState, content: GameContent, colorId: string) {
+  const per = canUnits(content);
+  const units = paintLeft(state, colorId);
+  return {
+    units,
+    cans: units / per,
+    share: per > 0 ? Math.min(1, (units % per || (units ? per : 0)) / per) : 0,
+  };
+}
+
+/** Was ein Werk dieses Styles je benutzter Farbe kostet. */
+export function paintCost(content: GameContent, styleId: string): number {
+  const style = content.spray?.styles.find((s) => s.id === styleId);
+  return style?.paint ?? content.economy?.paint_per_color ?? 0;
+}
+
+/** Reicht die Farbe für dieses Werk? */
+export function hasPaintFor(state: GameState, content: GameContent, colorId: string, styleId: string) {
+  return paintLeft(state, colorId) >= paintCost(content, styleId);
+}
+
 /** Welche Farben ein Werk kostet – ohne Doppelte. */
 export function paintFor(colors: {
   line?: string;
@@ -79,9 +120,14 @@ export function paintFor(colors: {
   return [...new Set(all.filter((c): c is string => c !== undefined))];
 }
 
-/** Farbe abziehen. Was auf 0 fällt, verschwindet aus der Tasche. */
-export function spendPaint(state: GameState, content: GameContent, colorIds: string[]): GameState {
-  const per = content.economy?.paint_per_color ?? 0;
+/** Farbe abziehen. Was leer ist, verschwindet aus der Tasche. */
+export function spendPaint(
+  state: GameState,
+  content: GameContent,
+  colorIds: string[],
+  styleId: string,
+): GameState {
+  const per = paintCost(content, styleId);
   if (per === 0 || colorIds.length === 0) return state;
   const items = { ...state.items };
   for (const id of colorIds) {
