@@ -17,8 +17,18 @@ export function MainMenu(props: { canContinue: boolean; onContinue: () => void; 
           Neues Spiel
         </button>
       </div>
+      {/* Version (Tester-Wunsch): Ohne die weiß niemand, ob der Browser gerade den neuen
+          Stand zeigt oder den alten aus dem Cache. */}
+      <p className="build">{buildLabel()}</p>
     </div>
   );
+}
+
+/** Woher der Stand kommt: Commit und Datum, so wie er gebaut wurde. */
+export function buildLabel(): string {
+  const build = process.env.NEXT_PUBLIC_BUILD ?? "lokal";
+  const date = process.env.NEXT_PUBLIC_BUILD_DATE ?? "";
+  return date ? `Build ${build} · ${date}` : `Build ${build}`;
 }
 
 export function ConfirmNewGame(props: { onYes: () => void; onNo: () => void }) {
@@ -103,6 +113,7 @@ export function PauseMenu(props: { onResume: () => void; onMainMenu: () => void 
             Hauptmenü
           </button>
         </div>
+        <p className="build">{buildLabel()}</p>
       </div>
     </div>
   );

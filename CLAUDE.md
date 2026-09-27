@@ -24,6 +24,7 @@ Rollen: **Product Owner** (Priorisierung, Abnahme, Issues), **Claude** (Code und
 7. Inhalte nur über `content/*.yaml`. `src/generated/` nie von Hand ändern.
 8. Keine neuen Abhängigkeiten ohne kurze Begründung im Commit.
 9. Mobile first: Querformat, Bühne 320×180.
+9a. **Die Version steht im Spiel.** Startbildschirm und Pausenmenü zeigen Commit und Build-Datum (`next.config.ts` → `NEXT_PUBLIC_BUILD`). Ohne das weiß beim Testen niemand, ob er den neuen Stand spielt oder den alten aus dem Browser-Cache.
 10. Code und Bezeichner auf Englisch. Kommentare, UI-Texte und Fehlermeldungen auf Deutsch.
 11. Kleine Commits (Conventional Commits), ein Branch pro Aufgabe.
 12. **Nach jeder Aufgabe** eine kurze Zusammenfassung in einfacher Sprache: was gemacht wurde, warum, und wie man es ausprobiert.

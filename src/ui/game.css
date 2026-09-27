@@ -979,6 +979,16 @@ body {
   cursor: default;
 }
 
+/* Versionsanzeige auf dem Startbildschirm */
+.build {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  margin: 0;
+  font-size: 9px;
+  color: var(--c64-dark-grey);
+}
+
 /* Offener Auftrag im Blackbook (M5b) */
 .bb-order {
   margin: 0 0 3px;
