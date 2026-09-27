@@ -43,7 +43,7 @@ dialogue:
         - text: "Du hattest was von deinem Tor gesagt."
           id: frag_auftrag
           once: true
-          if: [{ flag: hakan_tor }]
+          if: [{ flag: hakan_tor }, { not_fact: auftrag }]
           next: auftrag
         - text: "Stört dich das nicht, das ganze Gekritzel?"
           id: frag_graffiti
@@ -87,12 +87,13 @@ dialogue:
         - "Er hält mitten in der Bewegung inne und guckt dich zum ersten Mal richtig an."
       effects:
         - set_flag: hakan_tor
-      next: hub
+      next: auftrag
 
     auftrag:
       text:
         - '„Du malst doch. Ich hab da was."'
-        - '„Mein Lagertor, hinten im Hof. Jede Woche kritzelt einer was drauf, jede Woche mach ich es sauber."'
+        - '„Mein Lagertor, hinten im Hof. Das graue, das du kennst – gleich neben den Tonnen."'
+        - '„Jede Woche kritzelt einer was drauf, jede Woche mach ich es sauber. Ich hab keine Lust mehr."'
         - '„Mach du was Ordentliches drauf. Groß, mit Farbe. Dann trauen sich die anderen nicht mehr drüber."'
         - '„Drei Tage. Und es muss was hermachen, sonst zahl ich nicht."'
       effects:

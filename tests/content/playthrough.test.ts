@@ -932,3 +932,39 @@ describe("Aufträge", () => {
     }
   });
 });
+
+// Nach dem Tester-Feedback vom 27.09.2026: "er redet drüber, aber dann geschieht nichts".
+// Hakan musste man zweimal fragen – einmal, damit er das Tor erwähnt, und einmal für den Auftrag.
+describe("Hakan bietet den Auftrag von selbst an", () => {
+  const content = loadContent();
+
+  it("wer ihn aufs Gekritzel anspricht, hat danach den Auftrag", () => {
+    let s: GameState = { ...createNewGame(content, "TESTER", NOW), room: "doener" };
+    let r = reduce(s, { type: "INTERACT", hotspot: "hakan", verb: "sprechen" }, content, NOW);
+    s = r.state;
+    const nodeOf = (res: typeof r) => {
+      const d = res.events.find((e) => e.type === "DIALOGUE");
+      return d && d.type === "DIALOGUE" ? d.node : null;
+    };
+    // Bis zum Hub durchklicken.
+    for (let i = 0; i < 5 && nodeOf(r) && nodeOf(r) !== "hub"; i++) {
+      r = reduce(s, { type: "CONTINUE_DIALOGUE", npc: "hakan", node: nodeOf(r)! }, content, NOW);
+      s = r.state;
+    }
+    expect(nodeOf(r)).toBe("hub");
+
+    const hub = content.npcs.hakan!.dialogue.nodes.hub!;
+    const index = (hub.options ?? []).findIndex((o) => o.text.includes("Gekritzel"));
+    expect(index, "die Frage nach dem Gekritzel gibt es nicht mehr").toBeGreaterThanOrEqual(0);
+
+    r = reduce(s, { type: "CHOOSE_OPTION", npc: "hakan", node: "hub", option: index }, content, NOW);
+    s = r.state;
+    for (let i = 0; i < 5 && nodeOf(r) && nodeOf(r) !== "hub"; i++) {
+      r = reduce(s, { type: "CONTINUE_DIALOGUE", npc: "hakan", node: nodeOf(r)! }, content, NOW);
+      s = r.state;
+    }
+    // Ohne zweites Nachfragen: Auftrag angenommen und im Blackbook.
+    expect(s.order?.id, "kein Auftrag nach dem einen Gespräch").toBe("hakan_rolltor");
+    expect(s.facts.auftrag).toBeDefined();
+  });
+});
